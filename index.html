@@ -172,8 +172,11 @@
     display:flex;flex-direction:column;gap:10px;
   }
   .file-thumb{
-    height:82px;border-radius:9px;display:flex;align-items:center;justify-content:center;color:#fff;position:relative;
+    height:82px;border-radius:9px;display:flex;align-items:center;justify-content:center;color:#fff;position:relative;overflow:hidden;
   }
+  .file-thumb-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;}
+  .file-thumb-play{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;z-index:1;}
+  .file-thumb-play-circle{width:30px;height:30px;border-radius:50%;background:rgba(0,0,0,.4);display:flex;align-items:center;justify-content:center;}
   .file-type-tag{
     position:absolute;top:8px;left:8px;background:rgba(0,0,0,.35);color:#fff;font-size:10px;font-weight:700;
     padding:2px 7px;border-radius:5px;letter-spacing:.03em;
@@ -310,16 +313,24 @@
   .docs-breadcrumb .sep{color:#C7CBD3;}
   .docs-empty{color:var(--muted);font-size:13.5px;padding:34px 10px;text-align:center;background:#fff;border:1px dashed var(--line);border-radius:12px;}
   .folder-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:16px;margin-bottom:24px;}
-  .folder-card{background:#fff;border:1px solid var(--line);border-radius:12px;padding:16px;cursor:pointer;display:flex;flex-direction:column;gap:12px;position:relative;transition:box-shadow .15s ease, transform .15s ease;}
+  .folder-card{background:#fff;border:1px solid var(--line);border-radius:12px;padding:0;overflow:hidden;cursor:pointer;display:flex;flex-direction:column;position:relative;transition:box-shadow .15s ease, transform .15s ease;}
   .folder-card:hover{box-shadow:0 10px 20px rgba(16,24,40,.09);transform:translateY(-2px);}
-  .folder-card-top{display:flex;align-items:center;gap:10px;padding-right:20px;}
-  .folder-card-icon{width:38px;height:38px;border-radius:9px;background:var(--ink);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+  .folder-card-cover{height:74px;flex-shrink:0;position:relative;display:flex;align-items:center;justify-content:center;overflow:hidden;}
+  .folder-card-cover-icon{width:30px;height:30px;color:rgba(255,255,255,.92);position:relative;z-index:1;}
+  .folder-card-cover-icon .ic{width:30px;height:30px;stroke-width:1.6;}
+  .folder-card-cover-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;}
+  .folder-card-cover-fade{position:absolute;inset:0;background:linear-gradient(180deg,rgba(2,48,71,0) 40%,rgba(2,48,71,.35) 100%);}
+  .folder-card-body{padding:12px 16px 16px;display:flex;flex-direction:column;gap:10px;}
+  .folder-card-top{display:flex;align-items:center;gap:10px;}
+  .folder-card-icon{width:32px;height:32px;border-radius:8px;background:var(--bg);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+  .folder-card-icon .ic{width:16px;height:16px;color:var(--ink-2);}
   .folder-card-name{font-size:14px;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .folder-card-count{font-size:11.5px;color:var(--muted);}
   .folder-preview{display:flex;gap:6px;}
   .fp-icon{width:26px;height:26px;border-radius:6px;background:var(--bg);display:flex;align-items:center;justify-content:center;}
   .fp-icon .ic{width:14px;height:14px;}
-  .folder-card-del{position:absolute;top:12px;right:12px;background:none;border:none;color:var(--muted);cursor:pointer;padding:4px;border-radius:6px;}
-  .folder-card-del:hover{color:#B91C2B;background:#FEE2E2;}
+  .folder-card-del{position:absolute;top:10px;right:10px;z-index:2;background:rgba(2,48,71,.38);border:none;color:#fff;cursor:pointer;padding:5px;border-radius:7px;display:flex;}
+  .folder-card-del:hover{color:#fff;background:#B91C2B;}
   .doc-file-list{display:flex;flex-direction:column;gap:10px;}
   .doc-file-row{background:#fff;border:1px solid var(--line);border-radius:12px;padding:14px 16px;display:flex;align-items:center;gap:14px;}
   .doc-file-icon{width:36px;height:36px;border-radius:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
@@ -375,6 +386,7 @@
     <symbol id="i-file-xls" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="6" y1="13" x2="18" y2="13"/><line x1="6" y1="17" x2="18" y2="17"/><line x1="11" y1="10" x2="11" y2="21"/></symbol>
     <symbol id="i-edit" viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></symbol>
     <symbol id="i-x" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></symbol>
+    <symbol id="i-link" viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></symbol>
   </defs>
 </svg>
 
@@ -620,6 +632,18 @@
                 <option value="ink2">Azul-marinho</option>
               </select>
             </div>
+            <div class="login-field">
+              <label for="comunicadoLink">Link (opcional)</label>
+              <input type="url" id="comunicadoLink" placeholder="https://...">
+            </div>
+            <div class="login-field">
+              <label for="comunicadoAnexo">Anexo — PDF, imagem ou vídeo (opcional)</label>
+              <input type="file" id="comunicadoAnexo" accept=".pdf,image/*,video/*">
+              <div id="comunicadoAnexoAtual" style="font-size:12.5px;color:var(--muted,#6B7280);margin-top:6px;display:none;"></div>
+              <label class="gate-check-row" id="comunicadoRemoveAnexoWrap" style="display:none;margin-top:6px;">
+                <input type="checkbox" id="comunicadoRemoveAnexo"> Remover anexo atual
+              </label>
+            </div>
             <div style="display:flex;gap:10px;margin-top:16px;">
               <button type="submit" class="login-btn" style="width:auto;padding:11px 20px;">Salvar</button>
               <button type="button" class="login-btn" id="comunicadoCancel" style="width:auto;padding:11px 20px;background:#9CA3AF;">Cancelar</button>
@@ -665,6 +689,18 @@
                 <option value="ativo">Ativo na trava</option>
                 <option value="arquivado">Arquivado</option>
               </select>
+            </div>
+            <div class="login-field">
+              <label for="informativoLink">Link (opcional)</label>
+              <input type="url" id="informativoLink" placeholder="https://...">
+            </div>
+            <div class="login-field">
+              <label for="informativoAnexo">Anexo — PDF, imagem ou vídeo (opcional)</label>
+              <input type="file" id="informativoAnexo" accept=".pdf,image/*,video/*">
+              <div id="informativoAnexoAtual" style="font-size:12.5px;color:var(--muted,#6B7280);margin-top:6px;display:none;"></div>
+              <label class="gate-check-row" id="informativoRemoveAnexoWrap" style="display:none;margin-top:6px;">
+                <input type="checkbox" id="informativoRemoveAnexo"> Remover anexo atual
+              </label>
             </div>
             <div style="display:flex;gap:10px;margin-top:16px;">
               <button type="submit" class="login-btn" style="width:auto;padding:11px 20px;">Salvar</button>
@@ -849,6 +885,18 @@
                 <option value="green">Verde</option>
                 <option value="ink2">Azul-marinho</option>
               </select>
+            </div>
+            <div class="login-field">
+              <label for="unidadeFoto">Foto (opcional)</label>
+              <input type="file" id="unidadeFoto" accept="image/*">
+              <div id="unidadeFotoAtual" style="font-size:12.5px;color:var(--muted,#6B7280);margin-top:6px;display:none;"></div>
+              <label class="gate-check-row" id="unidadeRemoveFotoWrap" style="display:none;margin-top:6px;">
+                <input type="checkbox" id="unidadeRemoveFoto"> Remover foto atual
+              </label>
+            </div>
+            <div class="login-field">
+              <label for="unidadeVideo">Vídeo institucional (opcional) — link do YouTube, Vimeo etc.</label>
+              <input type="url" id="unidadeVideo" placeholder="https://...">
             </div>
             <div style="display:flex;gap:10px;margin-top:16px;">
               <button type="submit" class="login-btn" style="width:auto;padding:11px 20px;">Salvar</button>
@@ -1247,21 +1295,84 @@
     }
   }
 
-  function buildFolderCard(folder, previewDocs) {
+  async function fetchFolderDocCount(folderId) {
+    try {
+      var res = await supabase.from('documents').select('id', { count: 'exact', head: true }).eq('folder_id', folderId);
+      return res.count || 0;
+    } catch (e) {
+      return 0;
+    }
+  }
+
+  var FOLDER_COVER_PALETTE = [
+    ['#219EBC', '#187893'], ['#023047', '#034C67'], ['#2C7DA0', '#023047'],
+    ['#4A5C7A', '#023047'], ['#C9668B', '#8C4160'], ['#FB8500', '#CC6D00'],
+    ['#2EC4B6', '#1C8F84'], ['#16A34A', '#0E7A38']
+  ];
+  function hashStr(s) {
+    var h = 0;
+    for (var i = 0; i < s.length; i++) { h = ((h << 5) - h) + s.charCodeAt(i); h |= 0; }
+    return Math.abs(h);
+  }
+  function folderCoverColors(folder) {
+    var idx = hashStr(String(folder.id || folder.name || '')) % FOLDER_COVER_PALETTE.length;
+    return FOLDER_COVER_PALETTE[idx];
+  }
+
+  function buildFolderCard(folder, previewDocs, docCount) {
     var card = document.createElement('div');
     card.className = 'folder-card';
+
+    var colors = folderCoverColors(folder);
+    var cover = document.createElement('div');
+    cover.className = 'folder-card-cover';
+    cover.style.background = 'linear-gradient(135deg,' + colors[0] + ',' + colors[1] + ')';
+    var coverIcon = document.createElement('div');
+    coverIcon.className = 'folder-card-cover-icon';
+    coverIcon.innerHTML = '<svg class="ic"><use href="#i-folder"/></svg>';
+    cover.appendChild(coverIcon);
+    card.appendChild(cover);
+
+    // Se algum arquivo recente da pasta for imagem, usa a própria imagem como capa (prévia real).
+    var imageDoc = (previewDocs || []).find(function (d) {
+      return fileIconInfo(d.file_type, d.name).symbol === 'i-image';
+    });
+    if (imageDoc) {
+      supabase.storage.from('documentos').createSignedUrl(imageDoc.storage_path, 3600).then(function (res) {
+        if (res.data && res.data.signedUrl) {
+          coverIcon.style.display = 'none';
+          var img = document.createElement('img');
+          img.className = 'folder-card-cover-img';
+          img.alt = '';
+          img.src = res.data.signedUrl;
+          cover.insertBefore(img, coverIcon);
+          var fade = document.createElement('div');
+          fade.className = 'folder-card-cover-fade';
+          cover.appendChild(fade);
+        }
+      }).catch(function () {});
+    }
+
+    var body = document.createElement('div');
+    body.className = 'folder-card-body';
 
     var top = document.createElement('div');
     top.className = 'folder-card-top';
     var iconWrap = document.createElement('div');
     iconWrap.className = 'folder-card-icon';
-    iconWrap.innerHTML = '<svg class="ic" style="color:#fff"><use href="#i-folder"/></svg>';
+    iconWrap.innerHTML = '<svg class="ic"><use href="#i-folder"/></svg>';
     var nameEl = document.createElement('div');
     nameEl.className = 'folder-card-name';
     nameEl.textContent = folder.name;
     top.appendChild(iconWrap);
     top.appendChild(nameEl);
-    card.appendChild(top);
+    body.appendChild(top);
+
+    var countEl = document.createElement('div');
+    countEl.className = 'folder-card-count';
+    var n = docCount || 0;
+    countEl.textContent = n === 0 ? 'Vazia' : (n === 1 ? '1 arquivo' : n + ' arquivos');
+    body.appendChild(countEl);
 
     if (previewDocs && previewDocs.length) {
       var pv = document.createElement('div');
@@ -1270,13 +1381,15 @@
         var info = fileIconInfo(d.file_type, d.name);
         var fp = document.createElement('div');
         fp.className = 'fp-icon';
+        fp.title = d.name || '';
         fp.style.color = info.bg;
         fp.innerHTML = '<svg class="ic"><use href="#' + info.symbol + '"/></svg>';
         pv.appendChild(fp);
       });
-      card.appendChild(pv);
+      body.appendChild(pv);
     }
 
+    card.appendChild(body);
     card.addEventListener('click', function () { openFolder(folder); });
 
     if (appState.profile && appState.profile.is_admin) {
@@ -1314,7 +1427,8 @@
     emptyEl.style.display = 'none';
     for (var i = 0; i < folders.length; i++) {
       var previewDocs = await fetchRecentDocs(folders[i].id, 4);
-      grid.appendChild(buildFolderCard(folders[i], previewDocs));
+      var docCount = await fetchFolderDocCount(folders[i].id);
+      grid.appendChild(buildFolderCard(folders[i], previewDocs, docCount));
     }
   }
 
@@ -1372,7 +1486,8 @@
     subGrid.style.display = subfolders.length ? '' : 'none';
     for (var i = 0; i < subfolders.length; i++) {
       var previewDocs = await fetchRecentDocs(subfolders[i].id, 4);
-      subGrid.appendChild(buildFolderCard(subfolders[i], previewDocs));
+      var docCount = await fetchFolderDocCount(subfolders[i].id);
+      subGrid.appendChild(buildFolderCard(subfolders[i], previewDocs, docCount));
     }
 
     var docsRes = await supabase.from('documents').select('*').eq('folder_id', folderId).order('created_at', { ascending: false });
@@ -1690,6 +1805,19 @@
   // =====================================================================
   var COLOR_VAR_MAP = { red: '--red', blue: '--blue', purple: '--purple', pink: '--pink', orange: '--orange', teal: '--teal', green: '--green', ink2: '--ink-2' };
   function colorVarName(key) { return COLOR_VAR_MAP[key] || COLOR_VAR_MAP.blue; }
+  function attachmentTypeFromFilename(name) {
+    var ext = (name.split('.').pop() || '').toLowerCase();
+    if (ext === 'pdf') return 'pdf';
+    if (['jpg','jpeg','png','gif','webp','svg'].indexOf(ext) !== -1) return 'image';
+    if (['mp4','webm','mov','avi','mkv','m4v'].indexOf(ext) !== -1) return 'video';
+    return 'other';
+  }
+  function attachmentIcon(type) {
+    if (type === 'pdf') return 'i-file-pdf';
+    if (type === 'image') return 'i-image';
+    if (type === 'video') return 'i-video';
+    return 'i-file';
+  }
   var BADGE_CLASS_BY_COLOR = { red: 'badge-red', blue: 'badge-blue', purple: 'badge-purple', orange: 'badge-orange', green: 'badge-green' };
   function buildColorBadge(colorKey, text) {
     var span = document.createElement('span');
@@ -1723,6 +1851,7 @@
   var comunicadoModalTitle = document.getElementById('comunicadoModalTitle');
   var btnNewComunicado = document.getElementById('btnNewComunicado');
   var comunicadoCancel = document.getElementById('comunicadoCancel');
+  var comunicadoEditingAttachmentPath = null;
 
   function buildComunicadoCard(item) {
     var isAdmin = !!(appState.profile && appState.profile.is_admin);
@@ -1762,6 +1891,31 @@
     desc.textContent = item.description;
     body.appendChild(desc);
 
+    if (item.link_url || item.attachment_path) {
+      var actionsRow = document.createElement('div');
+      actionsRow.style.display = 'flex';
+      actionsRow.style.gap = '8px';
+      actionsRow.style.marginTop = '10px';
+      actionsRow.style.flexWrap = 'wrap';
+      if (item.link_url) {
+        var linkBtn = document.createElement('button');
+        linkBtn.type = 'button';
+        linkBtn.className = 'doc-action-btn';
+        linkBtn.innerHTML = '<svg class="ic" style="width:14px;height:14px"><use href="#i-link"/></svg> Abrir link';
+        linkBtn.addEventListener('click', function () { window.open(item.link_url, '_blank', 'noopener'); });
+        actionsRow.appendChild(linkBtn);
+      }
+      if (item.attachment_path) {
+        var attBtn = document.createElement('button');
+        attBtn.type = 'button';
+        attBtn.className = 'doc-action-btn';
+        attBtn.innerHTML = '<svg class="ic" style="width:14px;height:14px"><use href="#' + attachmentIcon(item.attachment_type) + '"/></svg> Baixar anexo';
+        attBtn.addEventListener('click', function () { downloadComunicadoAttachment(item, attBtn); });
+        actionsRow.appendChild(attBtn);
+      }
+      body.appendChild(actionsRow);
+    }
+
     var footer = document.createElement('div');
     footer.className = 'doc-footer';
     footer.innerHTML = '<span><svg class="ic" style="width:13px;height:13px"><use href="#i-clock"/></svg> ' + formatDateBR(item.created_at) + '</span>';
@@ -1769,6 +1923,23 @@
 
     card.appendChild(body);
     return card;
+  }
+
+  async function downloadComunicadoAttachment(item, btnEl) {
+    if (btnEl) btnEl.disabled = true;
+    try {
+      var signedRes = await supabase.storage.from('conteudo').createSignedUrl(item.attachment_path, 60);
+      if (signedRes.error || !signedRes.data) throw new Error('Não foi possível gerar o link de download.');
+      var fileResp = await fetch(signedRes.data.signedUrl);
+      if (!fileResp.ok) throw new Error('Falha ao baixar o arquivo.');
+      var blob = await fileResp.blob();
+      var filename = item.attachment_name || ('anexo-' + item.id);
+      triggerBlobDownload(blob, filename);
+    } catch (err) {
+      alert((err && err.message) || 'Não foi possível baixar o arquivo.');
+    } finally {
+      if (btnEl) btnEl.disabled = false;
+    }
   }
 
   async function loadComunicados() {
@@ -1796,6 +1967,18 @@
     document.getElementById('comunicadoDescricao').value = item ? item.description : '';
     document.getElementById('comunicadoArea').value = item ? item.area : '';
     document.getElementById('comunicadoCor').value = item ? (item.color || 'blue') : 'blue';
+    document.getElementById('comunicadoLink').value = item ? (item.link_url || '') : '';
+    comunicadoEditingAttachmentPath = item ? (item.attachment_path || null) : null;
+    var comunicadoAnexoAtualEl = document.getElementById('comunicadoAnexoAtual');
+    var comunicadoRemoveAnexoWrapEl = document.getElementById('comunicadoRemoveAnexoWrap');
+    document.getElementById('comunicadoRemoveAnexo').checked = false;
+    comunicadoAnexoAtualEl.style.display = 'none';
+    comunicadoRemoveAnexoWrapEl.style.display = 'none';
+    if (item && item.attachment_name) {
+      comunicadoAnexoAtualEl.textContent = 'Anexo atual: ' + item.attachment_name;
+      comunicadoAnexoAtualEl.style.display = 'block';
+      comunicadoRemoveAnexoWrapEl.style.display = 'flex';
+    }
     comunicadoModal.classList.remove('hidden');
   }
 
@@ -1812,6 +1995,38 @@
         area: document.getElementById('comunicadoArea').value.trim(),
         color: document.getElementById('comunicadoCor').value
       };
+      var linkVal = document.getElementById('comunicadoLink').value.trim();
+      payload.link_url = linkVal || null;
+      var fileInput = document.getElementById('comunicadoAnexo');
+      var file = fileInput.files[0];
+      var removeChecked = document.getElementById('comunicadoRemoveAnexo').checked;
+      var submitBtn = comunicadoForm.querySelector('button[type="submit"]');
+      if (file) {
+        if (submitBtn) submitBtn.disabled = true;
+        try {
+          var path = 'comunicados/' + crypto.randomUUID() + '-' + file.name;
+          var up = await supabase.storage.from('conteudo').upload(path, file);
+          if (up.error) throw new Error('Falha ao enviar o anexo.');
+          if (id && comunicadoEditingAttachmentPath) {
+            try { await supabase.storage.from('conteudo').remove([comunicadoEditingAttachmentPath]); } catch (ignoreErr) {}
+          }
+          payload.attachment_path = path;
+          payload.attachment_type = attachmentTypeFromFilename(file.name);
+          payload.attachment_name = file.name;
+        } catch (err) {
+          showMsgEl(comunicadoModalMsg, (err && err.message) || 'Não foi possível enviar o anexo.', 'error');
+          if (submitBtn) submitBtn.disabled = false;
+          return;
+        }
+        if (submitBtn) submitBtn.disabled = false;
+      } else if (removeChecked) {
+        if (comunicadoEditingAttachmentPath) {
+          try { await supabase.storage.from('conteudo').remove([comunicadoEditingAttachmentPath]); } catch (ignoreErr) {}
+        }
+        payload.attachment_path = null;
+        payload.attachment_type = null;
+        payload.attachment_name = null;
+      }
       var res;
       if (id) {
         res = await supabase.from('comunicados').update(payload).eq('id', id);
@@ -1828,6 +2043,9 @@
 
   async function deleteComunicado(item) {
     if (!confirm('Excluir o comunicado "' + item.title + '"? Esta ação não pode ser desfeita.')) return;
+    if (item.attachment_path) {
+      try { await supabase.storage.from('conteudo').remove([item.attachment_path]); } catch (ignoreErr) {}
+    }
     var res = await supabase.from('comunicados').delete().eq('id', item.id);
     if (res.error) { alert('Não foi possível excluir o comunicado.'); return; }
     loadComunicados();
@@ -1842,6 +2060,7 @@
   var informativoModalTitle = document.getElementById('informativoModalTitle');
   var btnNewInformativo = document.getElementById('btnNewInformativo');
   var informativoCancel = document.getElementById('informativoCancel');
+  var informativoEditingAttachmentPath = null;
 
   function buildInformativoCard(item) {
     var isAdmin = !!(appState.profile && appState.profile.is_admin);
@@ -1893,6 +2112,31 @@
     desc.textContent = item.description;
     body.appendChild(desc);
 
+    if (item.link_url || item.attachment_path) {
+      var actionsRow = document.createElement('div');
+      actionsRow.style.display = 'flex';
+      actionsRow.style.gap = '8px';
+      actionsRow.style.marginTop = '10px';
+      actionsRow.style.flexWrap = 'wrap';
+      if (item.link_url) {
+        var linkBtn = document.createElement('button');
+        linkBtn.type = 'button';
+        linkBtn.className = 'doc-action-btn';
+        linkBtn.innerHTML = '<svg class="ic" style="width:14px;height:14px"><use href="#i-link"/></svg> Abrir link';
+        linkBtn.addEventListener('click', function () { window.open(item.link_url, '_blank', 'noopener'); });
+        actionsRow.appendChild(linkBtn);
+      }
+      if (item.attachment_path) {
+        var attBtn = document.createElement('button');
+        attBtn.type = 'button';
+        attBtn.className = 'doc-action-btn';
+        attBtn.innerHTML = '<svg class="ic" style="width:14px;height:14px"><use href="#' + attachmentIcon(item.attachment_type) + '"/></svg> Baixar anexo';
+        attBtn.addEventListener('click', function () { downloadInformativoAttachment(item, attBtn); });
+        actionsRow.appendChild(attBtn);
+      }
+      body.appendChild(actionsRow);
+    }
+
     var footer = document.createElement('div');
     footer.className = 'doc-footer';
     footer.innerHTML = '<span><svg class="ic" style="width:13px;height:13px"><use href="#i-clock"/></svg> ' + formatDateBR(item.created_at) + '</span>';
@@ -1900,6 +2144,23 @@
 
     card.appendChild(body);
     return card;
+  }
+
+  async function downloadInformativoAttachment(item, btnEl) {
+    if (btnEl) btnEl.disabled = true;
+    try {
+      var signedRes = await supabase.storage.from('conteudo').createSignedUrl(item.attachment_path, 60);
+      if (signedRes.error || !signedRes.data) throw new Error('Não foi possível gerar o link de download.');
+      var fileResp = await fetch(signedRes.data.signedUrl);
+      if (!fileResp.ok) throw new Error('Falha ao baixar o arquivo.');
+      var blob = await fileResp.blob();
+      var filename = item.attachment_name || ('anexo-' + item.id);
+      triggerBlobDownload(blob, filename);
+    } catch (err) {
+      alert((err && err.message) || 'Não foi possível baixar o arquivo.');
+    } finally {
+      if (btnEl) btnEl.disabled = false;
+    }
   }
 
   async function loadInformativos() {
@@ -1926,6 +2187,18 @@
     document.getElementById('informativoTitulo').value = item ? item.title : '';
     document.getElementById('informativoDescricao').value = item ? item.description : '';
     document.getElementById('informativoStatus').value = item ? (item.status || 'ativo') : 'ativo';
+    document.getElementById('informativoLink').value = item ? (item.link_url || '') : '';
+    informativoEditingAttachmentPath = item ? (item.attachment_path || null) : null;
+    var informativoAnexoAtualEl = document.getElementById('informativoAnexoAtual');
+    var informativoRemoveAnexoWrapEl = document.getElementById('informativoRemoveAnexoWrap');
+    document.getElementById('informativoRemoveAnexo').checked = false;
+    informativoAnexoAtualEl.style.display = 'none';
+    informativoRemoveAnexoWrapEl.style.display = 'none';
+    if (item && item.attachment_name) {
+      informativoAnexoAtualEl.textContent = 'Anexo atual: ' + item.attachment_name;
+      informativoAnexoAtualEl.style.display = 'block';
+      informativoRemoveAnexoWrapEl.style.display = 'flex';
+    }
     informativoModal.classList.remove('hidden');
   }
 
@@ -1941,6 +2214,38 @@
         description: document.getElementById('informativoDescricao').value.trim(),
         status: document.getElementById('informativoStatus').value
       };
+      var linkVal = document.getElementById('informativoLink').value.trim();
+      payload.link_url = linkVal || null;
+      var fileInput = document.getElementById('informativoAnexo');
+      var file = fileInput.files[0];
+      var removeChecked = document.getElementById('informativoRemoveAnexo').checked;
+      var submitBtn = informativoForm.querySelector('button[type="submit"]');
+      if (file) {
+        if (submitBtn) submitBtn.disabled = true;
+        try {
+          var path = 'informativos/' + crypto.randomUUID() + '-' + file.name;
+          var up = await supabase.storage.from('conteudo').upload(path, file);
+          if (up.error) throw new Error('Falha ao enviar o anexo.');
+          if (id && informativoEditingAttachmentPath) {
+            try { await supabase.storage.from('conteudo').remove([informativoEditingAttachmentPath]); } catch (ignoreErr) {}
+          }
+          payload.attachment_path = path;
+          payload.attachment_type = attachmentTypeFromFilename(file.name);
+          payload.attachment_name = file.name;
+        } catch (err) {
+          showMsgEl(informativoModalMsg, (err && err.message) || 'Não foi possível enviar o anexo.', 'error');
+          if (submitBtn) submitBtn.disabled = false;
+          return;
+        }
+        if (submitBtn) submitBtn.disabled = false;
+      } else if (removeChecked) {
+        if (informativoEditingAttachmentPath) {
+          try { await supabase.storage.from('conteudo').remove([informativoEditingAttachmentPath]); } catch (ignoreErr) {}
+        }
+        payload.attachment_path = null;
+        payload.attachment_type = null;
+        payload.attachment_name = null;
+      }
       var res;
       if (id) {
         res = await supabase.from('informativos').update(payload).eq('id', id);
@@ -1956,6 +2261,9 @@
 
   async function deleteInformativo(item) {
     if (!confirm('Excluir o informativo "' + item.title + '"? Esta ação não pode ser desfeita.')) return;
+    if (item.attachment_path) {
+      try { await supabase.storage.from('conteudo').remove([item.attachment_path]); } catch (ignoreErr) {}
+    }
     var res = await supabase.from('informativos').delete().eq('id', item.id);
     if (res.error) { alert('Não foi possível excluir o informativo.'); return; }
     loadInformativos();
@@ -1991,10 +2299,58 @@
     var thumb = document.createElement('div');
     thumb.className = 'file-thumb';
     thumb.style.background = MARKETING_CATEGORY_GRADIENT[item.category] || MARKETING_CATEGORY_GRADIENT.pecas;
-    var symbol = item.category === 'video' ? 'i-video' : fileIconInfo(item.file_type, item.title).symbol;
+    var isImageFile = fileIconInfo(item.file_type, item.title).symbol === 'i-image';
+    var isVideoFile = item.category === 'video' || ['mp4', 'mov', 'webm', 'avi', 'mkv'].indexOf((item.file_type || '').toLowerCase()) !== -1;
+    var symbol = isVideoFile ? 'i-video' : fileIconInfo(item.file_type, item.title).symbol;
     thumb.innerHTML = '<span class="file-type-tag">' + ((item.file_type || '').toUpperCase()) + '</span>' +
       '<svg class="ic" style="width:26px;height:26px;color:#fff"><use href="#' + symbol + '"/></svg>';
     card.appendChild(thumb);
+
+    // Prévia real do arquivo (imagem ou frame do vídeo), quando possível — cai no ícone se não der.
+    if (isImageFile) {
+      supabase.storage.from('marketing').createSignedUrl(item.storage_path, 3600).then(function (res) {
+        if (res.data && res.data.signedUrl) {
+          var iconSvg = thumb.querySelector('.ic');
+          if (iconSvg) iconSvg.style.display = 'none';
+          var img = document.createElement('img');
+          img.className = 'file-thumb-img';
+          img.alt = '';
+          img.src = res.data.signedUrl;
+          thumb.insertBefore(img, thumb.firstChild);
+        }
+      }).catch(function () {});
+    } else if (isVideoFile) {
+      supabase.storage.from('marketing').createSignedUrl(item.storage_path, 3600).then(function (res) {
+        if (!(res.data && res.data.signedUrl)) return;
+        try {
+          var vid = document.createElement('video');
+          vid.crossOrigin = 'anonymous';
+          vid.muted = true;
+          vid.preload = 'auto';
+          vid.src = res.data.signedUrl;
+          vid.addEventListener('loadeddata', function () {
+            try {
+              var canvas = document.createElement('canvas');
+              canvas.width = vid.videoWidth;
+              canvas.height = vid.videoHeight;
+              canvas.getContext('2d').drawImage(vid, 0, 0, canvas.width, canvas.height);
+              var dataUrl = canvas.toDataURL('image/jpeg', 0.7);
+              var iconSvg = thumb.querySelector('.ic');
+              if (iconSvg) iconSvg.style.display = 'none';
+              var img = document.createElement('img');
+              img.className = 'file-thumb-img';
+              img.alt = '';
+              img.src = dataUrl;
+              thumb.insertBefore(img, thumb.firstChild);
+              var play = document.createElement('div');
+              play.className = 'file-thumb-play';
+              play.innerHTML = '<div class="file-thumb-play-circle"><svg class="ic" style="width:14px;height:14px;color:#fff"><use href="#i-video"/></svg></div>';
+              thumb.appendChild(play);
+            } catch (e2) { /* provável CORS no frame — mantém o ícone padrão */ }
+          }, { once: true });
+        } catch (e) { /* mantém o ícone padrão */ }
+      }).catch(function () {});
+    }
 
     var infoWrap = document.createElement('div');
     var nameEl = document.createElement('div');
@@ -2121,11 +2477,23 @@
   var unidadeModalTitle = document.getElementById('unidadeModalTitle');
   var btnNewUnidade = document.getElementById('btnNewUnidade');
   var unidadeCancel = document.getElementById('unidadeCancel');
+  var unidadeEditingPhotoPath = null;
 
   function buildUnitCard(item) {
     var isAdmin = !!(appState.profile && appState.profile.is_admin);
     var card = document.createElement('div');
     card.className = 'unit-card';
+
+    var photoImg = null;
+    if (item.photo_path) {
+      photoImg = document.createElement('img');
+      photoImg.className = 'unit-photo';
+      photoImg.style.width = '100%';
+      photoImg.style.height = '120px';
+      photoImg.style.objectFit = 'cover';
+      photoImg.style.display = 'block';
+      card.appendChild(photoImg);
+    }
 
     var top = document.createElement('div');
     top.className = 'unit-top';
@@ -2162,6 +2530,19 @@
       row2.appendChild(document.createTextNode(item.address));
       body.appendChild(row2);
     }
+    if (item.video_url) {
+      var videoRow = document.createElement('div');
+      videoRow.style.display = 'flex';
+      videoRow.style.gap = '6px';
+      videoRow.style.marginTop = '10px';
+      var videoBtn = document.createElement('button');
+      videoBtn.type = 'button';
+      videoBtn.className = 'doc-action-btn';
+      videoBtn.innerHTML = '<svg class="ic" style="width:14px;height:14px"><use href="#i-video"/></svg> Assistir vídeo';
+      videoBtn.addEventListener('click', function () { window.open(item.video_url, '_blank', 'noopener'); });
+      videoRow.appendChild(videoBtn);
+      body.appendChild(videoRow);
+    }
     if (isAdmin) {
       var actions = document.createElement('div');
       actions.style.display = 'flex';
@@ -2172,6 +2553,11 @@
       body.appendChild(actions);
     }
     card.appendChild(body);
+    if (photoImg) {
+      supabase.storage.from('conteudo').createSignedUrl(item.photo_path, 3600).then(function (res) {
+        if (res.data) photoImg.src = res.data.signedUrl;
+      });
+    }
     return card;
   }
 
@@ -2202,6 +2588,18 @@
     document.getElementById('unidadeResponsavel').value = item ? (item.person_name || '') : '';
     document.getElementById('unidadeEndereco').value = item ? (item.address || '') : '';
     document.getElementById('unidadeCor').value = item ? (item.color || 'blue') : 'blue';
+    document.getElementById('unidadeVideo').value = item ? (item.video_url || '') : '';
+    unidadeEditingPhotoPath = item ? (item.photo_path || null) : null;
+    var unidadeFotoAtualEl = document.getElementById('unidadeFotoAtual');
+    var unidadeRemoveFotoWrapEl = document.getElementById('unidadeRemoveFotoWrap');
+    document.getElementById('unidadeRemoveFoto').checked = false;
+    unidadeFotoAtualEl.style.display = 'none';
+    unidadeRemoveFotoWrapEl.style.display = 'none';
+    if (item && item.photo_path) {
+      unidadeFotoAtualEl.textContent = 'Foto atual definida';
+      unidadeFotoAtualEl.style.display = 'block';
+      unidadeRemoveFotoWrapEl.style.display = 'flex';
+    }
     unidadeModal.classList.remove('hidden');
   }
 
@@ -2220,6 +2618,33 @@
         address: document.getElementById('unidadeEndereco').value.trim(),
         color: document.getElementById('unidadeCor').value
       };
+      payload.video_url = document.getElementById('unidadeVideo').value.trim() || null;
+      var fileInput = document.getElementById('unidadeFoto');
+      var file = fileInput.files[0];
+      var removeChecked = document.getElementById('unidadeRemoveFoto').checked;
+      var submitBtn = unidadeForm.querySelector('button[type="submit"]');
+      if (file) {
+        if (submitBtn) submitBtn.disabled = true;
+        try {
+          var path = 'unidades/' + crypto.randomUUID() + '-' + file.name;
+          var up = await supabase.storage.from('conteudo').upload(path, file);
+          if (up.error) throw new Error('Falha ao enviar a foto.');
+          if (id && unidadeEditingPhotoPath) {
+            try { await supabase.storage.from('conteudo').remove([unidadeEditingPhotoPath]); } catch (ignoreErr) {}
+          }
+          payload.photo_path = path;
+        } catch (err) {
+          showMsgEl(unidadeModalMsg, (err && err.message) || 'Não foi possível enviar a foto.', 'error');
+          if (submitBtn) submitBtn.disabled = false;
+          return;
+        }
+        if (submitBtn) submitBtn.disabled = false;
+      } else if (removeChecked) {
+        if (unidadeEditingPhotoPath) {
+          try { await supabase.storage.from('conteudo').remove([unidadeEditingPhotoPath]); } catch (ignoreErr) {}
+        }
+        payload.photo_path = null;
+      }
       var res;
       if (id) {
         res = await supabase.from('unidades').update(payload).eq('id', id);
@@ -2235,6 +2660,9 @@
 
   async function deleteUnidade(item) {
     if (!confirm('Excluir a unidade "' + item.name + '"? Esta ação não pode ser desfeita.')) return;
+    if (item.photo_path) {
+      try { await supabase.storage.from('conteudo').remove([item.photo_path]); } catch (ignoreErr) {}
+    }
     var res = await supabase.from('unidades').delete().eq('id', item.id);
     if (res.error) { alert('Não foi possível excluir a unidade.'); return; }
     loadUnidades();
