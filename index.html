@@ -432,32 +432,7 @@
       </div>
       <p>Antes de entrar no portal, leia os informativos abaixo. Você só avança depois de confirmar que está ciente.</p>
     </div>
-    <div class="gate-body">
-      <div class="gate-item">
-        <div class="gate-item-icon" style="background:var(--red)"><svg class="ic" style="width:18px;height:18px;color:#fff"><use href="#i-alert"/></svg></div>
-        <div>
-          <p class="gate-item-title">Atualização da tabela de convênios</p>
-          <p class="gate-item-date">13/08/2026</p>
-          <p class="gate-item-desc">Novos percentuais de margem consignável para servidores estaduais entram em vigor esta semana. Confira a tabela atualizada em <b>Documentos</b> antes de simular qualquer proposta.</p>
-        </div>
-      </div>
-      <div class="gate-item">
-        <div class="gate-item-icon" style="background:var(--blue)"><svg class="ic" style="width:18px;height:18px;color:#fff"><use href="#i-clock"/></svg></div>
-        <div>
-          <p class="gate-item-title">Novo horário — Unidade Rua do Sol</p>
-          <p class="gate-item-date">10/08/2026</p>
-          <p class="gate-item-desc">A unidade passa a atender das 8h às 17h a partir de segunda-feira, em função da reorganização administrativa em curso.</p>
-        </div>
-      </div>
-      <div class="gate-item">
-        <div class="gate-item-icon" style="background:var(--purple)"><svg class="ic" style="width:18px;height:18px;color:#fff"><use href="#i-bell"/></svg></div>
-        <div>
-          <p class="gate-item-title">Treinamento obrigatório: Konnect CRM</p>
-          <p class="gate-item-date">08/08/2026</p>
-          <p class="gate-item-desc">Todos os consultores devem concluir o treinamento de atendimento via WhatsApp/Konnect até sexta-feira. Inscrição na Universidade Corporativa.</p>
-        </div>
-      </div>
-    </div>
+    <div class="gate-body" id="gateBody"></div>
     <div class="gate-footer">
       <label class="gate-check-row">
         <input type="checkbox" id="ackCheckbox">
@@ -640,6 +615,11 @@
               <div id="comunicadoAnexoAtual" style="font-size:12.5px;color:var(--muted,#6B7280);margin-top:6px;display:none;"></div>
               <label class="gate-check-row" id="comunicadoRemoveAnexoWrap" style="display:none;margin-top:6px;">
                 <input type="checkbox" id="comunicadoRemoveAnexo"> Remover anexo atual
+              </label>
+            </div>
+            <div class="login-field">
+              <label class="gate-check-row" style="margin-top:0;">
+                <input type="checkbox" id="comunicadoShowGate"> Mostrar na tela de entrada (aviso obrigatório ao logar)
               </label>
             </div>
             <div style="display:flex;gap:10px;margin-top:16px;">
@@ -1099,7 +1079,7 @@
       updateUserChip(profile, session.user.email);
       applyAdminVisibility(!!(profile && profile.is_admin));
       loginOverlay.classList.add('hidden');
-      gateOverlay2.classList.remove('hidden');
+      if (typeof loadGateComunicados === 'function') { loadGateComunicados(); } else { gateOverlay2.classList.remove('hidden'); }
       if (typeof loadRootFolders === 'function') loadRootFolders();
       if (typeof loadHomeComunicados === 'function') loadHomeComunicados();
     } else {
@@ -1877,6 +1857,13 @@
     right.style.gap = '6px';
     right.style.alignItems = 'center';
     right.appendChild(buildColorBadge(item.color, item.area || 'Geral'));
+    if (item.show_in_gate) {
+      var gateBadge = document.createElement('span');
+      gateBadge.title = 'Aparece na tela de entrada ao logar';
+      gateBadge.style.cssText = 'display:flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:6px;background:var(--ink);color:#fff;';
+      gateBadge.innerHTML = '<svg class="ic" style="width:12px;height:12px"><use href="#i-lock"/></svg>';
+      right.appendChild(gateBadge);
+    }
     if (isAdmin) {
       right.appendChild(buildActionBtn('i-edit', 'Editar', function () { openComunicadoModal(item); }));
       right.appendChild(buildActionBtn('i-trash', 'Excluir', function () { deleteComunicado(item); }));
@@ -1966,6 +1953,7 @@
     document.getElementById('comunicadoArea').value = item ? item.area : '';
     document.getElementById('comunicadoCor').value = item ? (item.color || 'blue') : 'blue';
     document.getElementById('comunicadoLink').value = item ? (item.link_url || '') : '';
+    document.getElementById('comunicadoShowGate').checked = item ? !!item.show_in_gate : false;
     comunicadoEditingAttachmentPath = item ? (item.attachment_path || null) : null;
     var comunicadoAnexoAtualEl = document.getElementById('comunicadoAnexoAtual');
     var comunicadoRemoveAnexoWrapEl = document.getElementById('comunicadoRemoveAnexoWrap');
@@ -1991,7 +1979,8 @@
         title: document.getElementById('comunicadoTitulo').value.trim(),
         description: document.getElementById('comunicadoDescricao').value.trim(),
         area: document.getElementById('comunicadoArea').value.trim(),
-        color: document.getElementById('comunicadoCor').value
+        color: document.getElementById('comunicadoCor').value,
+        show_in_gate: document.getElementById('comunicadoShowGate').checked
       };
       var linkVal = document.getElementById('comunicadoLink').value.trim();
       payload.link_url = linkVal || null;
@@ -2664,6 +2653,36 @@
     var res = await supabase.from('unidades').delete().eq('id', item.id);
     if (res.error) { alert('Não foi possível excluir a unidade.'); return; }
     loadUnidades();
+  }
+
+  // ---------------- Gate: avisos obrigatórios ao logar ----------------
+  async function loadGateComunicados() {
+    var gateBody = document.getElementById('gateBody');
+    var gateOverlayEl = document.getElementById('gateOverlay');
+    if (!gateBody || !gateOverlayEl) return;
+    var res = await supabase.from('comunicados').select('*').eq('show_in_gate', true).order('created_at', { ascending: false }).limit(8);
+    var items = (res && res.data) || [];
+    gateBody.innerHTML = '';
+    if (!items.length) {
+      gateOverlayEl.classList.add('hidden');
+      return;
+    }
+    items.forEach(function (item) {
+      var el = document.createElement('div');
+      el.className = 'gate-item';
+      el.innerHTML = '<div class="gate-item-icon" style="background:var(' + colorVarName(item.color) + ')">' +
+        '<svg class="ic" style="width:18px;height:18px;color:#fff"><use href="#i-bell"/></svg></div>' +
+        '<div><p class="gate-item-title"></p><p class="gate-item-date"></p><p class="gate-item-desc"></p></div>';
+      el.querySelector('.gate-item-title').textContent = item.title || '';
+      el.querySelector('.gate-item-date').textContent = formatDateBR(item.created_at);
+      el.querySelector('.gate-item-desc').textContent = item.description || '';
+      gateBody.appendChild(el);
+    });
+    var ackCheckboxEl = document.getElementById('ackCheckbox');
+    var ackButtonEl = document.getElementById('ackButton');
+    if (ackCheckboxEl) ackCheckboxEl.checked = false;
+    if (ackButtonEl) { ackButtonEl.disabled = true; ackButtonEl.classList.remove('enabled'); }
+    gateOverlayEl.classList.remove('hidden');
   }
 
   // ---------------- Home: comunicados recentes ----------------
