@@ -25,6 +25,7 @@
     --amber:#D97706;
     --cyan:#0891B2;
     --coral:#F43F5E;
+    --indigo:#4338CA;
   }
   *{box-sizing:border-box;}
   html,body{margin:0;padding:0;height:100%;}
@@ -421,6 +422,7 @@
     <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></symbol>
     <symbol id="i-book" viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></symbol>
     <symbol id="i-inbox" viewBox="0 0 24 24"><path d="M22 12h-6l-2 3h-4l-2-3H2"/><path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/></symbol>
+    <symbol id="i-target" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></symbol>
   </defs>
 </svg>
 
@@ -529,6 +531,10 @@
         <svg class="ic"><use href="#i-inbox"/></svg> Chamados
         <span class="nav-badge" id="navChamadosBadge" style="display:none;"></span>
       </button>
+      <button class="nav-link" data-page="planos-acao" onclick="navigate('planos-acao')">
+        <svg class="ic"><use href="#i-target"/></svg> Planos de Ação
+        <span class="nav-badge" id="navPlanosBadge" style="display:none;"></span>
+      </button>
       <div class="nav-caption">Acesso</div>
       <button class="nav-link" id="navAdminBtn" data-page="admin" onclick="navigate('admin')">
         <svg class="ic"><use href="#i-user-plus"/></svg> Administração
@@ -611,6 +617,13 @@
               <span class="tile-badge" id="homeChamadosBadge" style="display:none;"></span>
             </div>
             <div class="tile-label">Chamados</div>
+          </button>
+          <button class="tile" style="background:var(--indigo)" onclick="navigate('planos-acao')">
+            <div class="tile-icon">
+              <svg class="ic" style="color:#fff"><use href="#i-target"/></svg>
+              <span class="tile-badge" id="homePlanosBadge" style="display:none;"></span>
+            </div>
+            <div class="tile-label">Planos de Ação</div>
           </button>
         </div>
 
@@ -1114,6 +1127,96 @@
         </div>
       </div>
 
+      <!-- ================= PLANOS DE AÇÃO ================= -->
+      <section class="page" id="page-planos-acao">
+        <div class="breadcrumb">Portal Interno / <b>Planos de Ação</b></div>
+        <div class="page-header">
+          <div><h1>Planos de Ação</h1><p>Ações corretivas por unidade — responsável, prazo e aprovação.</p></div>
+          <div class="docs-toolbar" id="planosAdminActions" style="display:none;">
+            <button type="button" class="doc-action-btn" id="btnNewPlano">
+              <svg class="ic" style="width:15px;height:15px"><use href="#i-plus"/></svg> Novo plano de ação
+            </button>
+          </div>
+        </div>
+        <div class="tabs">
+          <button class="tab active" onclick="filterPlanos('todos', this)">Todos</button>
+          <button class="tab" onclick="filterPlanos('novo', this)">Novo</button>
+          <button class="tab" onclick="filterPlanos('em_andamento', this)">Em andamento</button>
+          <button class="tab" onclick="filterPlanos('validacao', this)">Validação</button>
+          <button class="tab" onclick="filterPlanos('aprovado', this)">Aprovados</button>
+        </div>
+        <div class="login-msg error" id="planosMsg" style="margin-bottom:16px;"></div>
+        <div class="doc-list" id="planosList"></div>
+        <div class="docs-empty" id="planosEmpty" style="display:none;">Nenhum plano de ação cadastrado ainda.</div>
+      </section>
+
+      <!-- ============ MODAL: NOVO/EDITAR PLANO DE AÇÃO (admin) ============ -->
+      <div class="modal-overlay hidden" id="planoModal">
+        <div class="modal-card">
+          <h3 id="planoModalTitle">Novo plano de ação</h3>
+          <div class="login-msg error" id="planoModalMsg"></div>
+          <form id="planoForm">
+            <input type="hidden" id="planoId">
+            <div class="login-field">
+              <label for="planoUnidade">Unidade</label>
+              <select id="planoUnidade" required></select>
+            </div>
+            <div class="login-field">
+              <label for="planoQuestionario">Questionário / origem (opcional)</label>
+              <input type="text" id="planoQuestionario" placeholder="Ex: PEX - Programa de Excelência">
+            </div>
+            <div class="login-field">
+              <label for="planoQuestao">Questão / não conformidade (opcional)</label>
+              <input type="text" id="planoQuestao" placeholder="Ex: Falta de controle de descontos">
+            </div>
+            <div class="login-field">
+              <label for="planoOQueSeraFeito">O que será feito</label>
+              <textarea id="planoOQueSeraFeito" rows="3" style="width:100%;padding:11px 13px;border:1px solid var(--line);border-radius:9px;font-family:inherit;font-size:13.5px;background:var(--bg);resize:vertical;" required></textarea>
+            </div>
+            <div class="login-field">
+              <label for="planoQuemFara">Quem fará</label>
+              <select id="planoQuemFara" required></select>
+            </div>
+            <div class="login-field">
+              <label for="planoPrazo">Prazo</label>
+              <input type="date" id="planoPrazo">
+            </div>
+            <div style="display:flex;gap:10px;margin-top:16px;">
+              <button type="submit" class="login-btn" style="width:auto;padding:11px 20px;">Salvar</button>
+              <button type="button" class="login-btn" id="planoCancel" style="width:auto;padding:11px 20px;background:#9CA3AF;">Cancelar</button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- ============ MODAL: APROVAR/GERENCIAR PLANO DE AÇÃO (admin) ============ -->
+      <div class="modal-overlay hidden" id="planoManageModal">
+        <div class="modal-card">
+          <h3>Gerenciar plano de ação</h3>
+          <div class="login-msg error" id="planoManageMsg"></div>
+          <form id="planoManageForm">
+            <input type="hidden" id="planoManageId">
+            <div class="login-field">
+              <label for="planoManageStatus">Status</label>
+              <select id="planoManageStatus">
+                <option value="novo">Novo</option>
+                <option value="em_andamento">Em andamento</option>
+                <option value="validacao">Validação</option>
+                <option value="aprovado">Aprovado</option>
+              </select>
+            </div>
+            <div class="login-field">
+              <label for="planoManageObservacao">Observação (visível para o responsável)</label>
+              <textarea id="planoManageObservacao" rows="3" style="width:100%;padding:11px 13px;border:1px solid var(--line);border-radius:9px;font-family:inherit;font-size:13.5px;background:var(--bg);resize:vertical;"></textarea>
+            </div>
+            <div style="display:flex;gap:10px;margin-top:16px;">
+              <button type="submit" class="login-btn" style="width:auto;padding:11px 20px;">Salvar</button>
+              <button type="button" class="login-btn" id="planoManageCancel" style="width:auto;padding:11px 20px;background:#9CA3AF;">Cancelar</button>
+            </div>
+          </form>
+        </div>
+      </div>
+
       <!-- ================= ADMINISTRAÇÃO ================= -->
       <section class="page" id="page-admin">
         <div class="breadcrumb">Portal Interno / <b>Administração</b></div>
@@ -1327,6 +1430,7 @@
       if (typeof loadHomeComunicados === 'function') loadHomeComunicados();
       if (typeof updateTarefasBadges === 'function') updateTarefasBadges();
       if (typeof updateChamadosBadges === 'function') updateChamadosBadges();
+      if (typeof updatePlanosBadges === 'function') updatePlanosBadges();
     } else {
       appState.session = null;
       appState.profile = null;
@@ -2057,6 +2161,7 @@
     if (page === 'unidades' && typeof loadUnidades === 'function') { loadUnidades(); }
     if (page === 'tarefas' && typeof loadTarefas === 'function') { loadTarefas(); }
     if (page === 'chamados' && typeof loadChamados === 'function') { loadChamados(); }
+    if (page === 'planos-acao' && typeof loadPlanos === 'function') { loadPlanos(); }
     if (page === 'home' && typeof loadHomeComunicados === 'function') { loadHomeComunicados(); }
     window.scrollTo(0,0);
   }
@@ -3351,6 +3456,306 @@
     try {
       var res = await supabase.from('chamados').select('id').eq('status', 'aberto');
       var count = ((res && res.data) || []).length;
+      if (homeBadge) { if (count > 0) { homeBadge.textContent = count; homeBadge.style.display = 'flex'; } else { homeBadge.style.display = 'none'; } }
+      if (navBadge) { if (count > 0) { navBadge.textContent = count; navBadge.style.display = 'flex'; } else { navBadge.style.display = 'none'; } }
+    } catch (e) {
+      if (homeBadge) homeBadge.style.display = 'none';
+      if (navBadge) navBadge.style.display = 'none';
+    }
+  }
+
+  // ---------------- Planos de Ação ----------------
+  var PLANO_STATUS_LABELS = { novo: 'Novo', em_andamento: 'Em andamento', validacao: 'Validação', aprovado: 'Aprovado' };
+  var PLANO_STATUS_BADGE = { novo: 'badge-red', em_andamento: 'badge-orange', validacao: 'badge-blue', aprovado: 'badge-green' };
+  var currentPlanosFilter = 'todos';
+  var planosUnidadesCache = null;
+  var planosMsgEl = document.getElementById('planosMsg');
+  var planoModal = document.getElementById('planoModal');
+  var planoForm = document.getElementById('planoForm');
+  var planoModalMsg = document.getElementById('planoModalMsg');
+  var planoModalTitle = document.getElementById('planoModalTitle');
+  var planoCancel = document.getElementById('planoCancel');
+  var btnNewPlano = document.getElementById('btnNewPlano');
+  var planoManageModal = document.getElementById('planoManageModal');
+  var planoManageForm = document.getElementById('planoManageForm');
+  var planoManageMsg = document.getElementById('planoManageMsg');
+  var planoManageCancel = document.getElementById('planoManageCancel');
+
+  async function fetchUnidadesForSelect() {
+    if (planosUnidadesCache) return planosUnidadesCache;
+    var res = await supabase.from('unidades').select('id,name').order('name');
+    planosUnidadesCache = (res && res.data) || [];
+    return planosUnidadesCache;
+  }
+
+  function unidadeNameById(unidades, id) {
+    var u = unidades.filter(function (x) { return x.id === id; })[0];
+    return u ? u.name : '—';
+  }
+
+  function isPlanoOverdue(item) {
+    if (!item.prazo || item.status === 'aprovado') return false;
+    var today = new Date(); today.setHours(0, 0, 0, 0);
+    var due = new Date(item.prazo + 'T00:00:00');
+    return due < today;
+  }
+
+  function buildPlanoCard(item, profiles, unidades) {
+    var isAdmin = !!(appState.profile && appState.profile.is_admin);
+    var isMine = !!(appState.session && item.quem_fara === appState.session.user.id);
+    var card = document.createElement('div');
+    card.className = 'doc-card';
+
+    var icon = document.createElement('div');
+    icon.className = 'doc-icon';
+    icon.style.background = item.status === 'aprovado' ? 'var(--green)' : (item.status === 'validacao' ? 'var(--blue)' : (item.status === 'em_andamento' ? 'var(--amber)' : 'var(--indigo)'));
+    icon.innerHTML = '<svg class="ic" style="color:#fff"><use href="#i-target"/></svg>';
+    card.appendChild(icon);
+
+    var body = document.createElement('div');
+    body.className = 'doc-body';
+
+    var top = document.createElement('div');
+    top.className = 'doc-top';
+    var title = document.createElement('p');
+    title.className = 'doc-title';
+    title.textContent = unidadeNameById(unidades, item.unidade_id);
+    top.appendChild(title);
+
+    var right = document.createElement('div');
+    right.style.display = 'flex';
+    right.style.gap = '6px';
+    right.style.alignItems = 'center';
+    right.style.flexWrap = 'wrap';
+
+    if (isPlanoOverdue(item)) {
+      var overdueBadge = document.createElement('span');
+      overdueBadge.className = 'badge badge-red';
+      overdueBadge.textContent = 'Atrasado';
+      right.appendChild(overdueBadge);
+    }
+    var statusBadge = document.createElement('span');
+    statusBadge.className = 'badge ' + (PLANO_STATUS_BADGE[item.status] || 'badge-red');
+    statusBadge.textContent = PLANO_STATUS_LABELS[item.status] || item.status;
+    right.appendChild(statusBadge);
+
+    if (isAdmin) {
+      right.appendChild(buildActionBtn('i-check', 'Gerenciar / aprovar', function () { openPlanoManageModal(item); }));
+      right.appendChild(buildActionBtn('i-edit', 'Editar', function () { openPlanoModal(item); }));
+      right.appendChild(buildActionBtn('i-trash', 'Excluir', function () { deletePlano(item); }));
+    }
+    top.appendChild(right);
+    body.appendChild(top);
+
+    if (item.questionario || item.questao) {
+      var ctx = document.createElement('p');
+      ctx.className = 'doc-desc';
+      ctx.style.fontSize = '12px';
+      ctx.style.color = 'var(--muted)';
+      ctx.textContent = [item.questionario, item.questao].filter(Boolean).join(' · ');
+      body.appendChild(ctx);
+    }
+
+    var desc = document.createElement('p');
+    desc.className = 'doc-desc';
+    desc.innerHTML = '<b>O que será feito:</b> ';
+    desc.appendChild(document.createTextNode(item.o_que_sera_feito));
+    body.appendChild(desc);
+
+    if (item.observacao) {
+      var obs = document.createElement('p');
+      obs.className = 'doc-desc';
+      obs.style.marginTop = '8px';
+      obs.style.padding = '10px 12px';
+      obs.style.background = 'var(--bg)';
+      obs.style.borderRadius = '8px';
+      obs.innerHTML = '<b>Observação:</b> ';
+      obs.appendChild(document.createTextNode(item.observacao));
+      body.appendChild(obs);
+    }
+
+    if (isMine && item.status !== 'validacao' && item.status !== 'aprovado') {
+      var actionsRow = document.createElement('div');
+      actionsRow.style.display = 'flex';
+      actionsRow.style.gap = '8px';
+      actionsRow.style.marginTop = '10px';
+      actionsRow.style.flexWrap = 'wrap';
+      var advanceBtn = document.createElement('button');
+      advanceBtn.type = 'button';
+      advanceBtn.className = 'doc-action-btn';
+      advanceBtn.innerHTML = item.status === 'novo'
+        ? '<svg class="ic" style="width:14px;height:14px"><use href="#i-check"/></svg> Iniciar'
+        : '<svg class="ic" style="width:14px;height:14px"><use href="#i-check"/></svg> Enviar para validação';
+      advanceBtn.addEventListener('click', function () { advancePlanoStatus(item); });
+      actionsRow.appendChild(advanceBtn);
+      body.appendChild(actionsRow);
+    }
+
+    var footer = document.createElement('div');
+    footer.className = 'doc-footer';
+    var footerHtml = '<span><svg class="ic" style="width:13px;height:13px"><use href="#i-user"/></svg> ' + profileNameById(profiles, item.quem_fara) + '</span>';
+    if (item.prazo) footerHtml += '<span><svg class="ic" style="width:13px;height:13px"><use href="#i-clock"/></svg> Prazo: ' + formatDateBR(item.prazo) + '</span>';
+    footerHtml += '<span><svg class="ic" style="width:13px;height:13px"><use href="#i-clock"/></svg> Criado em ' + formatDateBR(item.created_at) + '</span>';
+    footer.innerHTML = footerHtml;
+    body.appendChild(footer);
+
+    card.appendChild(body);
+    return card;
+  }
+
+  async function loadPlanos() {
+    if (!appState.session) return;
+    if (planosMsgEl) hideMsgEl(planosMsgEl);
+    var toolbar = document.getElementById('planosAdminActions');
+    if (toolbar) toolbar.style.display = (appState.profile && appState.profile.is_admin) ? 'flex' : 'none';
+    var profiles = await fetchProfilesForSelect();
+    var unidades = await fetchUnidadesForSelect();
+    var res = await supabase.from('planos_acao').select('*').order('created_at', { ascending: false });
+    if (res.error) { if (planosMsgEl) showMsgEl(planosMsgEl, 'Não foi possível carregar os planos de ação.', 'error'); return; }
+    var items = res.data || [];
+    if (currentPlanosFilter !== 'todos') items = items.filter(function (i) { return i.status === currentPlanosFilter; });
+    var listEl = document.getElementById('planosList');
+    var emptyEl = document.getElementById('planosEmpty');
+    listEl.innerHTML = '';
+    if (!items.length) { emptyEl.style.display = 'block'; return; }
+    emptyEl.style.display = 'none';
+    items.forEach(function (item) { listEl.appendChild(buildPlanoCard(item, profiles, unidades)); });
+  }
+
+  function filterPlanos(tag, btn) {
+    currentPlanosFilter = tag;
+    document.querySelectorAll('#page-planos-acao .tab').forEach(function (t) { t.classList.remove('active'); });
+    btn.classList.add('active');
+    loadPlanos();
+  }
+
+  async function fillPlanoSelects(selectedUnidade, selectedResponsavel) {
+    var unidades = await fetchUnidadesForSelect();
+    var unidadeSel = document.getElementById('planoUnidade');
+    unidadeSel.innerHTML = '';
+    unidades.forEach(function (u) {
+      var opt = document.createElement('option');
+      opt.value = u.id;
+      opt.textContent = u.name;
+      unidadeSel.appendChild(opt);
+    });
+    unidadeSel.value = selectedUnidade || (unidades[0] && unidades[0].id) || '';
+
+    var profiles = await fetchProfilesForSelect();
+    var respSel = document.getElementById('planoQuemFara');
+    respSel.innerHTML = '';
+    profiles.forEach(function (p) {
+      var opt = document.createElement('option');
+      opt.value = p.id;
+      opt.textContent = p.full_name || p.email;
+      respSel.appendChild(opt);
+    });
+    respSel.value = selectedResponsavel || (profiles[0] && profiles[0].id) || '';
+  }
+
+  async function openPlanoModal(item) {
+    hideMsgEl(planoModalMsg);
+    planoForm.reset();
+    planoModalTitle.textContent = item ? 'Editar plano de ação' : 'Novo plano de ação';
+    document.getElementById('planoId').value = item ? item.id : '';
+    document.getElementById('planoQuestionario').value = item ? (item.questionario || '') : '';
+    document.getElementById('planoQuestao').value = item ? (item.questao || '') : '';
+    document.getElementById('planoOQueSeraFeito').value = item ? item.o_que_sera_feito : '';
+    document.getElementById('planoPrazo').value = item && item.prazo ? item.prazo : '';
+    await fillPlanoSelects(item ? item.unidade_id : null, item ? item.quem_fara : null);
+    planoModal.classList.remove('hidden');
+  }
+
+  if (btnNewPlano) btnNewPlano.addEventListener('click', function () { openPlanoModal(null); });
+  if (planoCancel) planoCancel.addEventListener('click', function () { planoModal.classList.add('hidden'); });
+  if (planoForm) {
+    planoForm.addEventListener('submit', async function (e) {
+      e.preventDefault();
+      hideMsgEl(planoModalMsg);
+      var id = document.getElementById('planoId').value;
+      var payload = {
+        unidade_id: document.getElementById('planoUnidade').value,
+        questionario: document.getElementById('planoQuestionario').value.trim() || null,
+        questao: document.getElementById('planoQuestao').value.trim() || null,
+        o_que_sera_feito: document.getElementById('planoOQueSeraFeito').value.trim(),
+        quem_fara: document.getElementById('planoQuemFara').value,
+        prazo: document.getElementById('planoPrazo').value || null,
+        updated_at: new Date().toISOString()
+      };
+      var res;
+      if (id) {
+        res = await supabase.from('planos_acao').update(payload).eq('id', id);
+      } else {
+        payload.created_by = appState.session.user.id;
+        res = await supabase.from('planos_acao').insert(payload);
+      }
+      if (res.error) { showMsgEl(planoModalMsg, 'Não foi possível salvar o plano de ação.', 'error'); return; }
+      planoModal.classList.add('hidden');
+      loadPlanos();
+      updatePlanosBadges();
+    });
+  }
+
+  function openPlanoManageModal(item) {
+    hideMsgEl(planoManageMsg);
+    planoManageForm.reset();
+    document.getElementById('planoManageId').value = item.id;
+    document.getElementById('planoManageStatus').value = item.status;
+    document.getElementById('planoManageObservacao').value = item.observacao || '';
+    planoManageModal.classList.remove('hidden');
+  }
+  if (planoManageCancel) planoManageCancel.addEventListener('click', function () { planoManageModal.classList.add('hidden'); });
+  if (planoManageForm) {
+    planoManageForm.addEventListener('submit', async function (e) {
+      e.preventDefault();
+      hideMsgEl(planoManageMsg);
+      var id = document.getElementById('planoManageId').value;
+      var status = document.getElementById('planoManageStatus').value;
+      var payload = {
+        status: status,
+        observacao: document.getElementById('planoManageObservacao').value.trim() || null,
+        updated_at: new Date().toISOString(),
+        concluido_at: status === 'aprovado' ? new Date().toISOString() : null
+      };
+      var res = await supabase.from('planos_acao').update(payload).eq('id', id);
+      if (res.error) { showMsgEl(planoManageMsg, 'Não foi possível salvar.', 'error'); return; }
+      planoManageModal.classList.add('hidden');
+      loadPlanos();
+      updatePlanosBadges();
+    });
+  }
+
+  async function advancePlanoStatus(item) {
+    var next = item.status === 'novo' ? 'em_andamento' : 'validacao';
+    var res = await supabase.from('planos_acao').update({ status: next, updated_at: new Date().toISOString() }).eq('id', item.id);
+    if (res.error) { alert('Não foi possível atualizar o plano de ação.'); return; }
+    loadPlanos();
+    updatePlanosBadges();
+  }
+
+  async function deletePlano(item) {
+    if (!confirm('Excluir este plano de ação? Esta ação não pode ser desfeita.')) return;
+    var res = await supabase.from('planos_acao').delete().eq('id', item.id);
+    if (res.error) { alert('Não foi possível excluir o plano de ação.'); return; }
+    loadPlanos();
+    updatePlanosBadges();
+  }
+
+  async function updatePlanosBadges() {
+    if (!appState.session) return;
+    var homeBadge = document.getElementById('homePlanosBadge');
+    var navBadge = document.getElementById('navPlanosBadge');
+    try {
+      var isAdmin = !!(appState.profile && appState.profile.is_admin);
+      var uid = appState.session.user.id;
+      var count = 0;
+      if (isAdmin) {
+        var res = await supabase.from('planos_acao').select('id').eq('status', 'validacao');
+        count = ((res && res.data) || []).length;
+      } else {
+        var res2 = await supabase.from('planos_acao').select('id, status, quem_fara').eq('quem_fara', uid).in('status', ['novo', 'em_andamento']);
+        count = ((res2 && res2.data) || []).length;
+      }
       if (homeBadge) { if (count > 0) { homeBadge.textContent = count; homeBadge.style.display = 'flex'; } else { homeBadge.style.display = 'none'; } }
       if (navBadge) { if (count > 0) { navBadge.textContent = count; navBadge.style.display = 'flex'; } else { navBadge.style.display = 'none'; } }
     } catch (e) {
