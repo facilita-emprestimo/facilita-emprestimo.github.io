@@ -1071,7 +1071,11 @@
     }
   }
 
+  var lastHandledSessionKey; // evita reprocessar (e duplicar pastas/listas) quando o Supabase dispara o evento de sessão mais de uma vez no carregamento
   async function handleSession(session) {
+    var sessionKey = (session && session.access_token) ? session.access_token : null;
+    if (sessionKey === lastHandledSessionKey) return;
+    lastHandledSessionKey = sessionKey;
     if (session && session.user) {
       appState.session = session;
       var profile = await loadProfile(session.user.id);
