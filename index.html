@@ -24,6 +24,7 @@
     --violet:#7C3AED;
     --amber:#D97706;
     --cyan:#0891B2;
+    --coral:#F43F5E;
   }
   *{box-sizing:border-box;}
   html,body{margin:0;padding:0;height:100%;}
@@ -419,6 +420,7 @@
     <symbol id="i-users" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></symbol>
     <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></symbol>
     <symbol id="i-book" viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></symbol>
+    <symbol id="i-inbox" viewBox="0 0 24 24"><path d="M22 12h-6l-2 3h-4l-2-3H2"/><path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/></symbol>
   </defs>
 </svg>
 
@@ -523,6 +525,10 @@
         <svg class="ic"><use href="#i-clipboard-check"/></svg> Tarefas
         <span class="nav-badge" id="navTarefasBadge" style="display:none;"></span>
       </button>
+      <button class="nav-link" data-page="chamados" onclick="navigate('chamados')">
+        <svg class="ic"><use href="#i-inbox"/></svg> Chamados
+        <span class="nav-badge" id="navChamadosBadge" style="display:none;"></span>
+      </button>
       <div class="nav-caption">Acesso</div>
       <button class="nav-link" id="navAdminBtn" data-page="admin" onclick="navigate('admin')">
         <svg class="ic"><use href="#i-user-plus"/></svg> Administração
@@ -598,6 +604,13 @@
               <span class="tile-badge" id="homeTarefasBadge" style="display:none;"></span>
             </div>
             <div class="tile-label">Tarefas</div>
+          </button>
+          <button class="tile" style="background:var(--coral)" onclick="navigate('chamados')">
+            <div class="tile-icon">
+              <svg class="ic" style="color:#fff"><use href="#i-inbox"/></svg>
+              <span class="tile-badge" id="homeChamadosBadge" style="display:none;"></span>
+            </div>
+            <div class="tile-label">Chamados</div>
           </button>
         </div>
 
@@ -1014,6 +1027,93 @@
         </div>
       </div>
 
+      <!-- ================= CHAMADOS ================= -->
+      <section class="page" id="page-chamados">
+        <div class="breadcrumb">Portal Interno / <b>Chamados</b></div>
+        <div class="page-header">
+          <div><h1>Chamados</h1><p>Solicitações ao Administrativo, TI e Marketing.</p></div>
+          <div class="docs-toolbar">
+            <button type="button" class="doc-action-btn" id="btnNewChamado">
+              <svg class="ic" style="width:15px;height:15px"><use href="#i-plus"/></svg> Abrir chamado
+            </button>
+          </div>
+        </div>
+        <div class="tabs">
+          <button class="tab active" onclick="filterChamados('todos', this)">Todos</button>
+          <button class="tab" onclick="filterChamados('aberto', this)">Abertos</button>
+          <button class="tab" onclick="filterChamados('em_andamento', this)">Em andamento</button>
+          <button class="tab" onclick="filterChamados('resolvido', this)">Resolvidos</button>
+        </div>
+        <div class="login-msg error" id="chamadosMsg" style="margin-bottom:16px;"></div>
+        <div class="doc-list" id="chamadosList"></div>
+        <div class="docs-empty" id="chamadosEmpty" style="display:none;">Nenhum chamado por aqui ainda.</div>
+      </section>
+
+      <!-- ============ MODAL: NOVO CHAMADO ============ -->
+      <div class="modal-overlay hidden" id="chamadoModal">
+        <div class="modal-card">
+          <h3>Abrir chamado</h3>
+          <div class="login-msg error" id="chamadoModalMsg"></div>
+          <form id="chamadoForm">
+            <div class="login-field">
+              <label for="chamadoTitulo">Assunto</label>
+              <input type="text" id="chamadoTitulo" required>
+            </div>
+            <div class="login-field">
+              <label for="chamadoDescricao">Descreva a solicitação</label>
+              <textarea id="chamadoDescricao" rows="4" style="width:100%;padding:11px 13px;border:1px solid var(--line);border-radius:9px;font-family:inherit;font-size:13.5px;background:var(--bg);resize:vertical;" required></textarea>
+            </div>
+            <div class="login-field">
+              <label for="chamadoCategoria">Departamento</label>
+              <select id="chamadoCategoria" required>
+                <option value="ti">TI</option>
+                <option value="administrativo">Administrativo</option>
+                <option value="marketing">Marketing</option>
+              </select>
+            </div>
+            <div class="login-field">
+              <label for="chamadoPrioridade">Prioridade</label>
+              <select id="chamadoPrioridade">
+                <option value="baixa">Baixa</option>
+                <option value="media" selected>Média</option>
+                <option value="alta">Alta</option>
+              </select>
+            </div>
+            <div style="display:flex;gap:10px;margin-top:16px;">
+              <button type="submit" class="login-btn" style="width:auto;padding:11px 20px;">Enviar chamado</button>
+              <button type="button" class="login-btn" id="chamadoCancel" style="width:auto;padding:11px 20px;background:#9CA3AF;">Cancelar</button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- ============ MODAL: GERENCIAR CHAMADO (admin) ============ -->
+      <div class="modal-overlay hidden" id="chamadoManageModal">
+        <div class="modal-card">
+          <h3>Gerenciar chamado</h3>
+          <div class="login-msg error" id="chamadoManageMsg"></div>
+          <form id="chamadoManageForm">
+            <input type="hidden" id="chamadoManageId">
+            <div class="login-field">
+              <label for="chamadoManageStatus">Status</label>
+              <select id="chamadoManageStatus">
+                <option value="aberto">Aberto</option>
+                <option value="em_andamento">Em andamento</option>
+                <option value="resolvido">Resolvido</option>
+              </select>
+            </div>
+            <div class="login-field">
+              <label for="chamadoManageResposta">Resposta / observação (visível para quem abriu)</label>
+              <textarea id="chamadoManageResposta" rows="4" style="width:100%;padding:11px 13px;border:1px solid var(--line);border-radius:9px;font-family:inherit;font-size:13.5px;background:var(--bg);resize:vertical;"></textarea>
+            </div>
+            <div style="display:flex;gap:10px;margin-top:16px;">
+              <button type="submit" class="login-btn" style="width:auto;padding:11px 20px;">Salvar</button>
+              <button type="button" class="login-btn" id="chamadoManageCancel" style="width:auto;padding:11px 20px;background:#9CA3AF;">Cancelar</button>
+            </div>
+          </form>
+        </div>
+      </div>
+
       <!-- ================= ADMINISTRAÇÃO ================= -->
       <section class="page" id="page-admin">
         <div class="breadcrumb">Portal Interno / <b>Administração</b></div>
@@ -1226,6 +1326,7 @@
       if (typeof loadRootFolders === 'function') loadRootFolders();
       if (typeof loadHomeComunicados === 'function') loadHomeComunicados();
       if (typeof updateTarefasBadges === 'function') updateTarefasBadges();
+      if (typeof updateChamadosBadges === 'function') updateChamadosBadges();
     } else {
       appState.session = null;
       appState.profile = null;
@@ -1955,6 +2056,7 @@
     if (page === 'marketing' && typeof loadMarketing === 'function') { loadMarketing(); }
     if (page === 'unidades' && typeof loadUnidades === 'function') { loadUnidades(); }
     if (page === 'tarefas' && typeof loadTarefas === 'function') { loadTarefas(); }
+    if (page === 'chamados' && typeof loadChamados === 'function') { loadChamados(); }
     if (page === 'home' && typeof loadHomeComunicados === 'function') { loadHomeComunicados(); }
     window.scrollTo(0,0);
   }
@@ -3049,6 +3151,206 @@
       var res = await supabase.from('tasks').select('id, assigned_to').eq('status', 'pendente');
       var items = (res && res.data) || [];
       var count = items.filter(function (t) { return !t.assigned_to || t.assigned_to === uid; }).length;
+      if (homeBadge) { if (count > 0) { homeBadge.textContent = count; homeBadge.style.display = 'flex'; } else { homeBadge.style.display = 'none'; } }
+      if (navBadge) { if (count > 0) { navBadge.textContent = count; navBadge.style.display = 'flex'; } else { navBadge.style.display = 'none'; } }
+    } catch (e) {
+      if (homeBadge) homeBadge.style.display = 'none';
+      if (navBadge) navBadge.style.display = 'none';
+    }
+  }
+
+  // ---------------- Chamados ----------------
+  var CHAMADO_CATEGORIA_LABELS = { ti: 'TI', administrativo: 'Administrativo', marketing: 'Marketing' };
+  var CHAMADO_PRIORIDADE_LABELS = { baixa: 'Baixa', media: 'Média', alta: 'Alta' };
+  var CHAMADO_PRIORIDADE_BADGE = { baixa: 'badge-green', media: 'badge-orange', alta: 'badge-red' };
+  var CHAMADO_STATUS_LABELS = { aberto: 'Aberto', em_andamento: 'Em andamento', resolvido: 'Resolvido' };
+  var CHAMADO_STATUS_BADGE = { aberto: 'badge-red', em_andamento: 'badge-blue', resolvido: 'badge-green' };
+  var currentChamadosFilter = 'todos';
+  var chamadosMsgEl = document.getElementById('chamadosMsg');
+  var chamadoModal = document.getElementById('chamadoModal');
+  var chamadoForm = document.getElementById('chamadoForm');
+  var chamadoModalMsg = document.getElementById('chamadoModalMsg');
+  var chamadoCancel = document.getElementById('chamadoCancel');
+  var btnNewChamado = document.getElementById('btnNewChamado');
+  var chamadoManageModal = document.getElementById('chamadoManageModal');
+  var chamadoManageForm = document.getElementById('chamadoManageForm');
+  var chamadoManageMsg = document.getElementById('chamadoManageMsg');
+  var chamadoManageCancel = document.getElementById('chamadoManageCancel');
+
+  function buildChamadoCard(item, profiles) {
+    var isAdmin = !!(appState.profile && appState.profile.is_admin);
+    var card = document.createElement('div');
+    card.className = 'doc-card';
+
+    var icon = document.createElement('div');
+    icon.className = 'doc-icon';
+    icon.style.background = item.status === 'resolvido' ? 'var(--green)' : (item.status === 'em_andamento' ? 'var(--blue)' : 'var(--coral)');
+    icon.innerHTML = '<svg class="ic" style="color:#fff"><use href="#i-inbox"/></svg>';
+    card.appendChild(icon);
+
+    var body = document.createElement('div');
+    body.className = 'doc-body';
+
+    var top = document.createElement('div');
+    top.className = 'doc-top';
+    var title = document.createElement('p');
+    title.className = 'doc-title';
+    title.textContent = item.title;
+    top.appendChild(title);
+
+    var right = document.createElement('div');
+    right.style.display = 'flex';
+    right.style.gap = '6px';
+    right.style.alignItems = 'center';
+    right.style.flexWrap = 'wrap';
+
+    var catBadge = document.createElement('span');
+    catBadge.className = 'badge badge-purple';
+    catBadge.textContent = CHAMADO_CATEGORIA_LABELS[item.category] || item.category;
+    right.appendChild(catBadge);
+
+    var prioBadge = document.createElement('span');
+    prioBadge.className = 'badge ' + (CHAMADO_PRIORIDADE_BADGE[item.priority] || 'badge-orange');
+    prioBadge.textContent = 'Prioridade ' + (CHAMADO_PRIORIDADE_LABELS[item.priority] || item.priority);
+    right.appendChild(prioBadge);
+
+    var statusBadge = document.createElement('span');
+    statusBadge.className = 'badge ' + (CHAMADO_STATUS_BADGE[item.status] || 'badge-red');
+    statusBadge.textContent = CHAMADO_STATUS_LABELS[item.status] || item.status;
+    right.appendChild(statusBadge);
+
+    if (isAdmin) {
+      right.appendChild(buildActionBtn('i-edit', 'Gerenciar', function () { openChamadoManageModal(item); }));
+      right.appendChild(buildActionBtn('i-trash', 'Excluir', function () { deleteChamado(item); }));
+    }
+    top.appendChild(right);
+    body.appendChild(top);
+
+    if (item.description) {
+      var desc = document.createElement('p');
+      desc.className = 'doc-desc';
+      desc.textContent = item.description;
+      body.appendChild(desc);
+    }
+
+    if (item.resposta) {
+      var resposta = document.createElement('p');
+      resposta.className = 'doc-desc';
+      resposta.style.marginTop = '8px';
+      resposta.style.padding = '10px 12px';
+      resposta.style.background = 'var(--bg)';
+      resposta.style.borderRadius = '8px';
+      resposta.innerHTML = '<b>Resposta:</b> ';
+      resposta.appendChild(document.createTextNode(item.resposta));
+      body.appendChild(resposta);
+    }
+
+    var footer = document.createElement('div');
+    footer.className = 'doc-footer';
+    var footerHtml = '<span><svg class="ic" style="width:13px;height:13px"><use href="#i-user"/></svg> Aberto por ' + profileNameById(profiles, item.created_by) + '</span>';
+    footerHtml += '<span><svg class="ic" style="width:13px;height:13px"><use href="#i-clock"/></svg> ' + formatDateBR(item.created_at) + '</span>';
+    footer.innerHTML = footerHtml;
+    body.appendChild(footer);
+
+    card.appendChild(body);
+    return card;
+  }
+
+  async function loadChamados() {
+    if (!appState.session) return;
+    if (chamadosMsgEl) hideMsgEl(chamadosMsgEl);
+    var profiles = await fetchProfilesForSelect();
+    var res = await supabase.from('chamados').select('*').order('created_at', { ascending: false });
+    if (res.error) { if (chamadosMsgEl) showMsgEl(chamadosMsgEl, 'Não foi possível carregar os chamados.', 'error'); return; }
+    var items = res.data || [];
+    if (currentChamadosFilter !== 'todos') items = items.filter(function (i) { return i.status === currentChamadosFilter; });
+    var listEl = document.getElementById('chamadosList');
+    var emptyEl = document.getElementById('chamadosEmpty');
+    listEl.innerHTML = '';
+    if (!items.length) { emptyEl.style.display = 'block'; return; }
+    emptyEl.style.display = 'none';
+    items.forEach(function (item) { listEl.appendChild(buildChamadoCard(item, profiles)); });
+  }
+
+  function filterChamados(tag, btn) {
+    currentChamadosFilter = tag;
+    document.querySelectorAll('#page-chamados .tab').forEach(function (t) { t.classList.remove('active'); });
+    btn.classList.add('active');
+    loadChamados();
+  }
+
+  if (btnNewChamado) {
+    btnNewChamado.addEventListener('click', function () {
+      hideMsgEl(chamadoModalMsg);
+      chamadoForm.reset();
+      document.getElementById('chamadoPrioridade').value = 'media';
+      chamadoModal.classList.remove('hidden');
+    });
+  }
+  if (chamadoCancel) chamadoCancel.addEventListener('click', function () { chamadoModal.classList.add('hidden'); });
+  if (chamadoForm) {
+    chamadoForm.addEventListener('submit', async function (e) {
+      e.preventDefault();
+      hideMsgEl(chamadoModalMsg);
+      var payload = {
+        title: document.getElementById('chamadoTitulo').value.trim(),
+        description: document.getElementById('chamadoDescricao').value.trim() || null,
+        category: document.getElementById('chamadoCategoria').value,
+        priority: document.getElementById('chamadoPrioridade').value,
+        created_by: appState.session.user.id
+      };
+      var res = await supabase.from('chamados').insert(payload);
+      if (res.error) { showMsgEl(chamadoModalMsg, 'Não foi possível abrir o chamado.', 'error'); return; }
+      chamadoModal.classList.add('hidden');
+      loadChamados();
+      updateChamadosBadges();
+    });
+  }
+
+  function openChamadoManageModal(item) {
+    hideMsgEl(chamadoManageMsg);
+    chamadoManageForm.reset();
+    document.getElementById('chamadoManageId').value = item.id;
+    document.getElementById('chamadoManageStatus').value = item.status;
+    document.getElementById('chamadoManageResposta').value = item.resposta || '';
+    chamadoManageModal.classList.remove('hidden');
+  }
+  if (chamadoManageCancel) chamadoManageCancel.addEventListener('click', function () { chamadoManageModal.classList.add('hidden'); });
+  if (chamadoManageForm) {
+    chamadoManageForm.addEventListener('submit', async function (e) {
+      e.preventDefault();
+      hideMsgEl(chamadoManageMsg);
+      var id = document.getElementById('chamadoManageId').value;
+      var status = document.getElementById('chamadoManageStatus').value;
+      var payload = {
+        status: status,
+        resposta: document.getElementById('chamadoManageResposta').value.trim() || null,
+        updated_at: new Date().toISOString(),
+        resolved_at: status === 'resolvido' ? new Date().toISOString() : null
+      };
+      var res = await supabase.from('chamados').update(payload).eq('id', id);
+      if (res.error) { showMsgEl(chamadoManageMsg, 'Não foi possível salvar.', 'error'); return; }
+      chamadoManageModal.classList.add('hidden');
+      loadChamados();
+      updateChamadosBadges();
+    });
+  }
+
+  async function deleteChamado(item) {
+    if (!confirm('Excluir o chamado "' + item.title + '"? Esta ação não pode ser desfeita.')) return;
+    var res = await supabase.from('chamados').delete().eq('id', item.id);
+    if (res.error) { alert('Não foi possível excluir o chamado.'); return; }
+    loadChamados();
+    updateChamadosBadges();
+  }
+
+  async function updateChamadosBadges() {
+    if (!appState.session) return;
+    var homeBadge = document.getElementById('homeChamadosBadge');
+    var navBadge = document.getElementById('navChamadosBadge');
+    try {
+      var res = await supabase.from('chamados').select('id').eq('status', 'aberto');
+      var count = ((res && res.data) || []).length;
       if (homeBadge) { if (count > 0) { homeBadge.textContent = count; homeBadge.style.display = 'flex'; } else { homeBadge.style.display = 'none'; } }
       if (navBadge) { if (count > 0) { navBadge.textContent = count; navBadge.style.display = 'flex'; } else { navBadge.style.display = 'none'; } }
     } catch (e) {
