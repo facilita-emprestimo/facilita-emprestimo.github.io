@@ -790,64 +790,6 @@
         </div>
       </div>
 
-      <!-- ================= MARKETING ================= -->
-      <section class="page" id="page-marketing">
-        <div class="breadcrumb">Portal Interno / <b>Marketing</b></div>
-        <div class="page-header">
-          <div><h1>Material de Marketing</h1><p>Artes, peças e materiais oficiais para uso em redes sociais e nas unidades.</p></div>
-          <div class="docs-toolbar" id="marketingAdminActions" style="display:none;">
-            <button type="button" class="doc-action-btn" id="btnNewMarketing">
-              <svg class="ic" style="width:15px;height:15px"><use href="#i-plus"/></svg> Nova arte
-            </button>
-          </div>
-        </div>
-
-        <div class="tabs">
-          <button class="tab active" onclick="filterMarketing('todos', this)">Todos</button>
-          <button class="tab" onclick="filterMarketing('campanhas', this)">Campanhas</button>
-          <button class="tab" onclick="filterMarketing('pecas', this)">Peças prontas</button>
-          <button class="tab" onclick="filterMarketing('institucional', this)">Institucional</button>
-          <button class="tab" onclick="filterMarketing('video', this)">Vídeos</button>
-        </div>
-
-        <div class="login-msg error" id="marketingMsg" style="margin-bottom:16px;"></div>
-
-        <div class="section-label">Materiais</div>
-        <div class="file-grid" id="marketingGrid"></div>
-        <div class="docs-empty" id="marketingEmpty" style="display:none;">Nenhum material cadastrado ainda.</div>
-      </section>
-
-      <!-- ============ MODAL: NOVA ARTE ============ -->
-      <div class="modal-overlay hidden" id="marketingModal">
-        <div class="modal-card">
-          <h3>Nova arte</h3>
-          <div class="login-msg error" id="marketingModalMsg"></div>
-          <form id="marketingForm">
-            <div class="login-field">
-              <label for="marketingTitulo">Título</label>
-              <input type="text" id="marketingTitulo" required>
-            </div>
-            <div class="login-field">
-              <label for="marketingCategoria">Categoria</label>
-              <select id="marketingCategoria">
-                <option value="campanhas">Campanhas</option>
-                <option value="pecas">Peças prontas</option>
-                <option value="institucional">Institucional</option>
-                <option value="video">Vídeos</option>
-              </select>
-            </div>
-            <div class="login-field">
-              <label for="marketingArquivo">Arquivo</label>
-              <input type="file" id="marketingArquivo" required>
-            </div>
-            <div style="display:flex;gap:10px;margin-top:16px;">
-              <button type="submit" class="login-btn" id="marketingSubmitBtn" style="width:auto;padding:11px 20px;">Enviar</button>
-              <button type="button" class="login-btn" id="marketingCancel" style="width:auto;padding:11px 20px;background:#9CA3AF;">Cancelar</button>
-            </div>
-          </form>
-        </div>
-      </div>
-
       <!-- ================= DOCUMENTOS ================= -->
       <section class="page" id="page-documentos">
         <div class="breadcrumb">Portal Interno / <b id="docsAreaCrumb">Documentos</b></div>
@@ -1620,6 +1562,7 @@
   // filtra e grava na tabela `folders` usando a coluna `area`.
   var AREA_CONFIG = {
     documentos: { crumb: 'Documentos', title: 'Documentos e Políticas', subtitle: 'Pastas e arquivos organizados por nível de acesso.', emptyFolders: 'Nenhuma pasta disponível para o seu nível de acesso ainda.' },
+    marketing: { crumb: 'Marketing', title: 'Material de Marketing', subtitle: 'Artes, campanhas e peças organizadas em pastas e subpastas — várias imagens e vídeos por pasta.', emptyFolders: 'Nenhuma pasta de marketing publicada ainda.' },
     'pessoas-cultura': { crumb: 'Pessoas e Cultura', title: 'Pessoas e Cultura', subtitle: 'Benefícios, cultura e conteúdos sobre o time Facilita — pastas com PDFs, vídeos e imagens.', emptyFolders: 'Nenhum conteúdo publicado em Pessoas e Cultura ainda.' },
     'sobre-nos': { crumb: 'Sobre Nós', title: 'Sobre Nós', subtitle: 'História, missão e valores da Facilita Empréstimo — pastas com PDFs, vídeos e imagens.', emptyFolders: 'Nenhum conteúdo publicado em Sobre Nós ainda.' },
     'trilha-conhecimento': { crumb: 'Trilha do Conhecimento', title: 'Trilha do Conhecimento', subtitle: 'Treinamentos, vídeos e materiais de capacitação — pastas com PDFs, vídeos e imagens.', emptyFolders: 'Nenhum conteúdo publicado na Trilha do Conhecimento ainda.' }
@@ -2216,27 +2159,12 @@
     }
     if (page === 'comunicados' && typeof loadComunicados === 'function') { loadComunicados(); }
     if (page === 'informativos' && typeof loadInformativos === 'function') { loadInformativos(); }
-    if (page === 'marketing' && typeof loadMarketing === 'function') { loadMarketing(); }
     if (page === 'unidades' && typeof loadUnidades === 'function') { loadUnidades(); }
     if (page === 'tarefas' && typeof loadTarefas === 'function') { loadTarefas(); }
     if (page === 'chamados' && typeof loadChamados === 'function') { loadChamados(); }
     if (page === 'planos-acao' && typeof loadPlanos === 'function') { loadPlanos(); }
     if (page === 'home' && typeof loadHomeComunicados === 'function') { loadHomeComunicados(); }
     window.scrollTo(0,0);
-  }
-
-  // ---- Filtro da página de Marketing ----
-  var currentMarketingFilter = 'todos';
-  function filterMarketing(tag, btn){
-    currentMarketingFilter = tag;
-    document.querySelectorAll('#page-marketing .tab').forEach(function(t){ t.classList.remove('active'); });
-    btn.classList.add('active');
-    applyMarketingFilter();
-  }
-  function applyMarketingFilter(){
-    document.querySelectorAll('#marketingGrid .file-card').forEach(function(c){
-      c.style.display = (currentMarketingFilter === 'todos' || c.dataset.tag === currentMarketingFilter) ? '' : 'none';
-    });
   }
 
   // =====================================================================
@@ -2715,206 +2643,6 @@
     var res = await supabase.from('informativos').delete().eq('id', item.id);
     if (res.error) { alert('Não foi possível excluir o informativo.'); return; }
     loadInformativos();
-  }
-
-  // ---------------- Marketing ----------------
-  var marketingMsgEl = document.getElementById('marketingMsg');
-  var marketingModal = document.getElementById('marketingModal');
-  var marketingForm = document.getElementById('marketingForm');
-  var marketingModalMsg = document.getElementById('marketingModalMsg');
-  var btnNewMarketing = document.getElementById('btnNewMarketing');
-  var marketingCancel = document.getElementById('marketingCancel');
-
-  var MARKETING_CATEGORY_GRADIENT = {
-    campanhas: 'linear-gradient(135deg,var(--red),var(--red-dark))',
-    pecas: 'linear-gradient(135deg,var(--teal),#0E7A70)',
-    institucional: 'linear-gradient(135deg,var(--orange),#C2620E)',
-    video: 'linear-gradient(135deg,var(--purple),#4C2FBF)'
-  };
-  var MARKETING_CATEGORY_LABEL = {
-    campanhas: 'Campanhas',
-    pecas: 'Peças prontas',
-    institucional: 'Institucional',
-    video: 'Vídeos'
-  };
-
-  function buildMarketingCard(item) {
-    var isAdmin = !!(appState.profile && appState.profile.is_admin);
-    var card = document.createElement('div');
-    card.className = 'file-card';
-    card.dataset.tag = item.category || 'pecas';
-
-    var thumb = document.createElement('div');
-    thumb.className = 'file-thumb';
-    thumb.style.background = MARKETING_CATEGORY_GRADIENT[item.category] || MARKETING_CATEGORY_GRADIENT.pecas;
-    var isImageFile = fileIconInfo(item.file_type, item.title).symbol === 'i-image';
-    var isVideoFile = item.category === 'video' || ['mp4', 'mov', 'webm', 'avi', 'mkv'].indexOf((item.file_type || '').toLowerCase()) !== -1;
-    var symbol = isVideoFile ? 'i-video' : fileIconInfo(item.file_type, item.title).symbol;
-    thumb.innerHTML = '<span class="file-type-tag">' + ((item.file_type || '').toUpperCase()) + '</span>' +
-      '<svg class="ic" style="width:26px;height:26px;color:#fff"><use href="#' + symbol + '"/></svg>';
-    card.appendChild(thumb);
-
-    // Prévia real do arquivo (imagem ou frame do vídeo), quando possível — cai no ícone se não der.
-    if (isImageFile) {
-      supabase.storage.from('marketing').createSignedUrl(item.storage_path, 3600).then(function (res) {
-        if (res.data && res.data.signedUrl) {
-          var iconSvg = thumb.querySelector('.ic');
-          if (iconSvg) iconSvg.style.display = 'none';
-          var img = document.createElement('img');
-          img.className = 'file-thumb-img';
-          img.alt = '';
-          img.src = res.data.signedUrl;
-          thumb.insertBefore(img, thumb.firstChild);
-        }
-      }).catch(function () {});
-    } else if (isVideoFile) {
-      supabase.storage.from('marketing').createSignedUrl(item.storage_path, 3600).then(function (res) {
-        if (!(res.data && res.data.signedUrl)) return;
-        try {
-          var vid = document.createElement('video');
-          vid.crossOrigin = 'anonymous';
-          vid.muted = true;
-          vid.preload = 'auto';
-          vid.src = res.data.signedUrl;
-          vid.addEventListener('loadeddata', function () {
-            try {
-              var canvas = document.createElement('canvas');
-              canvas.width = vid.videoWidth;
-              canvas.height = vid.videoHeight;
-              canvas.getContext('2d').drawImage(vid, 0, 0, canvas.width, canvas.height);
-              var dataUrl = canvas.toDataURL('image/jpeg', 0.7);
-              var iconSvg = thumb.querySelector('.ic');
-              if (iconSvg) iconSvg.style.display = 'none';
-              var img = document.createElement('img');
-              img.className = 'file-thumb-img';
-              img.alt = '';
-              img.src = dataUrl;
-              thumb.insertBefore(img, thumb.firstChild);
-              var play = document.createElement('div');
-              play.className = 'file-thumb-play';
-              play.innerHTML = '<div class="file-thumb-play-circle"><svg class="ic" style="width:14px;height:14px;color:#fff"><use href="#i-video"/></svg></div>';
-              thumb.appendChild(play);
-            } catch (e2) { /* provável CORS no frame — mantém o ícone padrão */ }
-          }, { once: true });
-        } catch (e) { /* mantém o ícone padrão */ }
-      }).catch(function () {});
-    }
-
-    var infoWrap = document.createElement('div');
-    var nameEl = document.createElement('div');
-    nameEl.className = 'file-name';
-    nameEl.textContent = item.title;
-    var subEl = document.createElement('div');
-    subEl.className = 'file-sub';
-    subEl.textContent = (MARKETING_CATEGORY_LABEL[item.category] || 'Peças prontas') + ' · ' + humanFileSize(item.size_bytes);
-    infoWrap.appendChild(nameEl);
-    infoWrap.appendChild(subEl);
-    card.appendChild(infoWrap);
-
-    var dlBtn = document.createElement('button');
-    dlBtn.type = 'button';
-    dlBtn.className = 'file-dl';
-    dlBtn.style.width = '100%';
-    dlBtn.style.cursor = 'pointer';
-    dlBtn.style.fontFamily = 'inherit';
-    dlBtn.innerHTML = '<svg class="ic"><use href="#i-download"/></svg> Download';
-    dlBtn.addEventListener('click', function () { downloadMarketingItem(item, dlBtn); });
-    card.appendChild(dlBtn);
-
-    if (isAdmin) {
-      var delBtn = buildActionBtn('i-trash', 'Excluir', function () { deleteMarketingItem(item); });
-      delBtn.style.position = 'absolute';
-      delBtn.style.top = '8px';
-      delBtn.style.right = '8px';
-      delBtn.style.background = 'rgba(255,255,255,.92)';
-      card.appendChild(delBtn);
-    }
-    return card;
-  }
-
-  async function loadMarketing() {
-    if (!appState.session) return;
-    if (marketingMsgEl) hideMsgEl(marketingMsgEl);
-    var toolbar = document.getElementById('marketingAdminActions');
-    if (toolbar) toolbar.style.display = (appState.profile && appState.profile.is_admin) ? 'flex' : 'none';
-    var res = await supabase.from('marketing').select('*').order('created_at', { ascending: false });
-    if (res.error) { if (marketingMsgEl) showMsgEl(marketingMsgEl, 'Não foi possível carregar os materiais.', 'error'); return; }
-    var items = res.data || [];
-    var grid = document.getElementById('marketingGrid');
-    var emptyEl = document.getElementById('marketingEmpty');
-    grid.innerHTML = '';
-    if (!items.length) { emptyEl.style.display = 'block'; return; }
-    emptyEl.style.display = 'none';
-    items.forEach(function (item) { grid.appendChild(buildMarketingCard(item)); });
-    applyMarketingFilter();
-  }
-
-  if (btnNewMarketing) {
-    btnNewMarketing.addEventListener('click', function () {
-      hideMsgEl(marketingModalMsg);
-      marketingForm.reset();
-      marketingModal.classList.remove('hidden');
-    });
-  }
-  if (marketingCancel) marketingCancel.addEventListener('click', function () { marketingModal.classList.add('hidden'); });
-  if (marketingForm) {
-    marketingForm.addEventListener('submit', async function (e) {
-      e.preventDefault();
-      hideMsgEl(marketingModalMsg);
-      var titulo = document.getElementById('marketingTitulo').value.trim();
-      var categoria = document.getElementById('marketingCategoria').value;
-      var fileInput = document.getElementById('marketingArquivo');
-      var file = fileInput.files[0];
-      if (!file) { showMsgEl(marketingModalMsg, 'Selecione um arquivo.', 'error'); return; }
-      var submitBtn = document.getElementById('marketingSubmitBtn');
-      submitBtn.disabled = true;
-      try {
-        var path = crypto.randomUUID() + '-' + safeStorageName(file.name);
-        var up = await supabase.storage.from('marketing').upload(path, file);
-        if (up.error) throw new Error('Falha ao enviar o arquivo.');
-        var ext = (file.name.split('.').pop() || '').toLowerCase();
-        var ins = await supabase.from('marketing').insert({
-          title: titulo,
-          category: categoria,
-          storage_path: path,
-          file_type: ext,
-          size_bytes: file.size,
-          created_by: appState.session.user.id
-        });
-        if (ins.error) throw new Error('Falha ao registrar o material.');
-        marketingModal.classList.add('hidden');
-        loadMarketing();
-      } catch (err) {
-        showMsgEl(marketingModalMsg, (err && err.message) || 'Não foi possível enviar a arte.', 'error');
-      } finally {
-        submitBtn.disabled = false;
-      }
-    });
-  }
-
-  async function downloadMarketingItem(item, btnEl) {
-    if (btnEl) btnEl.disabled = true;
-    try {
-      var signedRes = await supabase.storage.from('marketing').createSignedUrl(item.storage_path, 60);
-      if (signedRes.error || !signedRes.data) throw new Error('Não foi possível gerar o link de download.');
-      var fileResp = await fetch(signedRes.data.signedUrl);
-      if (!fileResp.ok) throw new Error('Falha ao baixar o arquivo.');
-      var blob = await fileResp.blob();
-      var filename = item.title + (item.file_type ? ('.' + item.file_type) : '');
-      triggerBlobDownload(blob, filename);
-    } catch (err) {
-      alert((err && err.message) || 'Não foi possível baixar o arquivo.');
-    } finally {
-      if (btnEl) btnEl.disabled = false;
-    }
-  }
-
-  async function deleteMarketingItem(item) {
-    if (!confirm('Excluir "' + item.title + '"? Esta ação não pode ser desfeita.')) return;
-    await supabase.storage.from('marketing').remove([item.storage_path]);
-    var del = await supabase.from('marketing').delete().eq('id', item.id);
-    if (del.error) { alert('Não foi possível excluir o material.'); return; }
-    loadMarketing();
   }
 
   // ---------------- Unidades ----------------
