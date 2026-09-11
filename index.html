@@ -1082,6 +1082,8 @@
                 <option value="ti">TI</option>
                 <option value="administrativo">Administrativo</option>
                 <option value="marketing">Marketing</option>
+                <option value="dep_pessoal">Dep. Pessoal</option>
+                <option value="financeiro">Financeiro</option>
               </select>
             </div>
             <div class="login-field">
@@ -1091,6 +1093,10 @@
                 <option value="media" selected>Média</option>
                 <option value="alta">Alta</option>
               </select>
+            </div>
+            <div class="login-field">
+              <label for="chamadoAnexosInput">Anexos (opcional — pode selecionar mais de um arquivo)</label>
+              <input type="file" id="chamadoAnexosInput" multiple>
             </div>
             <div style="display:flex;gap:10px;margin-top:16px;">
               <button type="submit" class="login-btn" style="width:auto;padding:11px 20px;">Enviar chamado</button>
@@ -1116,8 +1122,20 @@
               </select>
             </div>
             <div class="login-field">
+              <label for="chamadoManagePrioridade">Prioridade</label>
+              <select id="chamadoManagePrioridade">
+                <option value="baixa">Baixa</option>
+                <option value="media">Média</option>
+                <option value="alta">Alta</option>
+              </select>
+            </div>
+            <div class="login-field">
               <label for="chamadoManageResposta">Resposta / observação (visível para quem abriu)</label>
               <textarea id="chamadoManageResposta" rows="4" style="width:100%;padding:11px 13px;border:1px solid var(--line);border-radius:9px;font-family:inherit;font-size:13.5px;background:var(--bg);resize:vertical;"></textarea>
+            </div>
+            <div class="login-field">
+              <label for="chamadoManageAnexosInput">Anexar mais documentos (opcional — pode selecionar mais de um arquivo)</label>
+              <input type="file" id="chamadoManageAnexosInput" multiple>
             </div>
             <div style="display:flex;gap:10px;margin-top:16px;">
               <button type="submit" class="login-btn" style="width:auto;padding:11px 20px;">Salvar</button>
@@ -3265,7 +3283,7 @@
   }
 
   // ---------------- Chamados ----------------
-  var CHAMADO_CATEGORIA_LABELS = { ti: 'TI', administrativo: 'Administrativo', marketing: 'Marketing' };
+  var CHAMADO_CATEGORIA_LABELS = { ti: 'TI', administrativo: 'Administrativo', marketing: 'Marketing', dep_pessoal: 'Dep. Pessoal', financeiro: 'Financeiro' };
   var CHAMADO_PRIORIDADE_LABELS = { baixa: 'Baixa', media: 'Média', alta: 'Alta' };
   var CHAMADO_PRIORIDADE_BADGE = { baixa: 'badge-green', media: 'badge-orange', alta: 'badge-red' };
   var CHAMADO_STATUS_LABELS = { aberto: 'Aberto', em_andamento: 'Em andamento', resolvido: 'Resolvido' };
@@ -3282,7 +3300,88 @@
   var chamadoManageMsg = document.getElementById('chamadoManageMsg');
   var chamadoManageCancel = document.getElementById('chamadoManageCancel');
 
-  function buildChamadoCard(item, profiles) {
+  function buildChamadoAnexoRow(anexo, isAdmin) {
+    var row = document.createElement('div');
+    row.className = 'doc-file-row';
+    row.style.marginTop = '6px';
+    var info = fileIconInfo(anexo.file_type, anexo.name);
+
+    var iconEl = document.createElement('div');
+    iconEl.className = 'doc-file-icon';
+    iconEl.style.background = info.bg;
+    iconEl.innerHTML = '<svg class="ic" style="color:#fff"><use href="#' + info.symbol + '"/></svg>';
+    row.appendChild(iconEl);
+
+    var metaEl = document.createElement('div');
+    metaEl.className = 'doc-file-meta';
+    var nameEl = document.createElement('p');
+    nameEl.className = 'doc-file-name';
+    nameEl.textContent = anexo.name;
+    metaEl.appendChild(nameEl);
+    if (anexo.size_bytes) {
+      var subEl = document.createElement('div');
+      subEl.className = 'doc-file-sub';
+      subEl.textContent = humanFileSize(anexo.size_bytes);
+      metaEl.appendChild(subEl);
+    }
+    row.appendChild(metaEl);
+
+    var downloadBtn = document.createElement('button');
+    downloadBtn.type = 'button';
+    downloadBtn.className = 'doc-action-btn';
+    downloadBtn.innerHTML = '<svg class="ic" style="width:14px;height:14px"><use href="#i-download"/></svg>';
+    downloadBtn.title = 'Baixar';
+    downloadBtn.addEventListener('click', function () { downloadChamadoAnexo(anexo, downloadBtn); });
+    row.appendChild(downloadBtn);
+
+    if (isAdmin) {
+      var delBtn = buildActionBtn('i-trash', 'Excluir anexo', function () { deleteChamadoAnexo(anexo); });
+      row.appendChild(delBtn);
+    }
+    return row;
+  }
+
+  async function downloadChamadoAnexo(anexo, btnEl) {
+    if (btnEl) btnEl.disabled = true;
+    try {
+      var signedRes = await supabase.storage.from('conteudo').createSignedUrl(anexo.storage_path, 60);
+      if (signedRes.error || !signedRes.data) throw new Error('Não foi possível gerar o link de download.');
+      var fileResp = await fetch(signedRes.data.signedUrl);
+      if (!fileResp.ok) throw new Error('Falha ao baixar o arquivo.');
+      var blob = await fileResp.blob();
+      triggerBlobDownload(blob, anexo.name);
+    } catch (err) {
+      alert((err && err.message) || 'Não foi possível baixar o arquivo.');
+    } finally {
+      if (btnEl) btnEl.disabled = false;
+    }
+  }
+
+  async function deleteChamadoAnexo(anexo) {
+    if (!confirm('Excluir o anexo "' + anexo.name + '"? Esta ação não pode ser desfeita.')) return;
+    await supabase.storage.from('conteudo').remove([anexo.storage_path]);
+    var res = await supabase.from('chamado_anexos').delete().eq('id', anexo.id);
+    if (res.error) { alert('Não foi possível excluir o anexo.'); return; }
+    loadChamados();
+  }
+
+  async function uploadChamadoAnexo(file, chamadoId) {
+    var path = 'chamados/' + chamadoId + '/' + crypto.randomUUID() + '-' + safeStorageName(file.name);
+    var up = await supabase.storage.from('conteudo').upload(path, file);
+    if (up.error) { alert('Falha ao enviar ' + file.name + ': ' + up.error.message); return; }
+    var ext = (file.name.split('.').pop() || '').toLowerCase();
+    var ins = await supabase.from('chamado_anexos').insert({
+      chamado_id: chamadoId,
+      name: file.name,
+      storage_path: path,
+      file_type: ext,
+      size_bytes: file.size,
+      uploaded_by: appState.session.user.id
+    });
+    if (ins.error) { alert('Falha ao registrar ' + file.name + ': ' + ins.error.message); }
+  }
+
+  function buildChamadoCard(item, profiles, anexosByChamado) {
     var isAdmin = !!(appState.profile && appState.profile.is_admin);
     var card = document.createElement('div');
     card.className = 'doc-card';
@@ -3350,6 +3449,14 @@
       body.appendChild(resposta);
     }
 
+    var anexos = (anexosByChamado && anexosByChamado[item.id]) || [];
+    if (anexos.length) {
+      var anexosWrap = document.createElement('div');
+      anexosWrap.style.marginTop = '8px';
+      anexos.forEach(function (anexo) { anexosWrap.appendChild(buildChamadoAnexoRow(anexo, isAdmin)); });
+      body.appendChild(anexosWrap);
+    }
+
     var footer = document.createElement('div');
     footer.className = 'doc-footer';
     var footerHtml = '<span><svg class="ic" style="width:13px;height:13px"><use href="#i-user"/></svg> Aberto por ' + profileNameById(profiles, item.created_by) + '</span>';
@@ -3374,7 +3481,16 @@
     listEl.innerHTML = '';
     if (!items.length) { emptyEl.style.display = 'block'; return; }
     emptyEl.style.display = 'none';
-    items.forEach(function (item) { listEl.appendChild(buildChamadoCard(item, profiles)); });
+    var anexosByChamado = {};
+    if (items.length) {
+      var ids = items.map(function (i) { return i.id; });
+      var anexosRes = await supabase.from('chamado_anexos').select('*').in('chamado_id', ids).order('created_at');
+      ((anexosRes && anexosRes.data) || []).forEach(function (a) {
+        if (!anexosByChamado[a.chamado_id]) anexosByChamado[a.chamado_id] = [];
+        anexosByChamado[a.chamado_id].push(a);
+      });
+    }
+    items.forEach(function (item) { listEl.appendChild(buildChamadoCard(item, profiles, anexosByChamado)); });
   }
 
   function filterChamados(tag, btn) {
@@ -3404,8 +3520,14 @@
         priority: document.getElementById('chamadoPrioridade').value,
         created_by: appState.session.user.id
       };
-      var res = await supabase.from('chamados').insert(payload);
-      if (res.error) { showMsgEl(chamadoModalMsg, 'Não foi possível abrir o chamado.', 'error'); return; }
+      var res = await supabase.from('chamados').insert(payload).select();
+      if (res.error || !res.data || !res.data[0]) { showMsgEl(chamadoModalMsg, 'Não foi possível abrir o chamado.', 'error'); return; }
+      var novoChamado = res.data[0];
+      var anexosInput = document.getElementById('chamadoAnexosInput');
+      var files = (anexosInput && anexosInput.files) ? Array.prototype.slice.call(anexosInput.files) : [];
+      for (var i = 0; i < files.length; i++) {
+        await uploadChamadoAnexo(files[i], novoChamado.id);
+      }
       chamadoModal.classList.add('hidden');
       loadChamados();
       updateChamadosBadges();
@@ -3417,6 +3539,7 @@
     chamadoManageForm.reset();
     document.getElementById('chamadoManageId').value = item.id;
     document.getElementById('chamadoManageStatus').value = item.status;
+    document.getElementById('chamadoManagePrioridade').value = item.priority;
     document.getElementById('chamadoManageResposta').value = item.resposta || '';
     chamadoManageModal.classList.remove('hidden');
   }
@@ -3429,12 +3552,18 @@
       var status = document.getElementById('chamadoManageStatus').value;
       var payload = {
         status: status,
+        priority: document.getElementById('chamadoManagePrioridade').value,
         resposta: document.getElementById('chamadoManageResposta').value.trim() || null,
         updated_at: new Date().toISOString(),
         resolved_at: status === 'resolvido' ? new Date().toISOString() : null
       };
       var res = await supabase.from('chamados').update(payload).eq('id', id);
       if (res.error) { showMsgEl(chamadoManageMsg, 'Não foi possível salvar.', 'error'); return; }
+      var manageAnexosInput = document.getElementById('chamadoManageAnexosInput');
+      var manageFiles = (manageAnexosInput && manageAnexosInput.files) ? Array.prototype.slice.call(manageAnexosInput.files) : [];
+      for (var i = 0; i < manageFiles.length; i++) {
+        await uploadChamadoAnexo(manageFiles[i], id);
+      }
       chamadoManageModal.classList.add('hidden');
       loadChamados();
       updateChamadosBadges();
