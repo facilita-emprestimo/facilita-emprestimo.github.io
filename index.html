@@ -1397,6 +1397,25 @@
     el.className = 'login-msg show error';
   }
 
+  // Gera uma chave segura para o Supabase Storage a partir do nome original do
+  // arquivo (removendo acentos, espaços e outros caracteres que o Storage recusa
+  // com o erro "Invalid key"). O nome original de exibição/download continua
+  // sendo gravado normalmente nas tabelas (name/title/attachment_name).
+  function safeStorageName(name) {
+    var raw = (name || 'arquivo').toString();
+    var dotIdx = raw.lastIndexOf('.');
+    var base = dotIdx > 0 ? raw.slice(0, dotIdx) : raw;
+    var ext = dotIdx > 0 ? raw.slice(dotIdx + 1) : '';
+    function strip(s) {
+      try { s = s.normalize('NFD').replace(/[̀-ͯ]/g, ''); } catch (e) {}
+      return s;
+    }
+    base = strip(base).replace(/[^a-zA-Z0-9._-]+/g, '_').replace(/_+/g, '_').replace(/^[_.\-]+|[_.\-]+$/g, '');
+    ext = strip(ext).replace(/[^a-zA-Z0-9]+/g, '').toLowerCase();
+    if (!base) base = 'arquivo';
+    return ext ? (base + '.' + ext) : base;
+  }
+
   function fileIconInfo(fileType, name) {
     var ext = ((fileType || '') || (name || '').split('.').pop() || '').toLowerCase();
     if (ext === 'pdf') return { symbol: 'i-file-pdf', bg: '#FB8500' };
@@ -1816,7 +1835,7 @@
   }
 
   async function uploadOneFile(file, folderId) {
-    var path = folderId + '/' + crypto.randomUUID() + '-' + file.name;
+    var path = folderId + '/' + crypto.randomUUID() + '-' + safeStorageName(file.name);
     var up = await supabase.storage.from('documentos').upload(path, file);
     if (up.error) { alert('Falha ao enviar ' + file.name + ': ' + up.error.message); return; }
     var ext = (file.name.split('.').pop() || '').toLowerCase();
@@ -2167,7 +2186,7 @@
       if (file) {
         if (submitBtn) submitBtn.disabled = true;
         try {
-          var path = 'comunicados/' + crypto.randomUUID() + '-' + file.name;
+          var path = 'comunicados/' + crypto.randomUUID() + '-' + safeStorageName(file.name);
           var up = await supabase.storage.from('conteudo').upload(path, file);
           if (up.error) throw new Error('Falha ao enviar o anexo.');
           if (id && comunicadoEditingAttachmentPath) {
@@ -2386,7 +2405,7 @@
       if (file) {
         if (submitBtn) submitBtn.disabled = true;
         try {
-          var path = 'informativos/' + crypto.randomUUID() + '-' + file.name;
+          var path = 'informativos/' + crypto.randomUUID() + '-' + safeStorageName(file.name);
           var up = await supabase.storage.from('conteudo').upload(path, file);
           if (up.error) throw new Error('Falha ao enviar o anexo.');
           if (id && informativoEditingAttachmentPath) {
@@ -2584,7 +2603,7 @@
       var submitBtn = document.getElementById('marketingSubmitBtn');
       submitBtn.disabled = true;
       try {
-        var path = crypto.randomUUID() + '-' + file.name;
+        var path = crypto.randomUUID() + '-' + safeStorageName(file.name);
         var up = await supabase.storage.from('marketing').upload(path, file);
         if (up.error) throw new Error('Falha ao enviar o arquivo.');
         var ext = (file.name.split('.').pop() || '').toLowerCase();
@@ -2789,7 +2808,7 @@
       if (file) {
         if (submitBtn) submitBtn.disabled = true;
         try {
-          var path = 'unidades/' + crypto.randomUUID() + '-' + file.name;
+          var path = 'unidades/' + crypto.randomUUID() + '-' + safeStorageName(file.name);
           var up = await supabase.storage.from('conteudo').upload(path, file);
           if (up.error) throw new Error('Falha ao enviar a foto.');
           if (id && unidadeEditingPhotoPath) {
