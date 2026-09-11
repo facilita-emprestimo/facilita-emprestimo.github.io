@@ -529,7 +529,7 @@
             <div class="tile-icon"><svg class="ic" style="color:#fff"><use href="#i-store"/></svg></div>
             <div class="tile-label">Unidades</div>
           </button>
-          <button class="tile" style="background:var(--ink-2)" onclick="navigate('informativos')">
+          <button class="tile" style="background:var(--ink-2)" onclick="reopenGate()">
             <div class="tile-icon"><svg class="ic" style="color:#fff"><use href="#i-lock"/></svg></div>
             <div class="tile-label">Ver trava novamente</div>
           </button>
@@ -634,7 +634,7 @@
       <section class="page" id="page-informativos">
         <div class="breadcrumb">Portal Interno / <b>Informativos</b></div>
         <div class="page-header">
-          <div><h1>Informativos</h1><p>Arquivo dos avisos exibidos na trava de entrada do portal.</p></div>
+          <div><h1>Informativos</h1><p>Avisos e circulares internos da empresa.</p></div>
           <div class="docs-toolbar" id="informativosAdminActions" style="display:none;">
             <button type="button" class="doc-action-btn" id="btnNewInformativo">
               <svg class="ic" style="width:15px;height:15px"><use href="#i-plus"/></svg> Novo informativo
@@ -2695,6 +2695,15 @@
     if (ackCheckboxEl) ackCheckboxEl.checked = false;
     if (ackButtonEl) { ackButtonEl.disabled = true; ackButtonEl.classList.remove('enabled'); }
     gateOverlayEl.classList.remove('hidden');
+  }
+
+  // Reabre a trava manualmente (botão "Ver trava novamente" na Home).
+  // Se não houver nenhum Comunicado marcado como "Mostrar na tela de entrada",
+  // loadGateComunicados() simplesmente não mostra nada — não há trava para ver.
+  function reopenGate() {
+    var appEl = document.getElementById('app');
+    if (appEl) appEl.classList.add('locked');
+    if (typeof loadGateComunicados === 'function') loadGateComunicados();
   }
 
   // ---------------- Home: comunicados recentes ----------------
