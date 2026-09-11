@@ -2659,12 +2659,20 @@
   async function loadGateComunicados() {
     var gateBody = document.getElementById('gateBody');
     var gateOverlayEl = document.getElementById('gateOverlay');
-    if (!gateBody || !gateOverlayEl) return;
-    var res = await supabase.from('comunicados').select('*').eq('show_in_gate', true).order('created_at', { ascending: false }).limit(8);
-    var items = (res && res.data) || [];
+    var appEl = document.getElementById('app');
+    if (!gateBody || !gateOverlayEl) { if (appEl) appEl.classList.remove('locked'); return; }
+    var items = [];
+    try {
+      var res = await supabase.from('comunicados').select('*').eq('show_in_gate', true).order('created_at', { ascending: false }).limit(8);
+      items = (res && res.data) || [];
+    } catch (e) {
+      console.error('Erro ao carregar avisos da tela de entrada:', e);
+      items = [];
+    }
     gateBody.innerHTML = '';
     if (!items.length) {
       gateOverlayEl.classList.add('hidden');
+      if (appEl) appEl.classList.remove('locked');
       return;
     }
     items.forEach(function (item) {
