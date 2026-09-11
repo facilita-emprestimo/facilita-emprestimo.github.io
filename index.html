@@ -339,6 +339,8 @@
   .doc-action-btn.upload-label input{display:none;}
   .docs-breadcrumb{display:flex;align-items:center;gap:4px;font-size:12.5px;color:var(--muted);margin-bottom:18px;flex-wrap:wrap;}
   .docs-breadcrumb button{background:none;border:none;color:var(--red);cursor:pointer;font-family:inherit;font-size:12.5px;font-weight:700;padding:2px;}
+  .link-btn{background:none;border:none;color:var(--red);cursor:pointer;font-family:inherit;font-weight:700;padding:0;margin-left:6px;text-decoration:underline;}
+  .link-btn:hover{color:#B91C2B;}
   .docs-breadcrumb button:hover{text-decoration:underline;}
   .docs-breadcrumb .sep{color:#C7CBD3;}
   .docs-empty{color:var(--muted);font-size:13.5px;padding:34px 10px;text-align:center;background:#fff;border:1px dashed var(--line);border-radius:12px;}
@@ -357,17 +359,17 @@
   .folder-card-icon .ic{width:16px;height:16px;color:var(--ink-2);}
   .folder-card-name{font-size:14px;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
   .folder-card-count{font-size:11.5px;color:var(--muted);}
-  .folder-preview{display:flex;gap:6px;}
-  .fp-icon{width:26px;height:26px;border-radius:6px;background:var(--bg);display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;}
-  .fp-icon .ic{width:14px;height:14px;}
+  .folder-preview{display:flex;align-items:center;gap:6px;}
+  .fp-icon{width:22px;height:22px;border-radius:6px;background:var(--bg);display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;flex-shrink:0;border:1px solid rgba(2,48,71,.08);box-sizing:border-box;}
+  .fp-icon .ic{width:12px;height:12px;}
   .fp-icon .thumb-mini-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;}
   .fp-icon .thumb-mini-play{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.28);z-index:1;}
-  .fp-icon .thumb-mini-play svg{width:9px;height:9px;}
+  .fp-icon .thumb-mini-play svg{width:8px;height:8px;}
   .folder-card-del{position:absolute;top:10px;right:10px;z-index:2;background:rgba(2,48,71,.38);border:none;color:#fff;cursor:pointer;padding:5px;border-radius:7px;display:flex;}
   .folder-card-del:hover{color:#fff;background:#B91C2B;}
   .doc-file-list{display:flex;flex-direction:column;gap:10px;}
   .doc-file-row{background:#fff;border:1px solid var(--line);border-radius:12px;padding:14px 16px;display:flex;align-items:center;gap:14px;}
-  .doc-file-icon{width:36px;height:36px;border-radius:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0;position:relative;overflow:hidden;}
+  .doc-file-icon{width:36px;height:36px;border-radius:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0;position:relative;overflow:hidden;box-sizing:border-box;border:1px solid rgba(2,48,71,.08);}
   .doc-file-icon .thumb-mini-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;}
   .doc-file-icon .thumb-mini-play{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.28);z-index:1;}
   .doc-file-icon .thumb-mini-play svg{width:13px;height:13px;}
@@ -570,7 +572,7 @@
         <div class="page-header">
           <div>
             <h1>Bem-vindo(a) ao Portal Interno</h1>
-            <p>Informativos, comunicados e materiais de marketing da Facilita Empréstimo, tudo em um só lugar.</p>
+            <p>Informativos, comunicados e materiais de marketing da Facilita Empréstimo, tudo em um só lugar. <button type="button" class="link-btn" onclick="reopenGate()" style="font-size:12.5px;">Ver avisos de entrada novamente</button></p>
           </div>
         </div>
 
@@ -606,10 +608,6 @@
           <button class="tile" style="background:var(--amber)" onclick="navigate('trilha-conhecimento')">
             <div class="tile-icon"><svg class="ic" style="color:#fff"><use href="#i-book"/></svg></div>
             <div class="tile-label">Trilha do Conhecimento</div>
-          </button>
-          <button class="tile" style="background:var(--ink-2)" onclick="reopenGate()">
-            <div class="tile-icon"><svg class="ic" style="color:#fff"><use href="#i-lock"/></svg></div>
-            <div class="tile-label">Ver trava novamente</div>
           </button>
           <button class="tile" style="background:var(--green)" onclick="navigate('tarefas')">
             <div class="tile-icon">
