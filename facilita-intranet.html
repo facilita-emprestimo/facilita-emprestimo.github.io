@@ -187,6 +187,51 @@
   .doc-footer{display:flex;gap:16px;margin-top:10px;font-size:11.5px;color:var(--muted);}
   .doc-footer span{display:flex;align-items:center;gap:5px;}
 
+  /* ---------- NOTÍCIAS (capa com imagem/vídeo na Home + matéria completa) ---------- */
+  .noticias-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:16px;}
+  .noticia-card{background:#fff;border:1px solid var(--line);border-radius:12px;overflow:hidden;cursor:pointer;display:flex;flex-direction:column;transition:box-shadow .15s,transform .15s;}
+  .noticia-card:hover{box-shadow:0 4px 14px rgba(16,24,40,.1);transform:translateY(-2px);}
+  .noticia-card-cover{height:120px;position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+  .noticia-card-cover-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;}
+  .noticia-card-cover-icon{width:26px;height:26px;color:rgba(255,255,255,.9);position:relative;z-index:1;}
+  .noticia-card-cover-icon .ic{width:26px;height:26px;stroke-width:1.6;}
+  .noticia-card-cover-play{position:absolute;top:8px;right:8px;width:24px;height:24px;border-radius:50%;background:rgba(0,0,0,.45);display:flex;align-items:center;justify-content:center;z-index:2;}
+  .noticia-card-cover-play svg{width:10px;height:10px;}
+  .noticia-card-body{padding:14px 16px;display:flex;flex-direction:column;gap:6px;flex:1;}
+  .noticia-card-title{font-size:13.5px;font-weight:700;margin:0;line-height:1.35;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+  .noticia-card-excerpt{font-size:12px;color:var(--muted);line-height:1.5;margin:0;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+  .noticia-card-meta{display:flex;gap:12px;margin-top:auto;padding-top:8px;font-size:11px;color:var(--muted);flex-wrap:wrap;}
+  .noticia-card-meta span{display:flex;align-items:center;gap:4px;}
+
+  .breadcrumb-link{cursor:pointer;text-decoration:underline;}
+  .breadcrumb-link:hover{color:var(--text);}
+  .noticia-layout{display:grid;grid-template-columns:1fr 300px;gap:22px;align-items:start;}
+  @media (max-width:880px){.noticia-layout{grid-template-columns:1fr;}}
+  .noticia-banner{background:linear-gradient(135deg,var(--red),#023047);color:#fff;border-radius:14px 14px 0 0;padding:26px 26px 18px;}
+  .noticia-banner .badge{background:rgba(255,255,255,.2);color:#fff;margin-bottom:10px;display:inline-block;}
+  .noticia-banner h1{font-size:21px;margin:0 0 12px;line-height:1.3;}
+  .noticia-meta-row{display:flex;gap:16px;font-size:12.5px;color:rgba(255,255,255,.88);flex-wrap:wrap;}
+  .noticia-meta-row span{display:flex;align-items:center;gap:5px;}
+  .noticia-cover-wrap{background:#000;}
+  .noticia-cover-wrap img,.noticia-cover-wrap video{width:100%;max-height:420px;object-fit:contain;display:block;background:#000;}
+  .noticia-body-wrap{background:#fff;border:1px solid var(--line);border-top:none;border-radius:0 0 14px 14px;padding:24px 26px;}
+  .noticia-corpo{font-size:14px;line-height:1.75;color:var(--text);white-space:pre-line;margin:0;}
+  .noticia-actions{display:flex;gap:10px;margin-top:18px;flex-wrap:wrap;}
+  .noticia-sidebar{display:flex;flex-direction:column;gap:16px;}
+  .noticia-sidebar .card{padding:18px;}
+  .noticia-search input{width:100%;border:1px solid var(--line);border-radius:9px;padding:9px 12px;font-size:13px;font-family:inherit;box-sizing:border-box;}
+  .noticia-cat-item{display:flex;justify-content:space-between;align-items:center;padding:8px 10px;border-radius:8px;cursor:pointer;font-size:12.5px;gap:8px;}
+  .noticia-cat-item:hover{background:var(--bg);}
+  .noticia-cat-item.active{background:var(--red);color:#fff;}
+  .noticia-cat-count{font-size:11px;color:var(--muted);flex-shrink:0;}
+  .noticia-cat-item.active .noticia-cat-count{color:rgba(255,255,255,.85);}
+  .noticia-side-item{display:flex;gap:10px;align-items:flex-start;padding:8px 6px;border-radius:8px;cursor:pointer;}
+  .noticia-side-item:hover,.noticia-side-item.active{background:var(--bg);}
+  .noticia-side-thumb{width:44px;height:44px;border-radius:8px;flex-shrink:0;background:var(--bg);overflow:hidden;}
+  .noticia-side-info{flex:1;min-width:0;}
+  .noticia-side-title{font-size:12.5px;font-weight:600;line-height:1.35;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+  .noticia-side-date{font-size:10.5px;color:var(--muted);margin-top:2px;}
+
   /* ---------- MARKETING / FILE EXPLORER ---------- */
   .tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:22px;}
   .tab{
@@ -245,6 +290,21 @@
     .unidades-side-btn{flex:1;justify-content:center;white-space:nowrap;}
   }
 
+  /* ---------- DOCUMENTOS/TRILHA: menu lateral de pastas principais ---------- */
+  .docs-layout{display:flex;gap:20px;align-items:flex-start;}
+  .docs-sidebar{display:flex;flex-direction:column;gap:6px;width:200px;flex-shrink:0;}
+  .docs-sidebar-btn{display:flex;align-items:center;gap:10px;background:#fff;border:1px solid var(--line);border-radius:10px;padding:11px 14px;cursor:pointer;font-family:inherit;font-size:13.5px;font-weight:700;color:var(--text);text-align:left;width:100%;}
+  .docs-sidebar-btn .ic{width:16px;height:16px;flex-shrink:0;color:var(--ink-2);}
+  .docs-sidebar-btn.active{background:var(--red);color:#fff;border-color:var(--red);}
+  .docs-sidebar-btn.active .ic{color:#fff;}
+  .docs-sidebar-empty{font-size:12px;color:var(--muted);padding:4px 2px;}
+  .docs-main{flex:1;min-width:0;}
+  @media (max-width:760px){
+    .docs-layout{flex-direction:column;}
+    .docs-sidebar{flex-direction:row;width:100%;overflow-x:auto;}
+    .docs-sidebar-btn{flex:1;justify-content:center;white-space:nowrap;width:auto;}
+  }
+
   /* ---------- COLABORADORES ---------- */
   .colaborador-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:18px;}
   .colaborador-card{background:#fff;border:1px solid var(--line);border-radius:14px;padding:20px 16px;display:flex;flex-direction:column;align-items:center;gap:8px;position:relative;text-align:center;}
@@ -265,6 +325,14 @@
   .colaborador-del:hover{color:#B91C2B;background:#FEE2E2;}
   .colaborador-edit{position:absolute;top:10px;left:10px;background:none;border:none;color:var(--muted);cursor:pointer;padding:5px;border-radius:6px;}
   .colaborador-edit:hover{color:var(--red);background:var(--bg);}
+  .colaborador-transfer{position:absolute;top:10px;left:38px;background:none;border:none;color:var(--muted);cursor:pointer;padding:5px;border-radius:6px;}
+  .colaborador-transfer:hover{color:var(--ink-2);background:var(--bg);}
+  .colaboradores-unit-section{margin-bottom:28px;}
+  .colaboradores-unit-section:last-child{margin-bottom:0;}
+  .colaboradores-unit-header{display:flex;align-items:center;gap:10px;margin-bottom:14px;padding-bottom:9px;border-bottom:1px solid var(--line);}
+  .colaboradores-unit-header .ic{width:16px;height:16px;color:var(--ink-2);flex-shrink:0;}
+  .colaboradores-unit-header h3{font-size:14.5px;font-weight:800;margin:0;flex:1;color:var(--text);}
+  .colaboradores-unit-count{font-size:11.5px;font-weight:700;color:var(--muted);background:var(--bg);border-radius:20px;padding:3px 10px;flex-shrink:0;}
   .conquistas-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px 10px;margin-top:10px;}
   .conquistas-grid .login-field{margin-bottom:0;}
   .conquistas-grid label{font-size:11px !important;}
@@ -481,6 +549,7 @@
     <symbol id="i-phone" viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.362 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.338 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></symbol>
     <symbol id="i-mail" viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="16" rx="2"/><polyline points="22 6 12 13 2 6"/></symbol>
     <symbol id="i-target" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></symbol>
+    <symbol id="i-swap" viewBox="0 0 24 24"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></symbol>
   </defs>
 </svg>
 
@@ -711,6 +780,52 @@
             </div>
           </div>
         </div>
+
+        <div class="card" style="margin-top:20px;">
+          <div class="panel-title">
+            <h3>Notícias</h3>
+            <button class="link-more" onclick="navigate('comunicados')">ver todos</button>
+          </div>
+          <div class="noticias-grid" id="homeNoticiasGrid"></div>
+          <div class="docs-empty" id="homeNoticiasEmpty" style="display:none;padding:18px 10px;">Nenhuma notícia com imagem ou vídeo publicada ainda.</div>
+        </div>
+      </section>
+
+      <!-- ================= NOTÍCIA (matéria completa) ================= -->
+      <section class="page" id="page-noticia">
+        <div class="breadcrumb">Portal Interno / <span class="breadcrumb-link" onclick="navigate('home')">Notícias</span> / <b id="noticiaBreadcrumbTitle">Notícia</b></div>
+        <div id="noticiaAdminActions" style="display:none;gap:8px;margin-bottom:12px;"></div>
+        <div class="noticia-layout">
+          <div class="noticia-main">
+            <div class="noticia-banner" id="noticiaBanner">
+              <span class="badge" id="noticiaCategoriaBadge" style="display:none;"></span>
+              <h1 id="noticiaTitulo"></h1>
+              <div class="noticia-meta-row">
+                <span><svg class="ic" style="width:13px;height:13px"><use href="#i-clock"/></svg> <span id="noticiaData"></span></span>
+                <span><svg class="ic" style="width:13px;height:13px"><use href="#i-user"/></svg> <span id="noticiaAutor"></span></span>
+              </div>
+            </div>
+            <div class="noticia-cover-wrap" id="noticiaCoverWrap" style="display:none;"></div>
+            <div class="noticia-body-wrap">
+              <p class="noticia-corpo" id="noticiaCorpo"></p>
+              <div class="noticia-actions" id="noticiaActions"></div>
+            </div>
+          </div>
+          <aside class="noticia-sidebar">
+            <div class="card noticia-search">
+              <div class="panel-title" style="margin-bottom:10px;"><h3>Buscar</h3></div>
+              <input type="text" id="noticiaBusca" placeholder="Buscar notícias..." oninput="renderNoticiaSideList()">
+            </div>
+            <div class="card">
+              <div class="panel-title" style="margin-bottom:10px;"><h3>Categorias</h3></div>
+              <div id="noticiaCategorias"></div>
+            </div>
+            <div class="card">
+              <div class="panel-title" style="margin-bottom:10px;"><h3>Outras notícias</h3></div>
+              <div id="noticiaListaLateral"></div>
+            </div>
+          </aside>
+        </div>
       </section>
 
       <!-- ================= COMUNICADOS ================= -->
@@ -856,25 +971,32 @@
           </div>
         </div>
 
-        <div id="docsBreadcrumb" class="docs-breadcrumb" style="display:none;"></div>
-        <div class="login-msg error" id="docsMsg" style="margin-bottom:16px;"></div>
-
-        <div id="docsFolderView">
-          <div id="docsFolderGrid" class="folder-grid"></div>
-          <div id="docsFolderEmpty" class="docs-empty" style="display:none;">Nenhuma pasta disponível para o seu nível de acesso ainda.</div>
-        </div>
-
-        <div id="docsInsideView" style="display:none;">
-          <div id="docsSubfolderGrid" class="folder-grid" style="display:none;"></div>
-          <div class="panel-title">
-            <h3>Arquivos</h3>
-            <label class="doc-action-btn upload-label" id="docsUploadWrap" style="display:none;">
-              <svg class="ic" style="width:15px;height:15px"><use href="#i-upload"/></svg> Upload
-              <input type="file" id="docsUploadInput" multiple>
-            </label>
+        <div class="docs-layout" id="docsLayout">
+          <div class="docs-sidebar" id="docsAreaSidebar" style="display:none;">
+            <div id="docsSidebarList"></div>
           </div>
-          <div id="docsFileList" class="doc-file-list"></div>
-          <div id="docsFileEmpty" class="docs-empty" style="display:none;">Nenhum arquivo nesta pasta ainda.</div>
+          <div class="docs-main">
+            <div id="docsBreadcrumb" class="docs-breadcrumb" style="display:none;"></div>
+            <div class="login-msg error" id="docsMsg" style="margin-bottom:16px;"></div>
+
+            <div id="docsFolderView">
+              <div id="docsFolderGrid" class="folder-grid"></div>
+              <div id="docsFolderEmpty" class="docs-empty" style="display:none;">Nenhuma pasta disponível para o seu nível de acesso ainda.</div>
+            </div>
+
+            <div id="docsInsideView" style="display:none;">
+              <div id="docsSubfolderGrid" class="folder-grid" style="display:none;"></div>
+              <div class="panel-title">
+                <h3>Arquivos</h3>
+                <label class="doc-action-btn upload-label" id="docsUploadWrap" style="display:none;">
+                  <svg class="ic" style="width:15px;height:15px"><use href="#i-upload"/></svg> Upload
+                  <input type="file" id="docsUploadInput" multiple>
+                </label>
+              </div>
+              <div id="docsFileList" class="doc-file-list"></div>
+              <div id="docsFileEmpty" class="docs-empty" style="display:none;">Nenhum arquivo nesta pasta ainda.</div>
+            </div>
+          </div>
         </div>
       </section>
 
@@ -946,7 +1068,7 @@
                 </button>
               </div>
               <div class="login-msg error" id="colaboradoresMsg" style="margin-bottom:16px;"></div>
-              <div class="colaborador-grid" id="colaboradoresGrid"></div>
+              <div id="colaboradoresGrid"></div>
               <div class="docs-empty" id="colaboradoresEmpty" style="display:none;">Nenhum colaborador cadastrado ainda.</div>
             </div>
           </div>
@@ -1075,6 +1197,24 @@
           <div class="colaborador-conquistas-list" id="colaboradorProfileConquistas"></div>
           <div style="display:flex;gap:10px;margin-top:20px;justify-content:center;flex-wrap:wrap;" id="colaboradorProfileActions">
             <button type="button" class="login-btn" id="colaboradorProfileClose" style="width:auto;padding:11px 20px;background:#9CA3AF;">Fechar</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ============ MODAL: TRANSFERIR COLABORADOR ============ -->
+      <div class="modal-overlay hidden" id="transferirModal">
+        <div class="modal-card" style="max-width:380px;">
+          <h3>Transferir de unidade</h3>
+          <p id="transferirModalNome" style="font-size:13px;color:var(--muted);margin:-4px 0 14px;"></p>
+          <div class="login-msg error" id="transferirModalMsg"></div>
+          <input type="hidden" id="transferirColaboradorId">
+          <div class="login-field">
+            <label for="transferirUnidadeSelect">Nova unidade</label>
+            <select id="transferirUnidadeSelect"></select>
+          </div>
+          <div style="display:flex;gap:10px;margin-top:16px;">
+            <button type="button" class="login-btn" id="transferirConfirmar" style="width:auto;padding:11px 20px;">Transferir</button>
+            <button type="button" class="login-btn" id="transferirCancelar" style="width:auto;padding:11px 20px;background:#9CA3AF;">Cancelar</button>
           </div>
         </div>
       </div>
@@ -1569,6 +1709,7 @@
       if (typeof loadGateComunicados === 'function') { loadGateComunicados(); } else { gateOverlay2.classList.remove('hidden'); }
       if (typeof loadRootFolders === 'function') loadRootFolders();
       if (typeof loadHomeComunicados === 'function') loadHomeComunicados();
+      if (typeof loadHomeNoticias === 'function') loadHomeNoticias();
       if (typeof updateTarefasBadges === 'function') updateTarefasBadges();
       if (typeof updateChamadosBadges === 'function') updateChamadosBadges();
       if (typeof updatePlanosBadges === 'function') updatePlanosBadges();
@@ -1720,6 +1861,9 @@
   };
   var docsState = { path: [], area: 'documentos' };
 
+  // Áreas que ganham o menu lateral com as pastas principais (estilo Unidades/Colaboradores).
+  var DOCS_SIDEBAR_AREAS = { 'trilha-conhecimento': true };
+
   function applyAreaHeader(area) {
     var cfg = AREA_CONFIG[area] || AREA_CONFIG.documentos;
     var crumbEl = document.getElementById('docsAreaCrumb');
@@ -1730,6 +1874,41 @@
     if (titleEl) titleEl.textContent = cfg.title;
     if (subtitleEl) subtitleEl.textContent = cfg.subtitle;
     if (emptyEl) emptyEl.textContent = cfg.emptyFolders;
+    var sidebarWrap = document.getElementById('docsAreaSidebar');
+    if (sidebarWrap) {
+      var showSidebar = !!DOCS_SIDEBAR_AREAS[area];
+      sidebarWrap.style.display = showSidebar ? 'flex' : 'none';
+      if (showSidebar) refreshDocsSidebar();
+    }
+  }
+
+  // Lista de pastas principais no menu lateral (só para as áreas em DOCS_SIDEBAR_AREAS).
+  // Reaproveita a mesma pasta clicada nos cards — só entra direto na pasta a partir da raiz.
+  async function refreshDocsSidebar() {
+    var listEl = document.getElementById('docsSidebarList');
+    if (!listEl || !DOCS_SIDEBAR_AREAS[docsState.area]) return;
+    var res = await supabase.from('folders').select('id,name').is('parent_id', null).eq('area', docsState.area).order('name');
+    var folders = res.data || [];
+    var activeId = docsState.path.length ? docsState.path[0].id : null;
+    listEl.innerHTML = '';
+    if (!folders.length) {
+      var empty = document.createElement('p');
+      empty.className = 'docs-sidebar-empty';
+      empty.textContent = 'Nenhuma pasta ainda.';
+      listEl.appendChild(empty);
+      return;
+    }
+    folders.forEach(function (f) {
+      var btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'docs-sidebar-btn' + (f.id === activeId ? ' active' : '');
+      btn.innerHTML = '<svg class="ic"><use href="#i-folder"/></svg>';
+      var label = document.createElement('span');
+      label.textContent = f.name;
+      btn.appendChild(label);
+      btn.addEventListener('click', function () { docsState.path = []; openFolder(f); });
+      listEl.appendChild(btn);
+    });
   }
 
   function currentFolderId() {
@@ -2036,6 +2215,7 @@
     document.getElementById('docsFolderView').style.display = '';
     document.getElementById('docsInsideView').style.display = 'none';
     document.getElementById('docsBreadcrumb').style.display = 'none';
+    refreshDocsSidebar();
 
     var res = await supabase.from('folders').select('*').is('parent_id', null).eq('area', docsState.area).order('name');
     if (res.error) { setDocsMsg('Não foi possível carregar as pastas.'); return; }
@@ -2058,6 +2238,7 @@
   function openFolder(folder) {
     docsState.path.push(folder);
     renderInsideFolder(folder.id);
+    refreshDocsSidebar();
   }
 
   function renderBreadcrumb() {
@@ -2116,6 +2297,7 @@
     var docsRes = await supabase.from('documents').select('*').eq('folder_id', folderId).order('created_at', { ascending: false });
     if (docsRes.error) { setDocsMsg('Não foi possível carregar os arquivos.'); }
     await renderFileList(docsRes.data || []);
+    refreshDocsSidebar();
   }
 
   async function renderFileList(docs) {
@@ -2419,6 +2601,8 @@
     if (page === 'chamados' && typeof loadChamados === 'function') { loadChamados(); }
     if (page === 'planos-acao' && typeof loadPlanos === 'function') { loadPlanos(); }
     if (page === 'home' && typeof loadHomeComunicados === 'function') { loadHomeComunicados(); }
+    if (page === 'home' && typeof loadHomeNoticias === 'function') { loadHomeNoticias(); }
+    if (page === 'noticia' && typeof renderNoticiaDetalhe === 'function') { renderNoticiaDetalhe(currentNoticiaId); }
     window.scrollTo(0,0);
   }
 
@@ -2669,6 +2853,8 @@
       comunicadoModal.classList.add('hidden');
       loadComunicados();
       loadHomeComunicados();
+      if (typeof loadHomeNoticias === 'function') loadHomeNoticias();
+      if (id && typeof currentNoticiaId !== 'undefined' && currentNoticiaId === id && typeof renderNoticiaDetalhe === 'function') { renderNoticiaDetalhe(id); }
     });
   }
 
@@ -2681,6 +2867,319 @@
     if (res.error) { alert('Não foi possível excluir o comunicado.'); return; }
     loadComunicados();
     loadHomeComunicados();
+    if (typeof loadHomeNoticias === 'function') loadHomeNoticias();
+    if (typeof currentNoticiaId !== 'undefined' && currentNoticiaId === item.id) { navigate('home'); }
+  }
+
+  // ---------------- Notícias (capa com imagem/vídeo na Home + matéria completa) ----------------
+  var currentNoticiaId = null;
+  var noticiaAllCache = [];
+  var noticiaAuthorsMap = {};
+  var noticiaCategoriaFiltro = '';
+
+  function openNoticia(id) {
+    currentNoticiaId = id;
+    navigate('noticia');
+  }
+
+  function attachComunicadoCover(coverEl, coverIconEl, item) {
+    if (!item.attachment_path || (item.attachment_type !== 'image' && item.attachment_type !== 'video')) return;
+    supabase.storage.from('conteudo').createSignedUrl(item.attachment_path, 3600).then(function (res) {
+      if (!res.data || !res.data.signedUrl) return;
+      var signedUrl = res.data.signedUrl;
+      var finishCover = function (imgSrc) {
+        if (coverIconEl) coverIconEl.style.display = 'none';
+        var img = document.createElement('img');
+        img.className = 'noticia-card-cover-img';
+        img.alt = '';
+        img.src = imgSrc;
+        coverEl.insertBefore(img, coverIconEl);
+        if (item.attachment_type === 'video') {
+          var playBadge = document.createElement('div');
+          playBadge.className = 'noticia-card-cover-play';
+          playBadge.innerHTML = PLAY_TRIANGLE_SVG;
+          coverEl.appendChild(playBadge);
+        }
+      };
+      if (item.attachment_type === 'image') {
+        finishCover(signedUrl);
+      } else {
+        var video = document.createElement('video');
+        video.crossOrigin = 'anonymous';
+        video.muted = true;
+        video.preload = 'auto';
+        video.style.position = 'fixed';
+        video.style.left = '-9999px';
+        video.style.width = '1px';
+        video.style.height = '1px';
+        var cleanup = function () { if (video.parentNode) video.parentNode.removeChild(video); };
+        video.addEventListener('loadeddata', function () {
+          try {
+            var canvas = document.createElement('canvas');
+            canvas.width = video.videoWidth || 320;
+            canvas.height = video.videoHeight || 180;
+            var ctx = canvas.getContext('2d');
+            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+            finishCover(canvas.toDataURL('image/jpeg', 0.75));
+          } catch (e) {}
+          cleanup();
+        });
+        video.addEventListener('error', cleanup);
+        document.body.appendChild(video);
+        video.src = signedUrl;
+      }
+    }).catch(function () {});
+  }
+
+  function buildNoticiaCard(item, authorProfile) {
+    var card = document.createElement('div');
+    card.className = 'noticia-card';
+    card.addEventListener('click', function () { openNoticia(item.id); });
+
+    var cover = document.createElement('div');
+    cover.className = 'noticia-card-cover';
+    cover.style.background = 'linear-gradient(135deg,var(' + colorVarName(item.color) + '),#023047)';
+    var coverIcon = document.createElement('div');
+    coverIcon.className = 'noticia-card-cover-icon';
+    coverIcon.innerHTML = '<svg class="ic"><use href="#i-bell"/></svg>';
+    cover.appendChild(coverIcon);
+    card.appendChild(cover);
+    attachComunicadoCover(cover, coverIcon, item);
+
+    var body = document.createElement('div');
+    body.className = 'noticia-card-body';
+    var title = document.createElement('p');
+    title.className = 'noticia-card-title';
+    title.textContent = item.title;
+    var excerpt = document.createElement('p');
+    excerpt.className = 'noticia-card-excerpt';
+    excerpt.textContent = item.description || '';
+    var meta = document.createElement('div');
+    meta.className = 'noticia-card-meta';
+    var dateSpan = document.createElement('span');
+    dateSpan.innerHTML = '<svg class="ic" style="width:11px;height:11px"><use href="#i-clock"/></svg>';
+    dateSpan.appendChild(document.createTextNode(' ' + formatDateBR(item.created_at)));
+    var authorSpan = document.createElement('span');
+    authorSpan.innerHTML = '<svg class="ic" style="width:11px;height:11px"><use href="#i-user"/></svg>';
+    authorSpan.appendChild(document.createTextNode(' ' + (authorProfile ? (authorProfile.full_name || authorProfile.email) : '—')));
+    meta.appendChild(dateSpan);
+    meta.appendChild(authorSpan);
+    body.appendChild(title);
+    body.appendChild(excerpt);
+    body.appendChild(meta);
+    card.appendChild(body);
+    return card;
+  }
+
+  async function loadHomeNoticias() {
+    var gridEl = document.getElementById('homeNoticiasGrid');
+    var emptyEl = document.getElementById('homeNoticiasEmpty');
+    if (!gridEl || !appState.session) return;
+    var res = await supabase.from('comunicados').select('*').order('created_at', { ascending: false }).limit(30);
+    var items = (res.data || []).filter(function (it) {
+      return it.attachment_path && (it.attachment_type === 'image' || it.attachment_type === 'video');
+    }).slice(0, 8);
+    gridEl.innerHTML = '';
+    if (!items.length) { emptyEl.style.display = 'block'; return; }
+    emptyEl.style.display = 'none';
+    var ids = [];
+    items.forEach(function (it) { if (it.created_by && ids.indexOf(it.created_by) === -1) ids.push(it.created_by); });
+    var authorsMap = {};
+    if (ids.length) {
+      var pr = await supabase.from('profiles').select('id,full_name,email').in('id', ids);
+      (pr.data || []).forEach(function (p) { authorsMap[p.id] = p; });
+    }
+    items.forEach(function (it) { gridEl.appendChild(buildNoticiaCard(it, authorsMap[it.created_by])); });
+  }
+
+  async function loadNoticiaSidebarData() {
+    var res = await supabase.from('comunicados').select('*').order('created_at', { ascending: false });
+    noticiaAllCache = res.data || [];
+    var ids = [];
+    noticiaAllCache.forEach(function (it) { if (it.created_by && ids.indexOf(it.created_by) === -1) ids.push(it.created_by); });
+    noticiaAuthorsMap = {};
+    if (ids.length) {
+      var pr = await supabase.from('profiles').select('id,full_name,email').in('id', ids);
+      (pr.data || []).forEach(function (p) { noticiaAuthorsMap[p.id] = p; });
+    }
+  }
+
+  function noticiaCategoriaCounts() {
+    var counts = {};
+    noticiaAllCache.forEach(function (it) {
+      var a = (it.area || '').trim();
+      if (!a) return;
+      counts[a] = (counts[a] || 0) + 1;
+    });
+    return counts;
+  }
+
+  function renderNoticiaCategorias() {
+    var wrap = document.getElementById('noticiaCategorias');
+    if (!wrap) return;
+    wrap.innerHTML = '';
+    var counts = noticiaCategoriaCounts();
+    function makeItem(label, count, value) {
+      var el = document.createElement('div');
+      el.className = 'noticia-cat-item' + (noticiaCategoriaFiltro === value ? ' active' : '');
+      var lab = document.createElement('span');
+      lab.textContent = label;
+      var cnt = document.createElement('span');
+      cnt.className = 'noticia-cat-count';
+      cnt.textContent = String(count);
+      el.appendChild(lab);
+      el.appendChild(cnt);
+      el.addEventListener('click', function () { noticiaCategoriaFiltro = value; renderNoticiaSidebar(); });
+      wrap.appendChild(el);
+    }
+    makeItem('Todas as notícias', noticiaAllCache.length, '');
+    Object.keys(counts).sort().forEach(function (area) { makeItem(area, counts[area], area); });
+  }
+
+  function renderNoticiaSideList() {
+    var wrap = document.getElementById('noticiaListaLateral');
+    if (!wrap) return;
+    wrap.innerHTML = '';
+    var buscaEl = document.getElementById('noticiaBusca');
+    var q = (buscaEl ? buscaEl.value : '').trim().toLowerCase();
+    var items = noticiaAllCache.filter(function (it) {
+      if (noticiaCategoriaFiltro && (it.area || '') !== noticiaCategoriaFiltro) return false;
+      if (q && (it.title || '').toLowerCase().indexOf(q) === -1) return false;
+      return true;
+    });
+    if (!items.length) {
+      var empty = document.createElement('p');
+      empty.style.cssText = 'font-size:12.5px;color:var(--muted);padding:6px;margin:0;';
+      empty.textContent = 'Nenhuma notícia encontrada.';
+      wrap.appendChild(empty);
+      return;
+    }
+    items.forEach(function (it) {
+      var row = document.createElement('div');
+      row.className = 'noticia-side-item' + (it.id === currentNoticiaId ? ' active' : '');
+      var thumbWrap = document.createElement('div');
+      thumbWrap.className = 'noticia-side-thumb';
+      if (it.attachment_path && it.attachment_type === 'image') {
+        (function (thumbWrap, it) {
+          supabase.storage.from('conteudo').createSignedUrl(it.attachment_path, 3600).then(function (res) {
+            if (res.data && res.data.signedUrl) {
+              var img = document.createElement('img');
+              img.src = res.data.signedUrl;
+              img.alt = '';
+              img.style.cssText = 'width:100%;height:100%;object-fit:cover;display:block;';
+              thumbWrap.appendChild(img);
+            }
+          }).catch(function () {});
+        })(thumbWrap, it);
+      }
+      var info = document.createElement('div');
+      info.className = 'noticia-side-info';
+      var t = document.createElement('div');
+      t.className = 'noticia-side-title';
+      t.textContent = it.title;
+      var d = document.createElement('div');
+      d.className = 'noticia-side-date';
+      d.textContent = formatDateBR(it.created_at);
+      info.appendChild(t);
+      info.appendChild(d);
+      row.appendChild(thumbWrap);
+      row.appendChild(info);
+      row.addEventListener('click', function () { renderNoticiaDetalhe(it.id); window.scrollTo(0, 0); });
+      wrap.appendChild(row);
+    });
+  }
+
+  function renderNoticiaSidebar() {
+    renderNoticiaCategorias();
+    renderNoticiaSideList();
+  }
+
+  async function renderNoticiaDetalhe(id) {
+    currentNoticiaId = id;
+    await loadNoticiaSidebarData();
+    var item = noticiaAllCache.find(function (x) { return x.id === id; });
+
+    var badgeEl = document.getElementById('noticiaCategoriaBadge');
+    var tituloEl = document.getElementById('noticiaTitulo');
+    var dataEl = document.getElementById('noticiaData');
+    var autorEl = document.getElementById('noticiaAutor');
+    var corpoEl = document.getElementById('noticiaCorpo');
+    var coverWrap = document.getElementById('noticiaCoverWrap');
+    var actionsEl = document.getElementById('noticiaActions');
+    var adminActionsEl = document.getElementById('noticiaAdminActions');
+    var bannerEl = document.getElementById('noticiaBanner');
+    var breadcrumbEl = document.getElementById('noticiaBreadcrumbTitle');
+
+    coverWrap.innerHTML = '';
+    coverWrap.style.display = 'none';
+    actionsEl.innerHTML = '';
+    adminActionsEl.innerHTML = '';
+    adminActionsEl.style.display = 'none';
+
+    if (!item) {
+      breadcrumbEl.textContent = 'Notícia';
+      badgeEl.style.display = 'none';
+      bannerEl.style.background = 'linear-gradient(135deg,var(--red),#023047)';
+      tituloEl.textContent = 'Notícia não encontrada';
+      dataEl.textContent = '';
+      autorEl.textContent = '';
+      corpoEl.textContent = 'Este conteúdo pode ter sido removido ou não existe mais.';
+      renderNoticiaSidebar();
+      return;
+    }
+
+    breadcrumbEl.textContent = item.title;
+    bannerEl.style.background = 'linear-gradient(135deg,var(' + colorVarName(item.color) + '),#023047)';
+    if (item.area) { badgeEl.textContent = item.area; badgeEl.style.display = 'inline-block'; } else { badgeEl.style.display = 'none'; }
+    tituloEl.textContent = item.title;
+    dataEl.textContent = formatDateBR(item.created_at);
+    var authorProfile = noticiaAuthorsMap[item.created_by];
+    autorEl.textContent = authorProfile ? (authorProfile.full_name || authorProfile.email) : '—';
+    corpoEl.textContent = item.description || '';
+
+    if (item.attachment_path && (item.attachment_type === 'image' || item.attachment_type === 'video')) {
+      var signed = await supabase.storage.from('conteudo').createSignedUrl(item.attachment_path, 3600);
+      if (signed.data && signed.data.signedUrl) {
+        coverWrap.style.display = 'block';
+        if (item.attachment_type === 'image') {
+          var img = document.createElement('img');
+          img.src = signed.data.signedUrl;
+          img.alt = '';
+          coverWrap.appendChild(img);
+        } else {
+          var video = document.createElement('video');
+          video.src = signed.data.signedUrl;
+          video.controls = true;
+          coverWrap.appendChild(video);
+        }
+      }
+    }
+
+    if (item.link_url) {
+      var linkBtn = document.createElement('button');
+      linkBtn.type = 'button';
+      linkBtn.className = 'doc-action-btn';
+      linkBtn.innerHTML = '<svg class="ic" style="width:14px;height:14px"><use href="#i-link"/></svg> Abrir link';
+      linkBtn.addEventListener('click', function () { window.open(item.link_url, '_blank', 'noopener'); });
+      actionsEl.appendChild(linkBtn);
+    }
+    if (item.attachment_path) {
+      var attBtn = document.createElement('button');
+      attBtn.type = 'button';
+      attBtn.className = 'doc-action-btn';
+      attBtn.innerHTML = '<svg class="ic" style="width:14px;height:14px"><use href="#' + attachmentIcon(item.attachment_type) + '"/></svg> Baixar anexo';
+      attBtn.addEventListener('click', function () { downloadComunicadoAttachment(item, attBtn); });
+      actionsEl.appendChild(attBtn);
+    }
+
+    var isAdmin = !!(appState.profile && appState.profile.is_admin);
+    if (isAdmin) {
+      adminActionsEl.style.display = 'flex';
+      adminActionsEl.appendChild(buildActionBtn('i-edit', 'Editar', function () { openComunicadoModal(item); }));
+      adminActionsEl.appendChild(buildActionBtn('i-trash', 'Excluir', function () { deleteComunicado(item); }));
+    }
+
+    renderNoticiaSidebar();
   }
 
   // ---------------- Informativos ----------------
@@ -3031,8 +3530,7 @@
       if (btnColaboradores) btnColaboradores.classList.add('active');
       if (viewUnidades) viewUnidades.style.display = 'none';
       if (viewColaboradores) viewColaboradores.style.display = '';
-      loadUnidades();
-      loadColaboradores();
+      loadUnidades().then(function () { loadColaboradores(); });
     } else {
       if (btnColaboradores) btnColaboradores.classList.remove('active');
       if (btnUnidades) btnUnidades.classList.add('active');
@@ -3195,6 +3693,13 @@
       editBtn.innerHTML = '<svg class="ic" style="width:15px;height:15px"><use href="#i-edit"/></svg>';
       editBtn.addEventListener('click', function () { openColaboradorModal(item); });
       card.appendChild(editBtn);
+      var transferBtn = document.createElement('button');
+      transferBtn.type = 'button';
+      transferBtn.className = 'colaborador-transfer';
+      transferBtn.title = 'Transferir de unidade';
+      transferBtn.innerHTML = '<svg class="ic" style="width:14px;height:14px"><use href="#i-swap"/></svg>';
+      transferBtn.addEventListener('click', function () { openTransferirModal(item); });
+      card.appendChild(transferBtn);
       var delBtn = document.createElement('button');
       delBtn.type = 'button';
       delBtn.className = 'colaborador-del';
@@ -3220,13 +3725,81 @@
     if (countEl) countEl.textContent = '(' + items.length + ')';
     var unidadeMap = {};
     unidadesCache.forEach(function (u) { unidadeMap[u.id] = u.name; });
-    var grid = document.getElementById('colaboradoresGrid');
+    var container = document.getElementById('colaboradoresGrid');
     var emptyEl = document.getElementById('colaboradoresEmpty');
-    grid.innerHTML = '';
+    container.innerHTML = '';
     if (!items.length) { emptyEl.style.display = 'block'; return; }
     emptyEl.style.display = 'none';
-    items.forEach(function (item) { grid.appendChild(buildColaboradorCard(item, unidadeMap[item.unidade_id])); });
+
+    // Agrupa cada colaborador dentro da sua unidade (uma seção por unidade, na ordem das Unidades).
+    var groups = [];
+    var groupByUnidade = {};
+    unidadesCache.forEach(function (u) {
+      var g = { id: u.id, name: u.name, items: [] };
+      groupByUnidade[u.id] = g;
+      groups.push(g);
+    });
+    var semUnidade = { id: null, name: 'Sem unidade', items: [] };
+    items.forEach(function (item) {
+      var g = item.unidade_id ? groupByUnidade[item.unidade_id] : null;
+      if (g) { g.items.push(item); } else { semUnidade.items.push(item); }
+    });
+    if (semUnidade.items.length) groups.push(semUnidade);
+
+    groups.filter(function (g) { return g.items.length; }).forEach(function (g) {
+      var section = document.createElement('div');
+      section.className = 'colaboradores-unit-section';
+      var header = document.createElement('div');
+      header.className = 'colaboradores-unit-header';
+      header.innerHTML = '<svg class="ic"><use href="#i-store"/></svg><h3>' + g.name + '</h3><span class="colaboradores-unit-count">' + g.items.length + '</span>';
+      section.appendChild(header);
+      var subGrid = document.createElement('div');
+      subGrid.className = 'colaborador-grid';
+      g.items.forEach(function (item) { subGrid.appendChild(buildColaboradorCard(item, null)); });
+      section.appendChild(subGrid);
+      container.appendChild(section);
+    });
   }
+
+  function populateTransferirUnidadeSelect(currentUnidadeId) {
+    var sel = document.getElementById('transferirUnidadeSelect');
+    if (!sel) return;
+    sel.innerHTML = '';
+    unidadesCache.forEach(function (u) {
+      var opt = document.createElement('option');
+      opt.value = u.id;
+      opt.textContent = u.name;
+      if (u.id === currentUnidadeId) opt.selected = true;
+      sel.appendChild(opt);
+    });
+  }
+
+  function openTransferirModal(item) {
+    var modal = document.getElementById('transferirModal');
+    if (!modal) return;
+    hideMsgEl(document.getElementById('transferirModalMsg'));
+    document.getElementById('transferirColaboradorId').value = item.id;
+    document.getElementById('transferirModalNome').textContent = item.nome;
+    populateTransferirUnidadeSelect(item.unidade_id);
+    modal.classList.remove('hidden');
+  }
+
+  var transferirCancelarBtn = document.getElementById('transferirCancelar');
+  if (transferirCancelarBtn) transferirCancelarBtn.addEventListener('click', function () {
+    document.getElementById('transferirModal').classList.add('hidden');
+  });
+  var transferirConfirmarBtn = document.getElementById('transferirConfirmar');
+  if (transferirConfirmarBtn) transferirConfirmarBtn.addEventListener('click', async function () {
+    var id = document.getElementById('transferirColaboradorId').value;
+    var novaUnidade = document.getElementById('transferirUnidadeSelect').value;
+    if (!id || !novaUnidade) return;
+    transferirConfirmarBtn.disabled = true;
+    var res = await supabase.from('colaboradores').update({ unidade_id: novaUnidade }).eq('id', id);
+    transferirConfirmarBtn.disabled = false;
+    if (res.error) { showMsgEl(document.getElementById('transferirModalMsg'), 'Não foi possível transferir.', 'error'); return; }
+    document.getElementById('transferirModal').classList.add('hidden');
+    loadColaboradores();
+  });
 
   function renderConquistasInputs(values) {
     var grid = document.getElementById('colaboradorConquistasGrid');
