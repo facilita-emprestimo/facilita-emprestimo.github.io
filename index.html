@@ -325,6 +325,14 @@
   .colaborador-del:hover{color:#B91C2B;background:#FEE2E2;}
   .colaborador-edit{position:absolute;top:10px;left:10px;background:none;border:none;color:var(--muted);cursor:pointer;padding:5px;border-radius:6px;}
   .colaborador-edit:hover{color:var(--red);background:var(--bg);}
+  .colaborador-transfer{position:absolute;top:10px;left:38px;background:none;border:none;color:var(--muted);cursor:pointer;padding:5px;border-radius:6px;}
+  .colaborador-transfer:hover{color:var(--ink-2);background:var(--bg);}
+  .colaboradores-unit-section{margin-bottom:28px;}
+  .colaboradores-unit-section:last-child{margin-bottom:0;}
+  .colaboradores-unit-header{display:flex;align-items:center;gap:10px;margin-bottom:14px;padding-bottom:9px;border-bottom:1px solid var(--line);}
+  .colaboradores-unit-header .ic{width:16px;height:16px;color:var(--ink-2);flex-shrink:0;}
+  .colaboradores-unit-header h3{font-size:14.5px;font-weight:800;margin:0;flex:1;color:var(--text);}
+  .colaboradores-unit-count{font-size:11.5px;font-weight:700;color:var(--muted);background:var(--bg);border-radius:20px;padding:3px 10px;flex-shrink:0;}
   .conquistas-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px 10px;margin-top:10px;}
   .conquistas-grid .login-field{margin-bottom:0;}
   .conquistas-grid label{font-size:11px !important;}
@@ -541,6 +549,7 @@
     <symbol id="i-phone" viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.362 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.338 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></symbol>
     <symbol id="i-mail" viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="16" rx="2"/><polyline points="22 6 12 13 2 6"/></symbol>
     <symbol id="i-target" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></symbol>
+    <symbol id="i-swap" viewBox="0 0 24 24"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></symbol>
   </defs>
 </svg>
 
@@ -1059,7 +1068,7 @@
                 </button>
               </div>
               <div class="login-msg error" id="colaboradoresMsg" style="margin-bottom:16px;"></div>
-              <div class="colaborador-grid" id="colaboradoresGrid"></div>
+              <div id="colaboradoresGrid"></div>
               <div class="docs-empty" id="colaboradoresEmpty" style="display:none;">Nenhum colaborador cadastrado ainda.</div>
             </div>
           </div>
@@ -1188,6 +1197,24 @@
           <div class="colaborador-conquistas-list" id="colaboradorProfileConquistas"></div>
           <div style="display:flex;gap:10px;margin-top:20px;justify-content:center;flex-wrap:wrap;" id="colaboradorProfileActions">
             <button type="button" class="login-btn" id="colaboradorProfileClose" style="width:auto;padding:11px 20px;background:#9CA3AF;">Fechar</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ============ MODAL: TRANSFERIR COLABORADOR ============ -->
+      <div class="modal-overlay hidden" id="transferirModal">
+        <div class="modal-card" style="max-width:380px;">
+          <h3>Transferir de unidade</h3>
+          <p id="transferirModalNome" style="font-size:13px;color:var(--muted);margin:-4px 0 14px;"></p>
+          <div class="login-msg error" id="transferirModalMsg"></div>
+          <input type="hidden" id="transferirColaboradorId">
+          <div class="login-field">
+            <label for="transferirUnidadeSelect">Nova unidade</label>
+            <select id="transferirUnidadeSelect"></select>
+          </div>
+          <div style="display:flex;gap:10px;margin-top:16px;">
+            <button type="button" class="login-btn" id="transferirConfirmar" style="width:auto;padding:11px 20px;">Transferir</button>
+            <button type="button" class="login-btn" id="transferirCancelar" style="width:auto;padding:11px 20px;background:#9CA3AF;">Cancelar</button>
           </div>
         </div>
       </div>
@@ -3503,8 +3530,7 @@
       if (btnColaboradores) btnColaboradores.classList.add('active');
       if (viewUnidades) viewUnidades.style.display = 'none';
       if (viewColaboradores) viewColaboradores.style.display = '';
-      loadUnidades();
-      loadColaboradores();
+      loadUnidades().then(function () { loadColaboradores(); });
     } else {
       if (btnColaboradores) btnColaboradores.classList.remove('active');
       if (btnUnidades) btnUnidades.classList.add('active');
@@ -3667,6 +3693,13 @@
       editBtn.innerHTML = '<svg class="ic" style="width:15px;height:15px"><use href="#i-edit"/></svg>';
       editBtn.addEventListener('click', function () { openColaboradorModal(item); });
       card.appendChild(editBtn);
+      var transferBtn = document.createElement('button');
+      transferBtn.type = 'button';
+      transferBtn.className = 'colaborador-transfer';
+      transferBtn.title = 'Transferir de unidade';
+      transferBtn.innerHTML = '<svg class="ic" style="width:14px;height:14px"><use href="#i-swap"/></svg>';
+      transferBtn.addEventListener('click', function () { openTransferirModal(item); });
+      card.appendChild(transferBtn);
       var delBtn = document.createElement('button');
       delBtn.type = 'button';
       delBtn.className = 'colaborador-del';
@@ -3692,13 +3725,81 @@
     if (countEl) countEl.textContent = '(' + items.length + ')';
     var unidadeMap = {};
     unidadesCache.forEach(function (u) { unidadeMap[u.id] = u.name; });
-    var grid = document.getElementById('colaboradoresGrid');
+    var container = document.getElementById('colaboradoresGrid');
     var emptyEl = document.getElementById('colaboradoresEmpty');
-    grid.innerHTML = '';
+    container.innerHTML = '';
     if (!items.length) { emptyEl.style.display = 'block'; return; }
     emptyEl.style.display = 'none';
-    items.forEach(function (item) { grid.appendChild(buildColaboradorCard(item, unidadeMap[item.unidade_id])); });
+
+    // Agrupa cada colaborador dentro da sua unidade (uma seção por unidade, na ordem das Unidades).
+    var groups = [];
+    var groupByUnidade = {};
+    unidadesCache.forEach(function (u) {
+      var g = { id: u.id, name: u.name, items: [] };
+      groupByUnidade[u.id] = g;
+      groups.push(g);
+    });
+    var semUnidade = { id: null, name: 'Sem unidade', items: [] };
+    items.forEach(function (item) {
+      var g = item.unidade_id ? groupByUnidade[item.unidade_id] : null;
+      if (g) { g.items.push(item); } else { semUnidade.items.push(item); }
+    });
+    if (semUnidade.items.length) groups.push(semUnidade);
+
+    groups.filter(function (g) { return g.items.length; }).forEach(function (g) {
+      var section = document.createElement('div');
+      section.className = 'colaboradores-unit-section';
+      var header = document.createElement('div');
+      header.className = 'colaboradores-unit-header';
+      header.innerHTML = '<svg class="ic"><use href="#i-store"/></svg><h3>' + g.name + '</h3><span class="colaboradores-unit-count">' + g.items.length + '</span>';
+      section.appendChild(header);
+      var subGrid = document.createElement('div');
+      subGrid.className = 'colaborador-grid';
+      g.items.forEach(function (item) { subGrid.appendChild(buildColaboradorCard(item, null)); });
+      section.appendChild(subGrid);
+      container.appendChild(section);
+    });
   }
+
+  function populateTransferirUnidadeSelect(currentUnidadeId) {
+    var sel = document.getElementById('transferirUnidadeSelect');
+    if (!sel) return;
+    sel.innerHTML = '';
+    unidadesCache.forEach(function (u) {
+      var opt = document.createElement('option');
+      opt.value = u.id;
+      opt.textContent = u.name;
+      if (u.id === currentUnidadeId) opt.selected = true;
+      sel.appendChild(opt);
+    });
+  }
+
+  function openTransferirModal(item) {
+    var modal = document.getElementById('transferirModal');
+    if (!modal) return;
+    hideMsgEl(document.getElementById('transferirModalMsg'));
+    document.getElementById('transferirColaboradorId').value = item.id;
+    document.getElementById('transferirModalNome').textContent = item.nome;
+    populateTransferirUnidadeSelect(item.unidade_id);
+    modal.classList.remove('hidden');
+  }
+
+  var transferirCancelarBtn = document.getElementById('transferirCancelar');
+  if (transferirCancelarBtn) transferirCancelarBtn.addEventListener('click', function () {
+    document.getElementById('transferirModal').classList.add('hidden');
+  });
+  var transferirConfirmarBtn = document.getElementById('transferirConfirmar');
+  if (transferirConfirmarBtn) transferirConfirmarBtn.addEventListener('click', async function () {
+    var id = document.getElementById('transferirColaboradorId').value;
+    var novaUnidade = document.getElementById('transferirUnidadeSelect').value;
+    if (!id || !novaUnidade) return;
+    transferirConfirmarBtn.disabled = true;
+    var res = await supabase.from('colaboradores').update({ unidade_id: novaUnidade }).eq('id', id);
+    transferirConfirmarBtn.disabled = false;
+    if (res.error) { showMsgEl(document.getElementById('transferirModalMsg'), 'Não foi possível transferir.', 'error'); return; }
+    document.getElementById('transferirModal').classList.add('hidden');
+    loadColaboradores();
+  });
 
   function renderConquistasInputs(values) {
     var grid = document.getElementById('colaboradorConquistasGrid');
