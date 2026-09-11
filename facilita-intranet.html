@@ -231,6 +231,53 @@
   .unit-row .ic{width:15px;height:15px;margin-top:2px;color:var(--muted);}
   .unit-row b{color:var(--text);}
 
+  /* ---------- UNIDADES: menu lateral (Unidades / Colaboradores) ---------- */
+  .unidades-layout{display:flex;gap:20px;align-items:flex-start;}
+  .unidades-sidebar{display:flex;flex-direction:column;gap:6px;width:190px;flex-shrink:0;}
+  .unidades-side-btn{display:flex;align-items:center;gap:10px;background:#fff;border:1px solid var(--line);border-radius:10px;padding:12px 14px;cursor:pointer;font-family:inherit;font-size:13.5px;font-weight:700;color:var(--text);text-align:left;}
+  .unidades-side-btn .ic{width:18px;height:18px;flex-shrink:0;}
+  .unidades-side-btn.active{background:var(--red);color:#fff;border-color:var(--red);}
+  .unidades-side-count{margin-left:auto;font-size:11.5px;font-weight:700;opacity:.7;}
+  .unidades-main{flex:1;min-width:0;}
+  @media (max-width:760px){
+    .unidades-layout{flex-direction:column;}
+    .unidades-sidebar{flex-direction:row;width:100%;overflow-x:auto;}
+    .unidades-side-btn{flex:1;justify-content:center;white-space:nowrap;}
+  }
+
+  /* ---------- COLABORADORES ---------- */
+  .colaborador-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:18px;}
+  .colaborador-card{background:#fff;border:1px solid var(--line);border-radius:14px;padding:20px 16px;display:flex;flex-direction:column;align-items:center;gap:8px;position:relative;text-align:center;}
+  .colaborador-avatar-wrap{position:relative;width:60px;height:60px;margin-bottom:6px;}
+  .colaborador-avatar{width:60px;height:60px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:18px;overflow:hidden;flex-shrink:0;}
+  .colaborador-avatar img{width:100%;height:100%;object-fit:cover;display:block;}
+  .colaborador-stars{position:absolute;bottom:-8px;left:50%;transform:translateX(-50%);display:flex;gap:0px;background:#fff;border-radius:20px;padding:2px 5px;box-shadow:0 1px 5px rgba(2,48,71,.18);white-space:nowrap;}
+  .colaborador-stars svg{width:8px;height:8px;color:#D97706;flex-shrink:0;}
+  .colaborador-stars svg.star-empty{color:#E2E5EA;}
+  .colaborador-name{font-size:14px;font-weight:800;line-height:1.25;}
+  .colaborador-tags{display:flex;gap:5px;flex-wrap:wrap;justify-content:center;}
+  .colaborador-row{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--muted);max-width:100%;}
+  .colaborador-row .ic{width:13px;height:13px;flex-shrink:0;}
+  .colaborador-row span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .colaborador-unit-badge{display:inline-flex;align-items:center;gap:6px;background:var(--bg);border-radius:8px;padding:5px 10px;font-size:11px;font-weight:700;color:var(--ink-2);}
+  .colaborador-actions{display:flex;gap:8px;margin-top:6px;flex-wrap:wrap;justify-content:center;}
+  .colaborador-del{position:absolute;top:10px;right:10px;background:none;border:none;color:var(--muted);cursor:pointer;padding:5px;border-radius:6px;}
+  .colaborador-del:hover{color:#B91C2B;background:#FEE2E2;}
+  .colaborador-edit{position:absolute;top:10px;left:10px;background:none;border:none;color:var(--muted);cursor:pointer;padding:5px;border-radius:6px;}
+  .colaborador-edit:hover{color:var(--red);background:var(--bg);}
+  .conquistas-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px 10px;margin-top:10px;}
+  .conquistas-grid .login-field{margin-bottom:0;}
+  .conquistas-grid label{font-size:11px !important;}
+  .colaborador-profile-photo-wrap{position:relative;width:110px;height:110px;margin:0 auto 14px;}
+  .colaborador-profile-photo{width:110px;height:110px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:32px;overflow:hidden;}
+  .colaborador-profile-photo img{width:100%;height:100%;object-fit:cover;display:block;}
+  .colaborador-profile-stars{position:absolute;bottom:-6px;left:50%;transform:translateX(-50%);display:flex;background:#fff;border-radius:20px;padding:4px 7px;box-shadow:0 1px 6px rgba(2,48,71,.2);white-space:nowrap;}
+  .colaborador-profile-stars svg{width:11px;height:11px;color:#D97706;}
+  .colaborador-profile-stars svg.star-empty{color:#E2E5EA;}
+  .colaborador-conquistas-list{margin-top:14px;text-align:left;}
+  .colaborador-conquistas-list .cq-item{display:flex;gap:8px;align-items:flex-start;font-size:12.5px;color:var(--text);padding:6px 0;border-bottom:1px solid var(--line);}
+  .colaborador-conquistas-list .cq-item svg{width:14px;height:14px;color:#D97706;flex-shrink:0;margin-top:1px;}
+
   /* ---------- GATE OVERLAY ---------- */
   .gate-overlay{
     position:fixed;inset:0;background:rgba(12,14,18,.74);backdrop-filter:blur(3px);
@@ -431,6 +478,8 @@
     <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></symbol>
     <symbol id="i-book" viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></symbol>
     <symbol id="i-inbox" viewBox="0 0 24 24"><path d="M22 12h-6l-2 3h-4l-2-3H2"/><path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/></symbol>
+    <symbol id="i-phone" viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.362 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.338 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></symbol>
+    <symbol id="i-mail" viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="16" rx="2"/><polyline points="22 6 12 13 2 6"/></symbol>
     <symbol id="i-target" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></symbol>
   </defs>
 </svg>
@@ -861,16 +910,47 @@
       <section class="page" id="page-unidades">
         <div class="breadcrumb">Portal Interno / <b>Unidades</b></div>
         <div class="page-header">
-          <div><h1>Unidades</h1><p>Lojas e estrutura da Facilita Empréstimo em São Luís.</p></div>
-          <div class="docs-toolbar" id="unidadesAdminActions" style="display:none;">
-            <button type="button" class="doc-action-btn" id="btnNewUnidade">
-              <svg class="ic" style="width:15px;height:15px"><use href="#i-plus"/></svg> Nova unidade
+          <div><h1>Unidades</h1><p>Lojas, estrutura e colaboradores da Facilita Empréstimo em São Luís.</p></div>
+        </div>
+
+        <div class="unidades-layout">
+          <div class="unidades-sidebar">
+            <button type="button" class="unidades-side-btn active" id="unidadesSideUnidades" onclick="switchUnidadesSubtab('unidades')">
+              <svg class="ic"><use href="#i-store"/></svg>
+              <span>Unidades</span>
+              <span class="unidades-side-count" id="unidadesSideCountUnidades"></span>
+            </button>
+            <button type="button" class="unidades-side-btn" id="unidadesSideColaboradores" onclick="switchUnidadesSubtab('colaboradores')">
+              <svg class="ic"><use href="#i-users"/></svg>
+              <span>Colaboradores</span>
+              <span class="unidades-side-count" id="unidadesSideCountColaboradores"></span>
             </button>
           </div>
+
+          <div class="unidades-main">
+            <div id="unidadesSubview">
+              <div class="docs-toolbar" id="unidadesAdminActions" style="display:none;margin-bottom:16px;">
+                <button type="button" class="doc-action-btn" id="btnNewUnidade">
+                  <svg class="ic" style="width:15px;height:15px"><use href="#i-plus"/></svg> Nova unidade
+                </button>
+              </div>
+              <div class="login-msg error" id="unidadesMsg" style="margin-bottom:16px;"></div>
+              <div class="unit-grid" id="unidadesGrid"></div>
+              <div class="docs-empty" id="unidadesEmpty" style="display:none;">Nenhuma unidade cadastrada ainda.</div>
+            </div>
+
+            <div id="colaboradoresSubview" style="display:none;">
+              <div class="docs-toolbar" id="colaboradoresAdminActions" style="display:none;margin-bottom:16px;">
+                <button type="button" class="doc-action-btn" id="btnNewColaborador">
+                  <svg class="ic" style="width:15px;height:15px"><use href="#i-plus"/></svg> Nova pessoa
+                </button>
+              </div>
+              <div class="login-msg error" id="colaboradoresMsg" style="margin-bottom:16px;"></div>
+              <div class="colaborador-grid" id="colaboradoresGrid"></div>
+              <div class="docs-empty" id="colaboradoresEmpty" style="display:none;">Nenhum colaborador cadastrado ainda.</div>
+            </div>
+          </div>
         </div>
-        <div class="login-msg error" id="unidadesMsg" style="margin-bottom:16px;"></div>
-        <div class="unit-grid" id="unidadesGrid"></div>
-        <div class="docs-empty" id="unidadesEmpty" style="display:none;">Nenhuma unidade cadastrada ainda.</div>
       </section>
 
       <!-- ============ MODAL: NOVA/EDITAR UNIDADE ============ -->
@@ -930,6 +1010,72 @@
               <button type="button" class="login-btn" id="unidadeCancel" style="width:auto;padding:11px 20px;background:#9CA3AF;">Cancelar</button>
             </div>
           </form>
+        </div>
+      </div>
+
+      <!-- ============ MODAL: NOVA/EDITAR PESSOA (COLABORADOR) ============ -->
+      <div class="modal-overlay hidden" id="colaboradorModal">
+        <div class="modal-card" style="max-width:480px;">
+          <h3 id="colaboradorModalTitle">Nova pessoa</h3>
+          <div class="login-msg error" id="colaboradorModalMsg"></div>
+          <form id="colaboradorForm">
+            <input type="hidden" id="colaboradorId">
+            <div class="login-field">
+              <label for="colaboradorNome">Nome</label>
+              <input type="text" id="colaboradorNome" required>
+            </div>
+            <div class="login-field">
+              <label for="colaboradorCargo">Cargo(s) / tag(s)</label>
+              <input type="text" id="colaboradorCargo" placeholder="Ex: Gerente, Vendedor (separe por vírgula se tiver mais de um)">
+            </div>
+            <div class="login-field">
+              <label for="colaboradorTelefone">Telefone / WhatsApp</label>
+              <input type="text" id="colaboradorTelefone" placeholder="Ex: (98) 98888-0000">
+            </div>
+            <div class="login-field">
+              <label for="colaboradorEmail">E-mail</label>
+              <input type="email" id="colaboradorEmail">
+            </div>
+            <div class="login-field">
+              <label for="colaboradorUnidade">Unidade</label>
+              <select id="colaboradorUnidade">
+                <option value="">Sem unidade</option>
+              </select>
+            </div>
+            <div class="login-field">
+              <label for="colaboradorFoto">Foto (opcional)</label>
+              <input type="file" id="colaboradorFoto" accept="image/*">
+              <div id="colaboradorFotoAtual" style="font-size:12.5px;color:var(--muted,#6B7280);margin-top:6px;display:none;"></div>
+              <label class="gate-check-row" id="colaboradorRemoveFotoWrap" style="display:none;margin-top:6px;">
+                <input type="checkbox" id="colaboradorRemoveFoto"> Remover foto atual
+              </label>
+            </div>
+            <details>
+              <summary style="cursor:pointer;font-size:12.5px;font-weight:700;color:var(--text);margin-bottom:4px;">Conquistas (opcional) — cada campo preenchido vira uma estrela na foto</summary>
+              <div class="conquistas-grid" id="colaboradorConquistasGrid"></div>
+            </details>
+            <div style="display:flex;gap:10px;margin-top:16px;">
+              <button type="submit" class="login-btn" style="width:auto;padding:11px 20px;">Salvar</button>
+              <button type="button" class="login-btn" id="colaboradorCancel" style="width:auto;padding:11px 20px;background:#9CA3AF;">Cancelar</button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- ============ MODAL: PERFIL DO COLABORADOR ============ -->
+      <div class="modal-overlay hidden" id="colaboradorProfileModal">
+        <div class="modal-card" style="max-width:400px;text-align:center;">
+          <div class="colaborador-profile-photo-wrap">
+            <div class="colaborador-profile-photo" id="colaboradorProfilePhoto"></div>
+            <div class="colaborador-profile-stars" id="colaboradorProfileStars"></div>
+          </div>
+          <h3 id="colaboradorProfileNome" style="margin:0 0 8px;"></h3>
+          <div class="colaborador-tags" id="colaboradorProfileTags" style="margin-bottom:10px;"></div>
+          <div style="display:flex;flex-direction:column;gap:8px;align-items:center;" id="colaboradorProfileRows"></div>
+          <div class="colaborador-conquistas-list" id="colaboradorProfileConquistas"></div>
+          <div style="display:flex;gap:10px;margin-top:20px;justify-content:center;flex-wrap:wrap;" id="colaboradorProfileActions">
+            <button type="button" class="login-btn" id="colaboradorProfileClose" style="width:auto;padding:11px 20px;background:#9CA3AF;">Fechar</button>
+          </div>
         </div>
       </div>
 
@@ -2268,7 +2414,7 @@
     }
     if (page === 'comunicados' && typeof loadComunicados === 'function') { loadComunicados(); }
     if (page === 'informativos' && typeof loadInformativos === 'function') { loadInformativos(); }
-    if (page === 'unidades' && typeof loadUnidades === 'function') { loadUnidades(); }
+    if (page === 'unidades' && typeof initUnidadesPage === 'function') { initUnidadesPage(); }
     if (page === 'tarefas' && typeof loadTarefas === 'function') { loadTarefas(); }
     if (page === 'chamados' && typeof loadChamados === 'function') { loadChamados(); }
     if (page === 'planos-acao' && typeof loadPlanos === 'function') { loadPlanos(); }
@@ -2854,6 +3000,10 @@
     var res = await supabase.from('unidades').select('*').order('created_at');
     if (res.error) { if (unidadesMsgEl) showMsgEl(unidadesMsgEl, 'Não foi possível carregar as unidades.', 'error'); return; }
     var items = res.data || [];
+    unidadesCache = items;
+    var countEl = document.getElementById('unidadesSideCountUnidades');
+    if (countEl) countEl.textContent = '(' + items.length + ')';
+    populateColaboradorUnidadeSelect();
     var grid = document.getElementById('unidadesGrid');
     var emptyEl = document.getElementById('unidadesEmpty');
     grid.innerHTML = '';
@@ -2861,6 +3011,431 @@
     emptyEl.style.display = 'none';
     items.forEach(function (item) { grid.appendChild(buildUnitCard(item)); });
   }
+
+  // ---------------- Unidades: menu lateral (Unidades / Colaboradores) ----------------
+  var unidadesCache = [];
+  var unidadesActiveSubtab = 'unidades';
+
+  function initUnidadesPage() {
+    switchUnidadesSubtab(unidadesActiveSubtab || 'unidades');
+  }
+
+  function switchUnidadesSubtab(tab) {
+    unidadesActiveSubtab = tab;
+    var btnUnidades = document.getElementById('unidadesSideUnidades');
+    var btnColaboradores = document.getElementById('unidadesSideColaboradores');
+    var viewUnidades = document.getElementById('unidadesSubview');
+    var viewColaboradores = document.getElementById('colaboradoresSubview');
+    if (tab === 'colaboradores') {
+      if (btnUnidades) btnUnidades.classList.remove('active');
+      if (btnColaboradores) btnColaboradores.classList.add('active');
+      if (viewUnidades) viewUnidades.style.display = 'none';
+      if (viewColaboradores) viewColaboradores.style.display = '';
+      loadUnidades();
+      loadColaboradores();
+    } else {
+      if (btnColaboradores) btnColaboradores.classList.remove('active');
+      if (btnUnidades) btnUnidades.classList.add('active');
+      if (viewColaboradores) viewColaboradores.style.display = 'none';
+      if (viewUnidades) viewUnidades.style.display = '';
+      loadUnidades();
+    }
+  }
+
+  function populateColaboradorUnidadeSelect() {
+    var sel = document.getElementById('colaboradorUnidade');
+    if (!sel) return;
+    var current = sel.value;
+    sel.innerHTML = '<option value="">Sem unidade</option>';
+    unidadesCache.forEach(function (u) {
+      var opt = document.createElement('option');
+      opt.value = u.id;
+      opt.textContent = u.name;
+      sel.appendChild(opt);
+    });
+    sel.value = current || '';
+  }
+
+  // ---------------- Colaboradores ----------------
+  var colaboradoresMsgEl = document.getElementById('colaboradoresMsg');
+  var colaboradorModal = document.getElementById('colaboradorModal');
+  var colaboradorForm = document.getElementById('colaboradorForm');
+  var colaboradorModalMsg = document.getElementById('colaboradorModalMsg');
+  var colaboradorModalTitle = document.getElementById('colaboradorModalTitle');
+  var btnNewColaborador = document.getElementById('btnNewColaborador');
+  var colaboradorCancel = document.getElementById('colaboradorCancel');
+  var colaboradorProfileModal = document.getElementById('colaboradorProfileModal');
+  var colaboradorProfileClose = document.getElementById('colaboradorProfileClose');
+  var colaboradorEditingPhotoPath = null;
+  var colaboradoresCache = [];
+  var N_CONQUISTAS = 12;
+
+  var AVATAR_PALETTE = ['#219EBC', '#2C7DA0', '#4A5C7A', '#C9668B', '#FB8500', '#2EC4B6', '#16A34A', '#7C3AED', '#D97706', '#0891B2', '#F43F5E', '#4338CA'];
+  function avatarColor(nome) { return AVATAR_PALETTE[hashStr(String(nome || '')) % AVATAR_PALETTE.length]; }
+  function initialsOf(nome) {
+    var parts = (nome || '').trim().split(/\s+/).filter(Boolean);
+    if (!parts.length) return '?';
+    if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
+    return (parts[0][0] + parts[1][0]).toUpperCase();
+  }
+  function starSvg(filled) {
+    return '<svg class="' + (filled ? '' : 'star-empty') + '" viewBox="0 0 24 24" ' + (filled ? 'fill="currentColor" stroke="none"' : 'fill="none" stroke="currentColor" stroke-width="2"') + '><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>';
+  }
+  function conquistasFilled(conquistas) {
+    return (conquistas || []).filter(function (c) { return c && String(c).trim(); });
+  }
+  function starsRowHtml(conquistas) {
+    var filled = conquistasFilled(conquistas);
+    var html = '';
+    for (var i = 0; i < N_CONQUISTAS; i++) { html += starSvg(i < filled.length); }
+    return html;
+  }
+
+  function buildColaboradorAvatarInner(item) {
+    if (item.photo_path) {
+      var img = document.createElement('img');
+      img.alt = '';
+      supabase.storage.from('conteudo').createSignedUrl(item.photo_path, 3600).then(function (res) {
+        if (res.data) img.src = res.data.signedUrl;
+      });
+      return img;
+    }
+    var span = document.createElement('span');
+    span.textContent = initialsOf(item.nome);
+    return span;
+  }
+
+  function buildColaboradorCard(item, unidadeName) {
+    var isAdmin = !!(appState.profile && appState.profile.is_admin);
+    var card = document.createElement('div');
+    card.className = 'colaborador-card';
+
+    var avatarWrap = document.createElement('div');
+    avatarWrap.className = 'colaborador-avatar-wrap';
+    var avatar = document.createElement('div');
+    avatar.className = 'colaborador-avatar';
+    avatar.style.background = avatarColor(item.nome);
+    avatar.appendChild(buildColaboradorAvatarInner(item));
+    avatarWrap.appendChild(avatar);
+    var filled = conquistasFilled(item.conquistas);
+    if (filled.length) {
+      var stars = document.createElement('div');
+      stars.className = 'colaborador-stars';
+      stars.title = filled.length + ' de ' + N_CONQUISTAS + ' conquistas';
+      stars.innerHTML = starsRowHtml(item.conquistas);
+      avatarWrap.appendChild(stars);
+    }
+    card.appendChild(avatarWrap);
+
+    var nameEl = document.createElement('div');
+    nameEl.className = 'colaborador-name';
+    nameEl.textContent = item.nome;
+    card.appendChild(nameEl);
+
+    if (item.cargo) {
+      var tags = document.createElement('div');
+      tags.className = 'colaborador-tags';
+      item.cargo.split(',').map(function (t) { return t.trim(); }).filter(Boolean).forEach(function (t) {
+        var b = document.createElement('span');
+        b.className = 'badge badge-blue';
+        b.textContent = t;
+        tags.appendChild(b);
+      });
+      card.appendChild(tags);
+    }
+
+    if (item.telefone) {
+      var rowTel = document.createElement('div');
+      rowTel.className = 'colaborador-row';
+      rowTel.innerHTML = '<svg class="ic"><use href="#i-phone"/></svg><span>' + item.telefone + '</span>';
+      card.appendChild(rowTel);
+    }
+    if (item.email) {
+      var rowEmail = document.createElement('div');
+      rowEmail.className = 'colaborador-row';
+      rowEmail.innerHTML = '<svg class="ic"><use href="#i-mail"/></svg><span>' + item.email + '</span>';
+      card.appendChild(rowEmail);
+    }
+    if (unidadeName) {
+      var unitBadge = document.createElement('div');
+      unitBadge.className = 'colaborador-unit-badge';
+      unitBadge.innerHTML = '<svg class="ic" style="width:13px;height:13px"><use href="#i-store"/></svg>' + unidadeName;
+      card.appendChild(unitBadge);
+    }
+
+    var actions = document.createElement('div');
+    actions.className = 'colaborador-actions';
+    var perfilBtn = document.createElement('button');
+    perfilBtn.type = 'button';
+    perfilBtn.className = 'doc-action-btn';
+    perfilBtn.style.background = 'var(--ink-2)';
+    perfilBtn.innerHTML = '<svg class="ic" style="width:13px;height:13px"><use href="#i-user"/></svg> Perfil';
+    perfilBtn.addEventListener('click', function () { openColaboradorProfile(item, unidadeName); });
+    actions.appendChild(perfilBtn);
+    if (item.telefone) {
+      var waBtn = document.createElement('button');
+      waBtn.type = 'button';
+      waBtn.className = 'doc-action-btn';
+      waBtn.style.background = 'var(--green)';
+      waBtn.innerHTML = '<svg class="ic" style="width:13px;height:13px"><use href="#i-link"/></svg> Whatsapp';
+      waBtn.addEventListener('click', function () {
+        var digits = String(item.telefone).replace(/\D/g, '');
+        if (digits.length <= 11) digits = '55' + digits;
+        window.open('https://wa.me/' + digits, '_blank', 'noopener');
+      });
+      actions.appendChild(waBtn);
+    }
+    card.appendChild(actions);
+
+    if (isAdmin) {
+      var editBtn = document.createElement('button');
+      editBtn.type = 'button';
+      editBtn.className = 'colaborador-edit';
+      editBtn.title = 'Editar';
+      editBtn.innerHTML = '<svg class="ic" style="width:15px;height:15px"><use href="#i-edit"/></svg>';
+      editBtn.addEventListener('click', function () { openColaboradorModal(item); });
+      card.appendChild(editBtn);
+      var delBtn = document.createElement('button');
+      delBtn.type = 'button';
+      delBtn.className = 'colaborador-del';
+      delBtn.title = 'Excluir';
+      delBtn.innerHTML = '<svg class="ic" style="width:15px;height:15px"><use href="#i-trash"/></svg>';
+      delBtn.addEventListener('click', function () { deleteColaborador(item); });
+      card.appendChild(delBtn);
+    }
+
+    return card;
+  }
+
+  async function loadColaboradores() {
+    if (!appState.session) return;
+    if (colaboradoresMsgEl) hideMsgEl(colaboradoresMsgEl);
+    var toolbar = document.getElementById('colaboradoresAdminActions');
+    if (toolbar) toolbar.style.display = (appState.profile && appState.profile.is_admin) ? 'flex' : 'none';
+    var res = await supabase.from('colaboradores').select('*').order('created_at');
+    if (res.error) { if (colaboradoresMsgEl) showMsgEl(colaboradoresMsgEl, 'Não foi possível carregar os colaboradores.', 'error'); return; }
+    var items = res.data || [];
+    colaboradoresCache = items;
+    var countEl = document.getElementById('unidadesSideCountColaboradores');
+    if (countEl) countEl.textContent = '(' + items.length + ')';
+    var unidadeMap = {};
+    unidadesCache.forEach(function (u) { unidadeMap[u.id] = u.name; });
+    var grid = document.getElementById('colaboradoresGrid');
+    var emptyEl = document.getElementById('colaboradoresEmpty');
+    grid.innerHTML = '';
+    if (!items.length) { emptyEl.style.display = 'block'; return; }
+    emptyEl.style.display = 'none';
+    items.forEach(function (item) { grid.appendChild(buildColaboradorCard(item, unidadeMap[item.unidade_id])); });
+  }
+
+  function renderConquistasInputs(values) {
+    var grid = document.getElementById('colaboradorConquistasGrid');
+    if (!grid) return;
+    grid.innerHTML = '';
+    for (var i = 0; i < N_CONQUISTAS; i++) {
+      var field = document.createElement('div');
+      field.className = 'login-field';
+      var label = document.createElement('label');
+      label.setAttribute('for', 'colaboradorConquista' + i);
+      label.textContent = 'Conquista ' + (i + 1);
+      var input = document.createElement('input');
+      input.type = 'text';
+      input.id = 'colaboradorConquista' + i;
+      input.value = (values && values[i]) ? values[i] : '';
+      input.placeholder = 'Ex: Vendedor do mês';
+      field.appendChild(label);
+      field.appendChild(input);
+      grid.appendChild(field);
+    }
+  }
+
+  function readConquistasInputs() {
+    var arr = [];
+    for (var i = 0; i < N_CONQUISTAS; i++) {
+      var el = document.getElementById('colaboradorConquista' + i);
+      arr.push(el ? el.value.trim() : '');
+    }
+    return arr;
+  }
+
+  function openColaboradorModal(item) {
+    hideMsgEl(colaboradorModalMsg);
+    colaboradorForm.reset();
+    populateColaboradorUnidadeSelect();
+    document.getElementById('colaboradorId').value = item ? item.id : '';
+    colaboradorModalTitle.textContent = item ? 'Editar pessoa' : 'Nova pessoa';
+    document.getElementById('colaboradorNome').value = item ? item.nome : '';
+    document.getElementById('colaboradorCargo').value = item ? (item.cargo || '') : '';
+    document.getElementById('colaboradorTelefone').value = item ? (item.telefone || '') : '';
+    document.getElementById('colaboradorEmail').value = item ? (item.email || '') : '';
+    document.getElementById('colaboradorUnidade').value = item ? (item.unidade_id || '') : '';
+    renderConquistasInputs(item ? item.conquistas : null);
+    colaboradorEditingPhotoPath = item ? (item.photo_path || null) : null;
+    var fotoAtualEl = document.getElementById('colaboradorFotoAtual');
+    var removeFotoWrapEl = document.getElementById('colaboradorRemoveFotoWrap');
+    document.getElementById('colaboradorRemoveFoto').checked = false;
+    fotoAtualEl.style.display = 'none';
+    removeFotoWrapEl.style.display = 'none';
+    if (item && item.photo_path) {
+      fotoAtualEl.textContent = 'Foto atual definida';
+      fotoAtualEl.style.display = 'block';
+      removeFotoWrapEl.style.display = 'flex';
+    }
+    colaboradorModal.classList.remove('hidden');
+  }
+
+  if (btnNewColaborador) btnNewColaborador.addEventListener('click', function () { openColaboradorModal(null); });
+  if (colaboradorCancel) colaboradorCancel.addEventListener('click', function () { colaboradorModal.classList.add('hidden'); });
+  if (colaboradorForm) {
+    colaboradorForm.addEventListener('submit', async function (e) {
+      e.preventDefault();
+      hideMsgEl(colaboradorModalMsg);
+      var id = document.getElementById('colaboradorId').value;
+      var payload = {
+        nome: document.getElementById('colaboradorNome').value.trim(),
+        cargo: document.getElementById('colaboradorCargo').value.trim() || null,
+        telefone: document.getElementById('colaboradorTelefone').value.trim() || null,
+        email: document.getElementById('colaboradorEmail').value.trim() || null,
+        unidade_id: document.getElementById('colaboradorUnidade').value || null,
+        conquistas: readConquistasInputs()
+      };
+      var fileInput = document.getElementById('colaboradorFoto');
+      var file = fileInput.files[0];
+      var removeChecked = document.getElementById('colaboradorRemoveFoto').checked;
+      var submitBtn = colaboradorForm.querySelector('button[type="submit"]');
+      if (file) {
+        if (submitBtn) submitBtn.disabled = true;
+        try {
+          var path = 'colaboradores/' + crypto.randomUUID() + '-' + safeStorageName(file.name);
+          var up = await supabase.storage.from('conteudo').upload(path, file);
+          if (up.error) throw new Error('Falha ao enviar a foto.');
+          if (id && colaboradorEditingPhotoPath) {
+            try { await supabase.storage.from('conteudo').remove([colaboradorEditingPhotoPath]); } catch (ignoreErr) {}
+          }
+          payload.photo_path = path;
+        } catch (err) {
+          showMsgEl(colaboradorModalMsg, (err && err.message) || 'Não foi possível enviar a foto.', 'error');
+          if (submitBtn) submitBtn.disabled = false;
+          return;
+        }
+        if (submitBtn) submitBtn.disabled = false;
+      } else if (removeChecked) {
+        if (colaboradorEditingPhotoPath) {
+          try { await supabase.storage.from('conteudo').remove([colaboradorEditingPhotoPath]); } catch (ignoreErr) {}
+        }
+        payload.photo_path = null;
+      }
+      var res;
+      if (id) {
+        res = await supabase.from('colaboradores').update(payload).eq('id', id);
+      } else {
+        payload.created_by = appState.session.user.id;
+        res = await supabase.from('colaboradores').insert(payload);
+      }
+      if (res.error) { showMsgEl(colaboradorModalMsg, 'Não foi possível salvar a pessoa.', 'error'); return; }
+      colaboradorModal.classList.add('hidden');
+      loadColaboradores();
+    });
+  }
+
+  async function deleteColaborador(item) {
+    if (!confirm('Excluir "' + item.nome + '"? Esta ação não pode ser desfeita.')) return;
+    if (item.photo_path) {
+      try { await supabase.storage.from('conteudo').remove([item.photo_path]); } catch (ignoreErr) {}
+    }
+    var res = await supabase.from('colaboradores').delete().eq('id', item.id);
+    if (res.error) { alert('Não foi possível excluir.'); return; }
+    loadColaboradores();
+  }
+
+  function openColaboradorProfile(item, unidadeName) {
+    var photoEl = document.getElementById('colaboradorProfilePhoto');
+    photoEl.style.background = avatarColor(item.nome);
+    photoEl.innerHTML = '';
+    if (item.photo_path) {
+      var img = document.createElement('img');
+      img.alt = '';
+      photoEl.appendChild(img);
+      supabase.storage.from('conteudo').createSignedUrl(item.photo_path, 3600).then(function (res) {
+        if (res.data) img.src = res.data.signedUrl;
+      });
+    } else {
+      photoEl.textContent = initialsOf(item.nome);
+    }
+    var filled = conquistasFilled(item.conquistas);
+    var starsEl = document.getElementById('colaboradorProfileStars');
+    if (filled.length) {
+      starsEl.style.display = '';
+      starsEl.title = filled.length + ' de ' + N_CONQUISTAS + ' conquistas';
+      starsEl.innerHTML = starsRowHtml(item.conquistas);
+    } else {
+      starsEl.style.display = 'none';
+    }
+    document.getElementById('colaboradorProfileNome').textContent = item.nome;
+    var tagsEl = document.getElementById('colaboradorProfileTags');
+    tagsEl.innerHTML = '';
+    if (item.cargo) {
+      item.cargo.split(',').map(function (t) { return t.trim(); }).filter(Boolean).forEach(function (t) {
+        var b = document.createElement('span');
+        b.className = 'badge badge-blue';
+        b.textContent = t;
+        tagsEl.appendChild(b);
+      });
+    }
+    var rowsEl = document.getElementById('colaboradorProfileRows');
+    rowsEl.innerHTML = '';
+    if (item.telefone) {
+      var rowTel = document.createElement('a');
+      rowTel.className = 'colaborador-row';
+      rowTel.href = 'tel:' + String(item.telefone).replace(/\D/g, '');
+      rowTel.style.color = 'inherit';
+      rowTel.style.textDecoration = 'none';
+      rowTel.innerHTML = '<svg class="ic"><use href="#i-phone"/></svg><span>' + item.telefone + '</span>';
+      rowsEl.appendChild(rowTel);
+    }
+    if (item.email) {
+      var rowEmail = document.createElement('a');
+      rowEmail.className = 'colaborador-row';
+      rowEmail.href = 'mailto:' + item.email;
+      rowEmail.style.color = 'inherit';
+      rowEmail.style.textDecoration = 'none';
+      rowEmail.innerHTML = '<svg class="ic"><use href="#i-mail"/></svg><span>' + item.email + '</span>';
+      rowsEl.appendChild(rowEmail);
+    }
+    if (unidadeName) {
+      var unitBadge = document.createElement('div');
+      unitBadge.className = 'colaborador-unit-badge';
+      unitBadge.innerHTML = '<svg class="ic" style="width:13px;height:13px"><use href="#i-store"/></svg>' + unidadeName;
+      rowsEl.appendChild(unitBadge);
+    }
+    var cqListEl = document.getElementById('colaboradorProfileConquistas');
+    cqListEl.innerHTML = '';
+    filled.forEach(function (c) {
+      var row = document.createElement('div');
+      row.className = 'cq-item';
+      row.innerHTML = starSvg(true) + '<span>' + c + '</span>';
+      cqListEl.appendChild(row);
+    });
+    var actionsEl = document.getElementById('colaboradorProfileActions');
+    var existingExtra = actionsEl.querySelectorAll('.profile-admin-btn');
+    existingExtra.forEach(function (b) { b.remove(); });
+    if (appState.profile && appState.profile.is_admin) {
+      var editBtn = document.createElement('button');
+      editBtn.type = 'button';
+      editBtn.className = 'login-btn profile-admin-btn';
+      editBtn.style.width = 'auto';
+      editBtn.style.padding = '11px 20px';
+      editBtn.textContent = 'Editar';
+      editBtn.addEventListener('click', function () {
+        colaboradorProfileModal.classList.add('hidden');
+        openColaboradorModal(item);
+      });
+      actionsEl.insertBefore(editBtn, colaboradorProfileClose);
+    }
+    colaboradorProfileModal.classList.remove('hidden');
+  }
+
+  if (colaboradorProfileClose) colaboradorProfileClose.addEventListener('click', function () { colaboradorProfileModal.classList.add('hidden'); });
 
   function openUnidadeModal(item) {
     hideMsgEl(unidadeModalMsg);
