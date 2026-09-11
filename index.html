@@ -290,6 +290,21 @@
     .unidades-side-btn{flex:1;justify-content:center;white-space:nowrap;}
   }
 
+  /* ---------- DOCUMENTOS/TRILHA: menu lateral de pastas principais ---------- */
+  .docs-layout{display:flex;gap:20px;align-items:flex-start;}
+  .docs-sidebar{display:flex;flex-direction:column;gap:6px;width:200px;flex-shrink:0;}
+  .docs-sidebar-btn{display:flex;align-items:center;gap:10px;background:#fff;border:1px solid var(--line);border-radius:10px;padding:11px 14px;cursor:pointer;font-family:inherit;font-size:13.5px;font-weight:700;color:var(--text);text-align:left;width:100%;}
+  .docs-sidebar-btn .ic{width:16px;height:16px;flex-shrink:0;color:var(--ink-2);}
+  .docs-sidebar-btn.active{background:var(--red);color:#fff;border-color:var(--red);}
+  .docs-sidebar-btn.active .ic{color:#fff;}
+  .docs-sidebar-empty{font-size:12px;color:var(--muted);padding:4px 2px;}
+  .docs-main{flex:1;min-width:0;}
+  @media (max-width:760px){
+    .docs-layout{flex-direction:column;}
+    .docs-sidebar{flex-direction:row;width:100%;overflow-x:auto;}
+    .docs-sidebar-btn{flex:1;justify-content:center;white-space:nowrap;width:auto;}
+  }
+
   /* ---------- COLABORADORES ---------- */
   .colaborador-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:18px;}
   .colaborador-card{background:#fff;border:1px solid var(--line);border-radius:14px;padding:20px 16px;display:flex;flex-direction:column;align-items:center;gap:8px;position:relative;text-align:center;}
@@ -947,25 +962,32 @@
           </div>
         </div>
 
-        <div id="docsBreadcrumb" class="docs-breadcrumb" style="display:none;"></div>
-        <div class="login-msg error" id="docsMsg" style="margin-bottom:16px;"></div>
-
-        <div id="docsFolderView">
-          <div id="docsFolderGrid" class="folder-grid"></div>
-          <div id="docsFolderEmpty" class="docs-empty" style="display:none;">Nenhuma pasta disponível para o seu nível de acesso ainda.</div>
-        </div>
-
-        <div id="docsInsideView" style="display:none;">
-          <div id="docsSubfolderGrid" class="folder-grid" style="display:none;"></div>
-          <div class="panel-title">
-            <h3>Arquivos</h3>
-            <label class="doc-action-btn upload-label" id="docsUploadWrap" style="display:none;">
-              <svg class="ic" style="width:15px;height:15px"><use href="#i-upload"/></svg> Upload
-              <input type="file" id="docsUploadInput" multiple>
-            </label>
+        <div class="docs-layout" id="docsLayout">
+          <div class="docs-sidebar" id="docsAreaSidebar" style="display:none;">
+            <div id="docsSidebarList"></div>
           </div>
-          <div id="docsFileList" class="doc-file-list"></div>
-          <div id="docsFileEmpty" class="docs-empty" style="display:none;">Nenhum arquivo nesta pasta ainda.</div>
+          <div class="docs-main">
+            <div id="docsBreadcrumb" class="docs-breadcrumb" style="display:none;"></div>
+            <div class="login-msg error" id="docsMsg" style="margin-bottom:16px;"></div>
+
+            <div id="docsFolderView">
+              <div id="docsFolderGrid" class="folder-grid"></div>
+              <div id="docsFolderEmpty" class="docs-empty" style="display:none;">Nenhuma pasta disponível para o seu nível de acesso ainda.</div>
+            </div>
+
+            <div id="docsInsideView" style="display:none;">
+              <div id="docsSubfolderGrid" class="folder-grid" style="display:none;"></div>
+              <div class="panel-title">
+                <h3>Arquivos</h3>
+                <label class="doc-action-btn upload-label" id="docsUploadWrap" style="display:none;">
+                  <svg class="ic" style="width:15px;height:15px"><use href="#i-upload"/></svg> Upload
+                  <input type="file" id="docsUploadInput" multiple>
+                </label>
+              </div>
+              <div id="docsFileList" class="doc-file-list"></div>
+              <div id="docsFileEmpty" class="docs-empty" style="display:none;">Nenhum arquivo nesta pasta ainda.</div>
+            </div>
+          </div>
         </div>
       </section>
 
@@ -1812,6 +1834,9 @@
   };
   var docsState = { path: [], area: 'documentos' };
 
+  // Áreas que ganham o menu lateral com as pastas principais (estilo Unidades/Colaboradores).
+  var DOCS_SIDEBAR_AREAS = { 'trilha-conhecimento': true };
+
   function applyAreaHeader(area) {
     var cfg = AREA_CONFIG[area] || AREA_CONFIG.documentos;
     var crumbEl = document.getElementById('docsAreaCrumb');
@@ -1822,6 +1847,41 @@
     if (titleEl) titleEl.textContent = cfg.title;
     if (subtitleEl) subtitleEl.textContent = cfg.subtitle;
     if (emptyEl) emptyEl.textContent = cfg.emptyFolders;
+    var sidebarWrap = document.getElementById('docsAreaSidebar');
+    if (sidebarWrap) {
+      var showSidebar = !!DOCS_SIDEBAR_AREAS[area];
+      sidebarWrap.style.display = showSidebar ? 'flex' : 'none';
+      if (showSidebar) refreshDocsSidebar();
+    }
+  }
+
+  // Lista de pastas principais no menu lateral (só para as áreas em DOCS_SIDEBAR_AREAS).
+  // Reaproveita a mesma pasta clicada nos cards — só entra direto na pasta a partir da raiz.
+  async function refreshDocsSidebar() {
+    var listEl = document.getElementById('docsSidebarList');
+    if (!listEl || !DOCS_SIDEBAR_AREAS[docsState.area]) return;
+    var res = await supabase.from('folders').select('id,name').is('parent_id', null).eq('area', docsState.area).order('name');
+    var folders = res.data || [];
+    var activeId = docsState.path.length ? docsState.path[0].id : null;
+    listEl.innerHTML = '';
+    if (!folders.length) {
+      var empty = document.createElement('p');
+      empty.className = 'docs-sidebar-empty';
+      empty.textContent = 'Nenhuma pasta ainda.';
+      listEl.appendChild(empty);
+      return;
+    }
+    folders.forEach(function (f) {
+      var btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'docs-sidebar-btn' + (f.id === activeId ? ' active' : '');
+      btn.innerHTML = '<svg class="ic"><use href="#i-folder"/></svg>';
+      var label = document.createElement('span');
+      label.textContent = f.name;
+      btn.appendChild(label);
+      btn.addEventListener('click', function () { docsState.path = []; openFolder(f); });
+      listEl.appendChild(btn);
+    });
   }
 
   function currentFolderId() {
@@ -2128,6 +2188,7 @@
     document.getElementById('docsFolderView').style.display = '';
     document.getElementById('docsInsideView').style.display = 'none';
     document.getElementById('docsBreadcrumb').style.display = 'none';
+    refreshDocsSidebar();
 
     var res = await supabase.from('folders').select('*').is('parent_id', null).eq('area', docsState.area).order('name');
     if (res.error) { setDocsMsg('Não foi possível carregar as pastas.'); return; }
@@ -2150,6 +2211,7 @@
   function openFolder(folder) {
     docsState.path.push(folder);
     renderInsideFolder(folder.id);
+    refreshDocsSidebar();
   }
 
   function renderBreadcrumb() {
@@ -2208,6 +2270,7 @@
     var docsRes = await supabase.from('documents').select('*').eq('folder_id', folderId).order('created_at', { ascending: false });
     if (docsRes.error) { setDocsMsg('Não foi possível carregar os arquivos.'); }
     await renderFileList(docsRes.data || []);
+    refreshDocsSidebar();
   }
 
   async function renderFileList(docs) {
