@@ -346,6 +346,44 @@
   .colaborador-conquistas-list .cq-item{display:flex;gap:8px;align-items:flex-start;font-size:12.5px;color:var(--text);padding:6px 0;border-bottom:1px solid var(--line);}
   .colaborador-conquistas-list .cq-item svg{width:14px;height:14px;color:#D97706;flex-shrink:0;margin-top:1px;}
 
+  /* ---------- FERRAMENTAS (Home) ---------- */
+  .ferramentas-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:14px;}
+  .ferramenta-card{display:flex;flex-direction:column;gap:10px;background:#fff;border:1px solid var(--line);border-radius:14px;padding:16px;text-decoration:none;color:inherit;transition:box-shadow .15s,transform .15s;}
+  .ferramenta-card:hover{box-shadow:0 6px 18px rgba(2,48,71,.12);transform:translateY(-2px);}
+  .ferramenta-icon{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;color:#fff;flex-shrink:0;}
+  .ferramenta-icon .ic{width:19px;height:19px;}
+  .ferramenta-title{font-size:13.5px;font-weight:800;}
+  .ferramenta-sub{font-size:11.5px;color:var(--muted);margin-top:2px;}
+
+  /* ---------- ASSISTENTE VIRTUAL (IA) ---------- */
+  .ai-fab{position:fixed;bottom:24px;right:24px;width:56px;height:56px;border-radius:50%;background:var(--red);color:#fff;border:none;cursor:pointer;box-shadow:0 6px 20px rgba(2,48,71,.3);display:flex;align-items:center;justify-content:center;z-index:900;transition:transform .15s;}
+  .ai-fab:hover{transform:scale(1.06);}
+  .ai-fab .ic{width:24px;height:24px;}
+  .ai-panel{position:fixed;bottom:92px;right:24px;width:360px;max-width:calc(100vw - 32px);height:480px;max-height:calc(100vh - 120px);background:#fff;border-radius:16px;box-shadow:0 20px 50px rgba(2,48,71,.3);display:flex;flex-direction:column;overflow:hidden;z-index:900;transition:opacity .2s,transform .2s;}
+  .ai-panel.hidden{opacity:0;visibility:hidden;transform:translateY(12px);pointer-events:none;}
+  .ai-panel-head{background:linear-gradient(135deg,var(--ink),var(--ink-2));color:#fff;padding:16px 18px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;gap:10px;}
+  .ai-panel-head b{display:block;font-size:14px;}
+  .ai-panel-head span{display:block;font-size:11.5px;color:rgba(255,255,255,.75);margin-top:2px;}
+  .ai-panel-close{background:none;border:none;color:#fff;cursor:pointer;padding:4px;opacity:.85;flex-shrink:0;}
+  .ai-panel-close:hover{opacity:1;}
+  .ai-panel-close .ic{width:16px;height:16px;}
+  .ai-panel-messages{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:10px;}
+  .ai-msg{max-width:85%;padding:9px 13px;border-radius:13px;font-size:13px;line-height:1.5;white-space:pre-wrap;}
+  .ai-msg-bot{background:var(--bg);color:var(--text);align-self:flex-start;border-bottom-left-radius:4px;}
+  .ai-msg-user{background:var(--red);color:#fff;align-self:flex-end;border-bottom-right-radius:4px;}
+  .ai-msg-error{background:#FEE2E2;color:#B91C2B;align-self:flex-start;border-bottom-left-radius:4px;}
+  .ai-msg-typing{background:var(--bg);color:var(--muted);align-self:flex-start;font-style:italic;}
+  .ai-panel-input{display:flex;gap:8px;padding:12px;border-top:1px solid var(--line);flex-shrink:0;}
+  .ai-panel-input input{flex:1;border:1px solid var(--line);border-radius:20px;padding:10px 14px;font-family:inherit;font-size:13px;background:var(--bg);}
+  .ai-panel-input input:focus{outline:none;border-color:var(--red);}
+  .ai-panel-input button{width:38px;height:38px;border-radius:50%;background:var(--red);color:#fff;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+  .ai-panel-input button:disabled{opacity:.5;cursor:default;}
+  .ai-panel-input button .ic{width:16px;height:16px;}
+  @media (max-width:520px){
+    .ai-panel{right:16px;left:16px;width:auto;bottom:84px;}
+    .ai-fab{right:16px;bottom:16px;}
+  }
+
   /* ---------- GATE OVERLAY ---------- */
   .gate-overlay{
     position:fixed;inset:0;background:rgba(12,14,18,.74);backdrop-filter:blur(3px);
@@ -550,6 +588,8 @@
     <symbol id="i-mail" viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="16" rx="2"/><polyline points="22 6 12 13 2 6"/></symbol>
     <symbol id="i-target" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></symbol>
     <symbol id="i-swap" viewBox="0 0 24 24"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></symbol>
+    <symbol id="i-message" viewBox="0 0 24 24"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></symbol>
+    <symbol id="i-send" viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></symbol>
   </defs>
 </svg>
 
@@ -748,6 +788,34 @@
             </div>
             <div class="tile-label">Planos de Ação</div>
           </button>
+        </div>
+
+        <div class="card" style="margin-top:20px;">
+          <div class="panel-title">
+            <h3>Ferramentas</h3>
+          </div>
+          <div class="ferramentas-grid">
+            <a class="ferramenta-card" href="https://email.uolhost.com.br/facilitaemprestimo.com.br/" target="_blank" rel="noopener">
+              <div class="ferramenta-icon" style="background:var(--blue)"><svg class="ic"><use href="#i-mail"/></svg></div>
+              <div><div class="ferramenta-title">E-mail</div><div class="ferramenta-sub">Webmail UOL Host</div></div>
+            </a>
+            <a class="ferramenta-card" href="https://livecred.com.br/sistema/home.php" target="_blank" rel="noopener">
+              <div class="ferramenta-icon" style="background:var(--teal)"><svg class="ic"><use href="#i-link"/></svg></div>
+              <div><div class="ferramenta-title">Live Cred</div><div class="ferramenta-sub">CRM de clientes</div></div>
+            </a>
+            <a class="ferramenta-card" href="https://chat.konnectcrm.com.br" target="_blank" rel="noopener">
+              <div class="ferramenta-icon" style="background:var(--green)"><svg class="ic"><use href="#i-link"/></svg></div>
+              <div><div class="ferramenta-title">Konnect</div><div class="ferramenta-sub">CRM WhatsApp</div></div>
+            </a>
+            <a class="ferramenta-card" href="https://tiquetaque.app/registrar" target="_blank" rel="noopener">
+              <div class="ferramenta-icon" style="background:var(--orange)"><svg class="ic"><use href="#i-clock"/></svg></div>
+              <div><div class="ferramenta-title">Registro de Ponto</div><div class="ferramenta-sub">Tiquetaque</div></div>
+            </a>
+            <a class="ferramenta-card" href="https://docs.google.com/spreadsheets/d/1fnkc0qXe_2D4aMlU8bm21dgwCf8F3zBC/edit?gid=1518627485#gid=1518627485" target="_blank" rel="noopener">
+              <div class="ferramenta-icon" style="background:var(--purple)"><svg class="ic"><use href="#i-file-xls"/></svg></div>
+              <div><div class="ferramenta-title">Tabela de Prioridades</div><div class="ferramenta-sub">Bancos e convênios</div></div>
+            </a>
+          </div>
         </div>
 
         <div class="home-grid-2col">
@@ -1569,6 +1637,27 @@
       </section>
 
     </div>
+  </div>
+
+  <!-- ============ ASSISTENTE VIRTUAL (IA) ============ -->
+  <button type="button" class="ai-fab" id="aiFab" title="Assistente virtual">
+    <svg class="ic"><use href="#i-message"/></svg>
+  </button>
+  <div class="ai-panel hidden" id="aiPanel">
+    <div class="ai-panel-head">
+      <div>
+        <b>Assistente Facilita</b>
+        <span>Tire dúvidas sobre o portal e a empresa</span>
+      </div>
+      <button type="button" class="ai-panel-close" id="aiPanelClose"><svg class="ic"><use href="#i-x"/></svg></button>
+    </div>
+    <div class="ai-panel-messages" id="aiMessages">
+      <div class="ai-msg ai-msg-bot">Oi! Sou a assistente virtual do Portal Interno. Posso ajudar a encontrar algo no portal ou tirar dúvidas sobre a Facilita. Como posso ajudar?</div>
+    </div>
+    <form class="ai-panel-input" id="aiForm">
+      <input type="text" id="aiInput" placeholder="Digite sua pergunta..." autocomplete="off">
+      <button type="submit" id="aiSendBtn"><svg class="ic"><use href="#i-send"/></svg></button>
+    </form>
   </div>
 </div>
 
@@ -5253,6 +5342,72 @@
       listEl.appendChild(row);
     });
   }
+
+  // ---------------- Assistente virtual (IA) ----------------
+  var aiFabBtn = document.getElementById('aiFab');
+  var aiPanelEl = document.getElementById('aiPanel');
+  var aiPanelCloseBtn = document.getElementById('aiPanelClose');
+  var aiMessagesEl = document.getElementById('aiMessages');
+  var aiFormEl = document.getElementById('aiForm');
+  var aiInputEl = document.getElementById('aiInput');
+  var aiSendBtnEl = document.getElementById('aiSendBtn');
+  var aiHistory = [];
+  var aiBusy = false;
+
+  function aiAppendMessage(role, text) {
+    var el = document.createElement('div');
+    el.className = 'ai-msg ' + (role === 'user' ? 'ai-msg-user' : role === 'error' ? 'ai-msg-error' : 'ai-msg-bot');
+    el.textContent = text;
+    aiMessagesEl.appendChild(el);
+    aiMessagesEl.scrollTop = aiMessagesEl.scrollHeight;
+    return el;
+  }
+
+  if (aiFabBtn) aiFabBtn.addEventListener('click', function () {
+    aiPanelEl.classList.toggle('hidden');
+    if (!aiPanelEl.classList.contains('hidden') && aiInputEl) aiInputEl.focus();
+  });
+  if (aiPanelCloseBtn) aiPanelCloseBtn.addEventListener('click', function () { aiPanelEl.classList.add('hidden'); });
+
+  if (aiFormEl) aiFormEl.addEventListener('submit', async function (e) {
+    e.preventDefault();
+    if (aiBusy) return;
+    var texto = (aiInputEl.value || '').trim();
+    if (!texto) return;
+    aiInputEl.value = '';
+    aiAppendMessage('user', texto);
+    aiHistory.push({ role: 'user', content: texto });
+    var typingEl = document.createElement('div');
+    typingEl.className = 'ai-msg ai-msg-typing';
+    typingEl.textContent = 'digitando...';
+    aiMessagesEl.appendChild(typingEl);
+    aiMessagesEl.scrollTop = aiMessagesEl.scrollHeight;
+    aiBusy = true;
+    aiSendBtnEl.disabled = true;
+    try {
+      if (!appState.session) throw new Error('Sessão expirada. Atualize a página e faça login novamente.');
+      var token = appState.session.access_token;
+      var resp = await fetch(SUPABASE_URL + '/functions/v1/ai-assistant', {
+        method: 'POST',
+        headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ messages: aiHistory.slice(-20) })
+      });
+      var data = await resp.json();
+      typingEl.remove();
+      if (data && data.reply) {
+        aiAppendMessage('bot', data.reply);
+        aiHistory.push({ role: 'assistant', content: data.reply });
+      } else {
+        aiAppendMessage('error', (data && data.error) || 'Não foi possível obter uma resposta agora.');
+      }
+    } catch (err) {
+      typingEl.remove();
+      aiAppendMessage('error', (err && err.message) || 'Não foi possível falar com a assistente agora.');
+    }
+    aiBusy = false;
+    aiSendBtnEl.disabled = false;
+    aiInputEl.focus();
+  });
 </script>
 
 </body>
