@@ -612,8 +612,18 @@
      instead of @media print + visibility:hidden, because visibility:hidden keeps
      the whole (very tall) app in normal flow and was producing several blank
      printed pages. display:none removes it from flow entirely -> exactly 1 page. */
-  body.printing-calendar > *:not(#calendarGrandeModal){display:none !important;}
+  /* Hide everything except the exact ancestor chain down to the calendar modal
+     (it's nested #app > .main-wrap > .content > #calendarGrandeModal, not a
+     direct child of body), then hide everything inside the modal except the
+     print area itself. */
+  body.printing-calendar > *:not(#app){display:none !important;}
+  body.printing-calendar #app > *:not(.main-wrap){display:none !important;}
+  body.printing-calendar #app > .main-wrap > *:not(.content){display:none !important;}
+  body.printing-calendar #app > .main-wrap > .content > *:not(#calendarGrandeModal){display:none !important;}
   body.printing-calendar{background:#fff !important;}
+  body.printing-calendar #app{display:block !important;min-height:0 !important;}
+  body.printing-calendar #app > .main-wrap{display:block !important;}
+  body.printing-calendar #app > .main-wrap > .content{padding:0 !important;max-width:none !important;margin:0 !important;}
   body.printing-calendar #calendarGrandeModal{
     position:static !important;inset:auto !important;background:none !important;
     padding:0 !important;display:block !important;z-index:auto !important;
