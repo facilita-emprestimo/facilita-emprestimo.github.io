@@ -267,7 +267,8 @@
 
   /* ---------- UNIDADES ---------- */
   .unit-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:18px;}
-  .unit-card{background:#fff;border:1px solid var(--line);border-radius:14px;overflow:hidden;}
+  .unit-card{background:#fff;border:1px solid var(--line);border-radius:14px;overflow:hidden;cursor:pointer;transition:box-shadow .15s ease;}
+  .unit-card:hover{box-shadow:0 4px 16px rgba(2,48,71,.12);}
   .unit-top{padding:16px 18px;color:#fff;}
   .unit-top h3{margin:0 0 3px;font-size:15.5px;}
   .unit-top span{font-size:11.5px;opacity:.85;}
@@ -327,12 +328,26 @@
   .colaborador-edit:hover{color:var(--red);background:var(--bg);}
   .colaborador-transfer{position:absolute;top:10px;left:38px;background:none;border:none;color:var(--muted);cursor:pointer;padding:5px;border-radius:6px;}
   .colaborador-transfer:hover{color:var(--ink-2);background:var(--bg);}
+  .colaborador-encerrar{position:absolute;top:10px;left:66px;background:none;border:none;color:var(--muted);cursor:pointer;padding:5px;border-radius:6px;}
+  .colaborador-encerrar:hover{color:#B45309;background:#FEF3C7;}
+  .colaborador-reativar{position:absolute;top:10px;left:38px;background:none;border:none;color:var(--muted);cursor:pointer;padding:5px;border-radius:6px;}
+  .colaborador-reativar:hover{color:#15803D;background:#DCFCE7;}
+  .colaborador-card-desligado{opacity:.6;}
+  .colaborador-desligado-badge{display:inline-flex;align-items:center;gap:6px;background:#FEF2F2;color:#B91C2B;border-radius:8px;padding:5px 10px;font-size:11px;font-weight:700;}
   .colaboradores-unit-section{margin-bottom:28px;}
   .colaboradores-unit-section:last-child{margin-bottom:0;}
   .colaboradores-unit-header{display:flex;align-items:center;gap:10px;margin-bottom:14px;padding-bottom:9px;border-bottom:1px solid var(--line);}
   .colaboradores-unit-header .ic{width:16px;height:16px;color:var(--ink-2);flex-shrink:0;}
   .colaboradores-unit-header h3{font-size:14.5px;font-weight:800;margin:0;flex:1;color:var(--text);}
   .colaboradores-unit-count{font-size:11.5px;font-weight:700;color:var(--muted);background:var(--bg);border-radius:20px;padding:3px 10px;flex-shrink:0;}
+  .colaboradores-unit-header-back{display:flex;align-items:center;gap:6px;background:none;border:none;color:var(--ink-2);font-weight:700;font-size:12.5px;cursor:pointer;padding:6px 2px;margin-bottom:10px;font-family:inherit;}
+  .colaboradores-unit-header-back:hover{color:var(--red);}
+  .colaboradores-desligados-toggle{display:inline-flex;align-items:center;gap:6px;background:none;border:none;color:var(--muted);font-size:12.5px;font-weight:700;cursor:pointer;padding:8px 2px;margin-top:6px;font-family:inherit;}
+  .colaboradores-desligados-toggle:hover{color:var(--ink-2);}
+  .obs-item{position:relative;display:flex;flex-direction:column;gap:3px;font-size:12.5px;color:var(--text);padding:9px 30px 9px 10px;border:1px solid var(--line);border-radius:9px;background:var(--bg);text-align:left;}
+  .obs-item .obs-meta{font-size:10.5px;color:var(--muted);font-weight:700;}
+  .obs-item .obs-del{position:absolute;top:6px;right:6px;background:none;border:none;color:var(--muted);cursor:pointer;padding:4px;border-radius:6px;}
+  .obs-item .obs-del:hover{color:#B91C2B;background:#FEE2E2;}
   .conquistas-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px 10px;margin-top:10px;}
   .conquistas-grid .login-field{margin-bottom:0;}
   .conquistas-grid label{font-size:11px !important;}
@@ -1398,7 +1413,7 @@
 
       <!-- ============ MODAL: PERFIL DO COLABORADOR ============ -->
       <div class="modal-overlay hidden" id="colaboradorProfileModal">
-        <div class="modal-card" style="max-width:400px;text-align:center;">
+        <div class="modal-card" style="max-width:440px;text-align:center;">
           <div class="colaborador-profile-photo-wrap">
             <div class="colaborador-profile-photo" id="colaboradorProfilePhoto"></div>
             <div class="colaborador-profile-stars" id="colaboradorProfileStars"></div>
@@ -1407,6 +1422,13 @@
           <div class="colaborador-tags" id="colaboradorProfileTags" style="margin-bottom:10px;"></div>
           <div style="display:flex;flex-direction:column;gap:8px;align-items:center;" id="colaboradorProfileRows"></div>
           <div class="colaborador-conquistas-list" id="colaboradorProfileConquistas"></div>
+          <div id="colaboradorProfileObsWrap" style="display:none;text-align:left;margin-top:18px;border-top:1px solid var(--line);padding-top:14px;">
+            <h4 style="font-size:12px;font-weight:800;color:var(--text);margin:0 0 10px;text-transform:uppercase;letter-spacing:.3px;">Observações</h4>
+            <div id="colaboradorProfileObsList" style="display:flex;flex-direction:column;gap:8px;max-height:220px;overflow-y:auto;margin-bottom:10px;"></div>
+            <div id="colaboradorProfileObsEmpty" style="font-size:12.5px;color:var(--muted);margin-bottom:10px;">Nenhuma observação registrada.</div>
+            <textarea id="colaboradorProfileObsInput" rows="2" placeholder="Adicionar observação..." style="width:100%;padding:9px 11px;border:1px solid var(--line);border-radius:9px;font-family:inherit;font-size:13px;background:var(--bg);resize:vertical;margin-bottom:8px;"></textarea>
+            <button type="button" class="doc-action-btn" id="colaboradorProfileObsAdd" style="width:auto;">Adicionar observação</button>
+          </div>
           <div style="display:flex;gap:10px;margin-top:20px;justify-content:center;flex-wrap:wrap;" id="colaboradorProfileActions">
             <button type="button" class="login-btn" id="colaboradorProfileClose" style="width:auto;padding:11px 20px;background:#9CA3AF;">Fechar</button>
           </div>
@@ -3849,6 +3871,10 @@
         if (res.data) photoImg.src = res.data.signedUrl;
       });
     }
+    card.addEventListener('click', function (e) {
+      if (e.target.closest('button')) return;
+      openUnidadeColaboradores(item);
+    });
     return card;
   }
 
@@ -3875,13 +3901,20 @@
   // ---------------- Unidades: menu lateral (Unidades / Colaboradores) ----------------
   var unidadesCache = [];
   var unidadesActiveSubtab = 'unidades';
+  var colaboradoresUnitFilter = null; // { id, name } quando veio de um clique em uma unidade
 
   function initUnidadesPage() {
     switchUnidadesSubtab(unidadesActiveSubtab || 'unidades');
   }
 
-  function switchUnidadesSubtab(tab) {
+  function openUnidadeColaboradores(item) {
+    colaboradoresUnitFilter = { id: item.id, name: item.name };
+    switchUnidadesSubtab('colaboradores', true);
+  }
+
+  function switchUnidadesSubtab(tab, keepFilter) {
     unidadesActiveSubtab = tab;
+    if (!keepFilter) colaboradoresUnitFilter = null;
     var btnUnidades = document.getElementById('unidadesSideUnidades');
     var btnColaboradores = document.getElementById('unidadesSideColaboradores');
     var viewUnidades = document.getElementById('unidadesSubview');
@@ -3927,6 +3960,7 @@
   var colaboradorProfileClose = document.getElementById('colaboradorProfileClose');
   var colaboradorEditingPhotoPath = null;
   var colaboradoresCache = [];
+  var colaboradorProfileCurrentId = null;
   var N_CONQUISTAS = 12;
 
   var AVATAR_PALETTE = ['#219EBC', '#2C7DA0', '#4A5C7A', '#C9668B', '#FB8500', '#2EC4B6', '#16A34A', '#7C3AED', '#D97706', '#0891B2', '#F43F5E', '#4338CA'];
@@ -3966,8 +4000,9 @@
 
   function buildColaboradorCard(item, unidadeName) {
     var isAdmin = !!(appState.profile && appState.profile.is_admin);
+    var isDesligado = item.status === 'desligado';
     var card = document.createElement('div');
-    card.className = 'colaborador-card';
+    card.className = 'colaborador-card' + (isDesligado ? ' colaborador-card-desligado' : '');
 
     var avatarWrap = document.createElement('div');
     avatarWrap.className = 'colaborador-avatar-wrap';
@@ -4021,6 +4056,12 @@
       unitBadge.innerHTML = '<svg class="ic" style="width:13px;height:13px"><use href="#i-store"/></svg>' + unidadeName;
       card.appendChild(unitBadge);
     }
+    if (isDesligado) {
+      var desligadoBadge = document.createElement('div');
+      desligadoBadge.className = 'colaborador-desligado-badge';
+      desligadoBadge.textContent = 'Desligado' + (item.desligado_em ? ' em ' + formatDateBR(item.desligado_em) : '');
+      card.appendChild(desligadoBadge);
+    }
 
     var actions = document.createElement('div');
     actions.className = 'colaborador-actions';
@@ -4054,13 +4095,33 @@
       editBtn.innerHTML = '<svg class="ic" style="width:15px;height:15px"><use href="#i-edit"/></svg>';
       editBtn.addEventListener('click', function () { openColaboradorModal(item); });
       card.appendChild(editBtn);
-      var transferBtn = document.createElement('button');
-      transferBtn.type = 'button';
-      transferBtn.className = 'colaborador-transfer';
-      transferBtn.title = 'Transferir de unidade';
-      transferBtn.innerHTML = '<svg class="ic" style="width:14px;height:14px"><use href="#i-swap"/></svg>';
-      transferBtn.addEventListener('click', function () { openTransferirModal(item); });
-      card.appendChild(transferBtn);
+
+      if (isDesligado) {
+        var reativarBtn = document.createElement('button');
+        reativarBtn.type = 'button';
+        reativarBtn.className = 'colaborador-reativar';
+        reativarBtn.title = 'Reativar';
+        reativarBtn.innerHTML = '<svg class="ic" style="width:14px;height:14px"><use href="#i-check"/></svg>';
+        reativarBtn.addEventListener('click', function () { reativarColaborador(item); });
+        card.appendChild(reativarBtn);
+      } else {
+        var transferBtn = document.createElement('button');
+        transferBtn.type = 'button';
+        transferBtn.className = 'colaborador-transfer';
+        transferBtn.title = 'Transferir de unidade';
+        transferBtn.innerHTML = '<svg class="ic" style="width:14px;height:14px"><use href="#i-swap"/></svg>';
+        transferBtn.addEventListener('click', function () { openTransferirModal(item); });
+        card.appendChild(transferBtn);
+
+        var encerrarBtn = document.createElement('button');
+        encerrarBtn.type = 'button';
+        encerrarBtn.className = 'colaborador-encerrar';
+        encerrarBtn.title = 'Encerrar (desligamento)';
+        encerrarBtn.innerHTML = '<svg class="ic" style="width:14px;height:14px"><use href="#i-logout"/></svg>';
+        encerrarBtn.addEventListener('click', function () { encerrarColaborador(item); });
+        card.appendChild(encerrarBtn);
+      }
+
       var delBtn = document.createElement('button');
       delBtn.type = 'button';
       delBtn.className = 'colaborador-del';
@@ -4073,26 +4134,92 @@
     return card;
   }
 
+  function appendDesligadosToggle(container, desligadosList) {
+    var wrap = document.createElement('div');
+    var toggleBtn = document.createElement('button');
+    toggleBtn.type = 'button';
+    toggleBtn.className = 'colaboradores-desligados-toggle';
+    function label(open) {
+      return '<svg class="ic" style="width:13px;height:13px"><use href="#' + (open ? 'i-chevron-left' : 'i-chevron-right') + '"/></svg> ' +
+        (open ? 'Ocultar desligados (' : 'Ver desligados (') + desligadosList.length + ')';
+    }
+    toggleBtn.innerHTML = label(false);
+    var listWrap = document.createElement('div');
+    listWrap.style.display = 'none';
+    listWrap.style.marginTop = '10px';
+    var grid = document.createElement('div');
+    grid.className = 'colaborador-grid';
+    desligadosList.forEach(function (item) {
+      var u = item.unidade_id ? unidadesCache.filter(function (x) { return x.id === item.unidade_id; })[0] : null;
+      grid.appendChild(buildColaboradorCard(item, u ? u.name : null));
+    });
+    listWrap.appendChild(grid);
+    toggleBtn.addEventListener('click', function () {
+      var opening = listWrap.style.display === 'none';
+      listWrap.style.display = opening ? 'block' : 'none';
+      toggleBtn.innerHTML = label(opening);
+    });
+    wrap.appendChild(toggleBtn);
+    wrap.appendChild(listWrap);
+    container.appendChild(wrap);
+  }
+
   async function loadColaboradores() {
     if (!appState.session) return;
     if (colaboradoresMsgEl) hideMsgEl(colaboradoresMsgEl);
+    var isAdmin = !!(appState.profile && appState.profile.is_admin);
     var toolbar = document.getElementById('colaboradoresAdminActions');
-    if (toolbar) toolbar.style.display = (appState.profile && appState.profile.is_admin) ? 'flex' : 'none';
+    if (toolbar) toolbar.style.display = isAdmin ? 'flex' : 'none';
     var res = await supabase.from('colaboradores').select('*').order('created_at');
     if (res.error) { if (colaboradoresMsgEl) showMsgEl(colaboradoresMsgEl, 'Não foi possível carregar os colaboradores.', 'error'); return; }
-    var items = res.data || [];
-    colaboradoresCache = items;
+    var allItems = res.data || [];
+    colaboradoresCache = allItems;
+    var ativos = allItems.filter(function (c) { return c.status !== 'desligado'; });
+    var desligados = allItems.filter(function (c) { return c.status === 'desligado'; });
     var countEl = document.getElementById('unidadesSideCountColaboradores');
-    if (countEl) countEl.textContent = '(' + items.length + ')';
-    var unidadeMap = {};
-    unidadesCache.forEach(function (u) { unidadeMap[u.id] = u.name; });
+    if (countEl) countEl.textContent = '(' + ativos.length + ')';
     var container = document.getElementById('colaboradoresGrid');
     var emptyEl = document.getElementById('colaboradoresEmpty');
     container.innerHTML = '';
-    if (!items.length) { emptyEl.style.display = 'block'; return; }
+
+    if (colaboradoresUnitFilter) {
+      emptyEl.style.display = 'none';
+      var backBtn = document.createElement('button');
+      backBtn.type = 'button';
+      backBtn.className = 'colaboradores-unit-header-back';
+      backBtn.innerHTML = '<svg class="ic" style="width:14px;height:14px"><use href="#i-chevron-left"/></svg> Voltar para Unidades';
+      backBtn.addEventListener('click', function () { switchUnidadesSubtab('unidades'); });
+      container.appendChild(backBtn);
+
+      var filtAtivos = ativos.filter(function (c) { return c.unidade_id === colaboradoresUnitFilter.id; });
+      var filtDesligados = desligados.filter(function (c) { return c.unidade_id === colaboradoresUnitFilter.id; });
+
+      var fsection = document.createElement('div');
+      fsection.className = 'colaboradores-unit-section';
+      var fheader = document.createElement('div');
+      fheader.className = 'colaboradores-unit-header';
+      fheader.innerHTML = '<svg class="ic"><use href="#i-store"/></svg><h3>' + colaboradoresUnitFilter.name + '</h3><span class="colaboradores-unit-count">' + filtAtivos.length + '</span>';
+      fsection.appendChild(fheader);
+      if (filtAtivos.length) {
+        var fgrid = document.createElement('div');
+        fgrid.className = 'colaborador-grid';
+        filtAtivos.forEach(function (item) { fgrid.appendChild(buildColaboradorCard(item, null)); });
+        fsection.appendChild(fgrid);
+      } else {
+        var fnone = document.createElement('div');
+        fnone.className = 'docs-empty';
+        fnone.textContent = 'Nenhum colaborador ativo nesta unidade.';
+        fsection.appendChild(fnone);
+      }
+      container.appendChild(fsection);
+      if (isAdmin && filtDesligados.length) appendDesligadosToggle(container, filtDesligados);
+      return;
+    }
+
+    if (!allItems.length) { emptyEl.style.display = 'block'; return; }
     emptyEl.style.display = 'none';
 
-    // Agrupa cada colaborador dentro da sua unidade (uma seção por unidade, na ordem das Unidades).
+    // Agrupa cada colaborador ativo dentro da sua unidade (uma seção por unidade, na ordem das Unidades).
     var groups = [];
     var groupByUnidade = {};
     unidadesCache.forEach(function (u) {
@@ -4101,13 +4228,15 @@
       groups.push(g);
     });
     var semUnidade = { id: null, name: 'Sem unidade', items: [] };
-    items.forEach(function (item) {
+    ativos.forEach(function (item) {
       var g = item.unidade_id ? groupByUnidade[item.unidade_id] : null;
       if (g) { g.items.push(item); } else { semUnidade.items.push(item); }
     });
     if (semUnidade.items.length) groups.push(semUnidade);
 
+    var anyShown = false;
     groups.filter(function (g) { return g.items.length; }).forEach(function (g) {
+      anyShown = true;
       var section = document.createElement('div');
       section.className = 'colaboradores-unit-section';
       var header = document.createElement('div');
@@ -4120,6 +4249,9 @@
       section.appendChild(subGrid);
       container.appendChild(section);
     });
+    if (!anyShown) emptyEl.style.display = 'block';
+
+    if (isAdmin && desligados.length) appendDesligadosToggle(container, desligados);
   }
 
   function populateTransferirUnidadeSelect(currentUnidadeId) {
@@ -4282,6 +4414,28 @@
     loadColaboradores();
   }
 
+  async function encerrarColaborador(item) {
+    if (!confirm('Encerrar o vínculo de "' + item.nome + '"? A pessoa sai da lista de ativos, mas o histórico e as observações continuam guardados.')) return;
+    var res = await supabase.from('colaboradores').update({
+      status: 'desligado',
+      desligado_em: new Date().toISOString(),
+      desligado_by: appState.session.user.id
+    }).eq('id', item.id);
+    if (res.error) { alert('Não foi possível encerrar o vínculo.'); return; }
+    loadColaboradores();
+  }
+
+  async function reativarColaborador(item) {
+    if (!confirm('Reativar "' + item.nome + '"? A pessoa volta a aparecer como colaborador ativo.')) return;
+    var res = await supabase.from('colaboradores').update({
+      status: 'ativo',
+      desligado_em: null,
+      desligado_by: null
+    }).eq('id', item.id);
+    if (res.error) { alert('Não foi possível reativar.'); return; }
+    loadColaboradores();
+  }
+
   function openColaboradorProfile(item, unidadeName) {
     var photoEl = document.getElementById('colaboradorProfilePhoto');
     photoEl.style.background = avatarColor(item.nome);
@@ -4366,10 +4520,84 @@
       });
       actionsEl.insertBefore(editBtn, colaboradorProfileClose);
     }
+    colaboradorProfileCurrentId = item.id;
+    var obsWrapEl = document.getElementById('colaboradorProfileObsWrap');
+    if (obsWrapEl) {
+      if (appState.profile && appState.profile.is_admin) {
+        obsWrapEl.style.display = 'block';
+        var obsInputEl = document.getElementById('colaboradorProfileObsInput');
+        if (obsInputEl) obsInputEl.value = '';
+        loadColaboradorObservacoes(item.id);
+      } else {
+        obsWrapEl.style.display = 'none';
+      }
+    }
     colaboradorProfileModal.classList.remove('hidden');
   }
 
   if (colaboradorProfileClose) colaboradorProfileClose.addEventListener('click', function () { colaboradorProfileModal.classList.add('hidden'); });
+
+  // ---------------- Observações do colaborador (permanentes, apagar restrito ao administrador) ----------------
+  async function loadColaboradorObservacoes(colaboradorId) {
+    var listEl = document.getElementById('colaboradorProfileObsList');
+    var emptyEl = document.getElementById('colaboradorProfileObsEmpty');
+    if (!listEl) return;
+    listEl.innerHTML = '';
+    if (emptyEl) emptyEl.style.display = 'none';
+    var res = await supabase.from('colaborador_observacoes').select('*').eq('colaborador_id', colaboradorId).order('created_at', { ascending: false });
+    if (res.error) return;
+    var items = res.data || [];
+    if (!items.length) { if (emptyEl) emptyEl.style.display = 'block'; return; }
+    items.forEach(function (obs) { listEl.appendChild(buildObsItem(obs)); });
+  }
+
+  function buildObsItem(obs) {
+    var row = document.createElement('div');
+    row.className = 'obs-item';
+    var meta = document.createElement('div');
+    meta.className = 'obs-meta';
+    meta.textContent = (obs.criado_por_nome || 'Administrador') + ' · ' + formatDateBR(obs.created_at);
+    row.appendChild(meta);
+    var texto = document.createElement('div');
+    texto.textContent = obs.texto;
+    row.appendChild(texto);
+    var delBtn = document.createElement('button');
+    delBtn.type = 'button';
+    delBtn.className = 'obs-del';
+    delBtn.title = 'Apagar observação';
+    delBtn.innerHTML = '<svg class="ic" style="width:13px;height:13px"><use href="#i-trash"/></svg>';
+    delBtn.addEventListener('click', function () { deleteColaboradorObservacao(obs.id); });
+    row.appendChild(delBtn);
+    return row;
+  }
+
+  async function deleteColaboradorObservacao(obsId) {
+    if (!confirm('Apagar esta observação? Esta ação não pode ser desfeita.')) return;
+    var res = await supabase.from('colaborador_observacoes').delete().eq('id', obsId);
+    if (res.error) { alert('Não foi possível apagar a observação.'); return; }
+    if (colaboradorProfileCurrentId) loadColaboradorObservacoes(colaboradorProfileCurrentId);
+  }
+
+  var colaboradorProfileObsAddBtn = document.getElementById('colaboradorProfileObsAdd');
+  if (colaboradorProfileObsAddBtn) {
+    colaboradorProfileObsAddBtn.addEventListener('click', async function () {
+      var obsInputEl = document.getElementById('colaboradorProfileObsInput');
+      var texto = obsInputEl ? obsInputEl.value.trim() : '';
+      if (!texto || !colaboradorProfileCurrentId) return;
+      colaboradorProfileObsAddBtn.disabled = true;
+      var payload = {
+        colaborador_id: colaboradorProfileCurrentId,
+        texto: texto,
+        criado_por: appState.session.user.id,
+        criado_por_nome: (appState.profile && appState.profile.full_name) || (appState.session.user.email) || null
+      };
+      var res = await supabase.from('colaborador_observacoes').insert(payload);
+      colaboradorProfileObsAddBtn.disabled = false;
+      if (res.error) { alert('Não foi possível adicionar a observação.'); return; }
+      if (obsInputEl) obsInputEl.value = '';
+      loadColaboradorObservacoes(colaboradorProfileCurrentId);
+    });
+  }
 
   function openUnidadeModal(item) {
     hideMsgEl(unidadeModalMsg);
