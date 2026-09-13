@@ -602,26 +602,40 @@
   .evento-row-title{flex:1;font-size:13.5px;font-weight:600;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
   .evento-row-actions{display:flex;gap:4px;flex-shrink:0;}
   .cal-print-header{display:none;}
+  .cal-print-header{display:flex;align-items:center;gap:16px;border-bottom:3px solid #C2410C;padding-bottom:12px;margin-bottom:16px;}
+  .cal-print-logo{height:46px;width:auto;display:block;}
+  .cal-print-title h2{margin:0 0 4px 0;font-size:24px;font-weight:800;color:#111;letter-spacing:.2px;}
+  .cal-print-legend{display:flex;gap:18px;flex-wrap:wrap;font-size:11.5px;color:#333;}
+  .cal-print-legend span{display:inline-flex;align-items:center;gap:5px;}
+  .cal-print-legend i{width:10px;height:10px;border-radius:50%;display:inline-block;}
+  /* Printing is scoped with a body class toggled right before/after window.print()
+     instead of @media print + visibility:hidden, because visibility:hidden keeps
+     the whole (very tall) app in normal flow and was producing several blank
+     printed pages. display:none removes it from flow entirely -> exactly 1 page. */
+  body.printing-calendar > *:not(#calendarGrandeModal){display:none !important;}
+  body.printing-calendar{background:#fff !important;}
+  body.printing-calendar #calendarGrandeModal{
+    position:static !important;inset:auto !important;background:none !important;
+    padding:0 !important;display:block !important;z-index:auto !important;
+  }
+  body.printing-calendar #calendarGrandeModal .modal-card{
+    max-width:none !important;width:100% !important;max-height:none !important;
+    overflow:visible !important;box-shadow:none !important;border-radius:0 !important;padding:0 !important;
+  }
+  body.printing-calendar #calendarGrandeModal .modal-card > *:not(#calendarPrintArea){display:none !important;}
+  body.printing-calendar #calendarPrintArea{display:block !important;}
+  body.printing-calendar #calendarGrandeMonthLabel{display:none !important;}
+  body.printing-calendar .cal-print-header{display:flex !important;}
+  body.printing-calendar .cal-grid{gap:5px;}
+  body.printing-calendar .cal-dow{font-size:12px;font-weight:800;color:#222;border-bottom:2px solid #ccc;padding-bottom:6px;margin-bottom:2px;}
+  body.printing-calendar .cal-day{min-height:85px;border:1px solid #bbb;border-radius:4px;page-break-inside:avoid;}
+  body.printing-calendar .cal-day.is-empty{border:1px solid transparent;}
+  body.printing-calendar .cal-day.is-today{border-color:#C2410C;border-width:2px;}
+  body.printing-calendar .cal-day-num{font-size:12.5px;color:#555;}
+  body.printing-calendar .cal-event-chip{font-size:9.5px;white-space:normal;overflow:visible;text-overflow:clip;line-height:1.25;}
   @media print{
     @page{ size: landscape; margin: 10mm; }
     *{-webkit-print-color-adjust:exact !important;print-color-adjust:exact !important;color-adjust:exact !important;}
-    body *{visibility:hidden;}
-    #calendarPrintArea, #calendarPrintArea *{visibility:visible;}
-    #calendarPrintArea{position:absolute;left:0;top:0;width:100%;padding:0;}
-    #calendarGrandeMonthLabel{display:none;}
-    .cal-print-header{display:flex;align-items:center;gap:16px;border-bottom:3px solid #C2410C;padding-bottom:12px;margin-bottom:16px;}
-    .cal-print-logo{height:46px;width:auto;display:block;}
-    .cal-print-title h2{margin:0 0 4px 0;font-size:24px;font-weight:800;color:#111;letter-spacing:.2px;}
-    .cal-print-legend{display:flex;gap:18px;flex-wrap:wrap;font-size:11.5px;color:#333;}
-    .cal-print-legend span{display:inline-flex;align-items:center;gap:5px;}
-    .cal-print-legend i{width:10px;height:10px;border-radius:50%;display:inline-block;}
-    .cal-grid{gap:5px;}
-    .cal-dow{font-size:12px;font-weight:800;color:#222;border-bottom:2px solid #ccc;padding-bottom:6px;margin-bottom:2px;}
-    .cal-day{min-height:85px;border:1px solid #bbb;border-radius:4px;page-break-inside:avoid;}
-    .cal-day.is-empty{border:1px solid transparent;}
-    .cal-day.is-today{border-color:#C2410C;border-width:2px;}
-    .cal-day-num{font-size:12.5px;color:#555;}
-    .cal-event-chip{font-size:9.5px;white-space:normal;overflow:visible;text-overflow:clip;line-height:1.25;}
   }
 </style>
 </head>
@@ -5830,9 +5844,25 @@
       var btnImprimir = document.getElementById('btnImprimirCalendario');
       if (btnImprimir) btnImprimir.addEventListener('click', function () {
         openCalendarGrande(calendarioState.pageYear, calendarioState.pageMonth);
-        setTimeout(function () { window.print(); }, 150);
+        setTimeout(function () { printCalendarioGrande(); }, 150);
       });
     }
+  }
+
+  function printCalendarioGrande() {
+    document.body.classList.add('printing-calendar');
+    var cleanup = function () {
+      document.body.classList.remove('printing-calendar');
+      window.removeEventListener('afterprint', cleanup);
+    };
+    window.addEventListener('afterprint', cleanup);
+    setTimeout(function () {
+      window.print();
+      // Fallback for browsers that don't reliably fire 'afterprint' (e.g. if the
+      // print dialog is dismissed in an unusual way). Long delay so it never
+      // fires while someone is still looking at the print preview.
+      setTimeout(cleanup, 20000);
+    }, 50);
   }
 
   function openCalendarGrande(year, month) {
@@ -5863,7 +5893,7 @@
     document.getElementById('calendarGrandeModal').classList.add('hidden');
   });
   var calendarGrandePrintEl = document.getElementById('calendarGrandePrint');
-  if (calendarGrandePrintEl) calendarGrandePrintEl.addEventListener('click', function () { window.print(); });
+  if (calendarGrandePrintEl) calendarGrandePrintEl.addEventListener('click', function () { printCalendarioGrande(); });
   var calendarGrandeManageEl = document.getElementById('calendarGrandeManage');
   if (calendarGrandeManageEl) calendarGrandeManageEl.addEventListener('click', function () {
     document.getElementById('calendarGrandeModal').classList.add('hidden');
