@@ -184,6 +184,13 @@
   .doc-top{display:flex;justify-content:space-between;gap:10px;align-items:flex-start;flex-wrap:wrap;}
   .doc-title{font-size:14.5px;font-weight:700;margin:0 0 4px;}
   .doc-desc{font-size:13px;color:var(--muted);line-height:1.55;margin:6px 0 0;}
+  .doc-desc a{color:var(--red);text-decoration:underline;word-break:break-word;}
+  .doc-card.doc-card-importante{border-color:#F3B7B7;background:linear-gradient(135deg,#FEF2F2,#fff 55%);}
+  .doc-important-badge{display:inline-flex;align-items:center;gap:4px;background:var(--red);color:#fff;font-size:10px;font-weight:800;letter-spacing:.3px;padding:2px 8px;border-radius:20px;text-transform:uppercase;flex-shrink:0;}
+  .doc-media{margin-top:10px;border-radius:10px;overflow:hidden;max-width:100%;background:#000;line-height:0;}
+  .doc-media img,.doc-media video{display:block;width:100%;max-height:320px;object-fit:cover;cursor:pointer;}
+  .attach-preview{margin-top:8px;border-radius:10px;overflow:hidden;max-width:100%;background:#000;line-height:0;}
+  .attach-preview img,.attach-preview video{display:block;width:100%;max-height:220px;object-fit:contain;background:#000;}
   .doc-footer{display:flex;gap:16px;margin-top:10px;font-size:11.5px;color:var(--muted);}
   .doc-footer span{display:flex;align-items:center;gap:5px;}
 
@@ -428,6 +435,22 @@
   .gate-item-title{font-size:13.5px;font-weight:700;margin:0 0 3px;}
   .gate-item-date{font-size:11px;color:var(--muted);font-weight:600;margin-bottom:5px;}
   .gate-item-desc{font-size:12.5px;color:var(--muted);line-height:1.55;margin:0;}
+  .gate-item-desc a{color:var(--red);text-decoration:underline;word-break:break-word;}
+  .gate-item.gate-item-importante{background:linear-gradient(90deg,#FEF2F2,#fff 60%);border-bottom-color:#FCE4E4;border-radius:10px;padding:14px 12px;margin:0 -12px;}
+  .gate-item-badges{display:flex;gap:6px;align-items:center;margin-bottom:4px;flex-wrap:wrap;}
+  .gate-item-important-badge{display:inline-flex;align-items:center;gap:4px;background:var(--red);color:#fff;font-size:10px;font-weight:800;letter-spacing:.3px;padding:2px 8px;border-radius:20px;text-transform:uppercase;}
+  .gate-item-media{margin-top:9px;border-radius:10px;overflow:hidden;max-width:100%;background:#000;line-height:0;}
+  .gate-item-media img,.gate-item-media video{display:block;width:100%;max-height:220px;object-fit:cover;cursor:pointer;}
+  .gate-item-link{display:inline-flex;align-items:center;gap:6px;margin-top:9px;background:var(--bg);color:var(--ink-2);font-size:12px;font-weight:700;padding:7px 12px;border-radius:8px;text-decoration:none;border:1px solid var(--line);}
+  .gate-item-link:hover{background:var(--line);}
+  .gate-birthday-banner{
+    position:relative;overflow:hidden;border-radius:14px;padding:16px 18px;margin-bottom:16px;
+    background:linear-gradient(120deg,#F72585,#FB8500 60%,#FFB703);color:#fff;
+    display:flex;align-items:center;gap:14px;
+  }
+  .gate-birthday-emoji{font-size:32px;line-height:1;flex-shrink:0;filter:drop-shadow(0 2px 4px rgba(0,0,0,.25));}
+  .gate-birthday-text h4{margin:0 0 2px;font-size:14.5px;font-weight:800;}
+  .gate-birthday-text p{margin:0;font-size:12px;opacity:.95;line-height:1.4;}
   .gate-footer{
     padding:18px 30px;border-top:1px solid var(--line);background:#fff;flex-shrink:0;
     display:flex;flex-direction:column;gap:14px;
@@ -1111,8 +1134,14 @@
               <label for="comunicadoAnexo">Anexo — PDF, imagem ou vídeo (opcional)</label>
               <input type="file" id="comunicadoAnexo" accept=".pdf,image/*,video/*">
               <div id="comunicadoAnexoAtual" style="font-size:12.5px;color:var(--muted,#6B7280);margin-top:6px;display:none;"></div>
+              <div id="comunicadoAnexoPreview" class="attach-preview" style="display:none;"></div>
               <label class="gate-check-row" id="comunicadoRemoveAnexoWrap" style="display:none;margin-top:6px;">
                 <input type="checkbox" id="comunicadoRemoveAnexo"> Remover anexo atual
+              </label>
+            </div>
+            <div class="login-field">
+              <label class="gate-check-row" style="margin-top:0;">
+                <input type="checkbox" id="comunicadoImportante"> Marcar como importante (fica em destaque na tela de entrada)
               </label>
             </div>
             <div class="login-field">
@@ -1174,6 +1203,7 @@
               <label for="informativoAnexo">Anexo — PDF, imagem ou vídeo (opcional)</label>
               <input type="file" id="informativoAnexo" accept=".pdf,image/*,video/*">
               <div id="informativoAnexoAtual" style="font-size:12.5px;color:var(--muted,#6B7280);margin-top:6px;display:none;"></div>
+              <div id="informativoAnexoPreview" class="attach-preview" style="display:none;"></div>
               <label class="gate-check-row" id="informativoRemoveAnexoWrap" style="display:none;margin-top:6px;">
                 <input type="checkbox" id="informativoRemoveAnexo"> Remover anexo atual
               </label>
@@ -2408,6 +2438,56 @@
     return n.toFixed(1) + ' ' + units[u];
   }
 
+  // Converte URLs "soltas" dentro de um texto em links clicáveis reais (abrem em nova aba).
+  var URL_REGEX = /(https?:\/\/[^\s<>"']+)/gi;
+  function linkifyInto(el, text) {
+    el.innerHTML = '';
+    if (!text) return;
+    var lastIndex = 0;
+    var match;
+    URL_REGEX.lastIndex = 0;
+    while ((match = URL_REGEX.exec(text))) {
+      if (match.index > lastIndex) el.appendChild(document.createTextNode(text.slice(lastIndex, match.index)));
+      var a = document.createElement('a');
+      a.href = match[0];
+      a.target = '_blank';
+      a.rel = 'noopener';
+      a.textContent = match[0];
+      el.appendChild(a);
+      lastIndex = match.index + match[0].length;
+    }
+    if (lastIndex < text.length) el.appendChild(document.createTextNode(text.slice(lastIndex)));
+  }
+
+  // Anexa uma pré-visualização inline (imagem, ou vídeo com reprodução automática) dentro de wrapEl,
+  // usando a classe CSS informada (gate-item-media ou doc-media).
+  function attachInlineMediaPreview(wrapEl, item, cssClass) {
+    if (!item.attachment_path || (item.attachment_type !== 'image' && item.attachment_type !== 'video')) return;
+    var mediaWrap = document.createElement('div');
+    mediaWrap.className = cssClass;
+    wrapEl.appendChild(mediaWrap);
+    supabase.storage.from('conteudo').createSignedUrl(item.attachment_path, 3600).then(function (res) {
+      if (!res.data || !res.data.signedUrl) return;
+      var signedUrl = res.data.signedUrl;
+      if (item.attachment_type === 'image') {
+        var img = document.createElement('img');
+        img.alt = '';
+        img.src = signedUrl;
+        img.addEventListener('click', function () { window.open(signedUrl, '_blank', 'noopener'); });
+        mediaWrap.appendChild(img);
+      } else {
+        var video = document.createElement('video');
+        video.src = signedUrl;
+        video.autoplay = true;
+        video.muted = true;
+        video.loop = true;
+        video.playsInline = true;
+        video.controls = true;
+        mediaWrap.appendChild(video);
+      }
+    }).catch(function () {});
+  }
+
   function formatDateBR(iso) {
     if (!iso) return '';
     if (/^\d{4}-\d{2}-\d{2}$/.test(iso)) {
@@ -3007,6 +3087,50 @@
     if (type === 'video') return 'i-video';
     return 'i-file';
   }
+
+  // Pré-visualização do anexo dentro dos formulários de Comunicado/Informativo:
+  // mostra a imagem/vídeo escolhido (ainda no computador do usuário) antes mesmo de salvar.
+  function showAttachmentPreviewFromFile(previewEl, file) {
+    previewEl.innerHTML = '';
+    if (!file) { previewEl.style.display = 'none'; return; }
+    var type = attachmentTypeFromFilename(file.name);
+    if (type !== 'image' && type !== 'video') { previewEl.style.display = 'none'; return; }
+    var url = URL.createObjectURL(file);
+    if (type === 'image') {
+      var img = document.createElement('img');
+      img.alt = '';
+      img.src = url;
+      previewEl.appendChild(img);
+    } else {
+      var video = document.createElement('video');
+      video.src = url;
+      video.controls = true;
+      video.muted = true;
+      previewEl.appendChild(video);
+    }
+    previewEl.style.display = 'block';
+  }
+
+  // Pré-visualização do anexo já salvo (ao editar um Comunicado/Informativo existente).
+  function showAttachmentPreviewFromStorage(previewEl, attachmentPath, attachmentType) {
+    supabase.storage.from('conteudo').createSignedUrl(attachmentPath, 3600).then(function (res) {
+      if (!res.data || !res.data.signedUrl) return;
+      previewEl.innerHTML = '';
+      if (attachmentType === 'image') {
+        var img = document.createElement('img');
+        img.alt = '';
+        img.src = res.data.signedUrl;
+        previewEl.appendChild(img);
+      } else {
+        var video = document.createElement('video');
+        video.src = res.data.signedUrl;
+        video.controls = true;
+        video.muted = true;
+        previewEl.appendChild(video);
+      }
+      previewEl.style.display = 'block';
+    }).catch(function () {});
+  }
   var BADGE_CLASS_BY_COLOR = { red: 'badge-red', blue: 'badge-blue', purple: 'badge-purple', orange: 'badge-orange', green: 'badge-green' };
   function buildColorBadge(colorKey, text) {
     var span = document.createElement('span');
@@ -3045,7 +3169,7 @@
   function buildComunicadoCard(item) {
     var isAdmin = !!(appState.profile && appState.profile.is_admin);
     var card = document.createElement('div');
-    card.className = 'doc-card';
+    card.className = 'doc-card' + (item.importante ? ' doc-card-importante' : '');
 
     var icon = document.createElement('div');
     icon.className = 'doc-icon';
@@ -3067,6 +3191,12 @@
     right.style.display = 'flex';
     right.style.gap = '6px';
     right.style.alignItems = 'center';
+    if (item.importante) {
+      var importantBadge = document.createElement('span');
+      importantBadge.className = 'doc-important-badge';
+      importantBadge.innerHTML = '<svg class="ic" style="width:10px;height:10px"><use href="#i-alert"/></svg> Importante';
+      right.appendChild(importantBadge);
+    }
     right.appendChild(buildColorBadge(item.color, item.area || 'Geral'));
     if (item.show_in_gate) {
       var gateBadge = document.createElement('span');
@@ -3084,8 +3214,10 @@
 
     var desc = document.createElement('p');
     desc.className = 'doc-desc';
-    desc.textContent = item.description;
+    linkifyInto(desc, item.description || '');
     body.appendChild(desc);
+
+    attachInlineMediaPreview(body, item, 'doc-media');
 
     if (item.link_url || item.attachment_path) {
       var actionsRow = document.createElement('div');
@@ -3165,22 +3297,33 @@
     document.getElementById('comunicadoCor').value = item ? (item.color || 'blue') : 'blue';
     document.getElementById('comunicadoLink').value = item ? (item.link_url || '') : '';
     document.getElementById('comunicadoShowGate').checked = item ? !!item.show_in_gate : false;
+    document.getElementById('comunicadoImportante').checked = item ? !!item.importante : false;
     comunicadoEditingAttachmentPath = item ? (item.attachment_path || null) : null;
     var comunicadoAnexoAtualEl = document.getElementById('comunicadoAnexoAtual');
     var comunicadoRemoveAnexoWrapEl = document.getElementById('comunicadoRemoveAnexoWrap');
     document.getElementById('comunicadoRemoveAnexo').checked = false;
     comunicadoAnexoAtualEl.style.display = 'none';
     comunicadoRemoveAnexoWrapEl.style.display = 'none';
+    var comunicadoAnexoPreviewEl = document.getElementById('comunicadoAnexoPreview');
+    comunicadoAnexoPreviewEl.innerHTML = '';
+    comunicadoAnexoPreviewEl.style.display = 'none';
     if (item && item.attachment_name) {
       comunicadoAnexoAtualEl.textContent = 'Anexo atual: ' + item.attachment_name;
       comunicadoAnexoAtualEl.style.display = 'block';
       comunicadoRemoveAnexoWrapEl.style.display = 'flex';
+      if (item.attachment_path && (item.attachment_type === 'image' || item.attachment_type === 'video')) {
+        showAttachmentPreviewFromStorage(comunicadoAnexoPreviewEl, item.attachment_path, item.attachment_type);
+      }
     }
     comunicadoModal.classList.remove('hidden');
   }
 
   if (btnNewComunicado) btnNewComunicado.addEventListener('click', function () { openComunicadoModal(null); });
   if (comunicadoCancel) comunicadoCancel.addEventListener('click', function () { comunicadoModal.classList.add('hidden'); });
+  var comunicadoAnexoInput = document.getElementById('comunicadoAnexo');
+  if (comunicadoAnexoInput) comunicadoAnexoInput.addEventListener('change', function () {
+    showAttachmentPreviewFromFile(document.getElementById('comunicadoAnexoPreview'), comunicadoAnexoInput.files[0]);
+  });
   if (comunicadoForm) {
     comunicadoForm.addEventListener('submit', async function (e) {
       e.preventDefault();
@@ -3191,7 +3334,8 @@
         description: document.getElementById('comunicadoDescricao').value.trim(),
         area: document.getElementById('comunicadoArea').value.trim(),
         color: document.getElementById('comunicadoCor').value,
-        show_in_gate: document.getElementById('comunicadoShowGate').checked
+        show_in_gate: document.getElementById('comunicadoShowGate').checked,
+        importante: document.getElementById('comunicadoImportante').checked
       };
       var linkVal = document.getElementById('comunicadoLink').value.trim();
       payload.link_url = linkVal || null;
@@ -3518,7 +3662,7 @@
     dataEl.textContent = formatDateBR(item.created_at);
     var authorProfile = noticiaAuthorsMap[item.created_by];
     autorEl.textContent = authorProfile ? (authorProfile.full_name || authorProfile.email) : '—';
-    corpoEl.textContent = item.description || '';
+    linkifyInto(corpoEl, item.description || '');
 
     if (item.attachment_path && (item.attachment_type === 'image' || item.attachment_type === 'video')) {
       var signed = await supabase.storage.from('conteudo').createSignedUrl(item.attachment_path, 3600);
@@ -3533,6 +3677,10 @@
           var video = document.createElement('video');
           video.src = signed.data.signedUrl;
           video.controls = true;
+          video.autoplay = true;
+          video.muted = true;
+          video.loop = true;
+          video.playsInline = true;
           coverWrap.appendChild(video);
         }
       }
@@ -3622,8 +3770,10 @@
 
     var desc = document.createElement('p');
     desc.className = 'doc-desc';
-    desc.textContent = item.description;
+    linkifyInto(desc, item.description || '');
     body.appendChild(desc);
+
+    attachInlineMediaPreview(body, item, 'doc-media');
 
     if (item.link_url || item.attachment_path) {
       var actionsRow = document.createElement('div');
@@ -3707,16 +3857,26 @@
     document.getElementById('informativoRemoveAnexo').checked = false;
     informativoAnexoAtualEl.style.display = 'none';
     informativoRemoveAnexoWrapEl.style.display = 'none';
+    var informativoAnexoPreviewEl = document.getElementById('informativoAnexoPreview');
+    informativoAnexoPreviewEl.innerHTML = '';
+    informativoAnexoPreviewEl.style.display = 'none';
     if (item && item.attachment_name) {
       informativoAnexoAtualEl.textContent = 'Anexo atual: ' + item.attachment_name;
       informativoAnexoAtualEl.style.display = 'block';
       informativoRemoveAnexoWrapEl.style.display = 'flex';
+      if (item.attachment_path && (item.attachment_type === 'image' || item.attachment_type === 'video')) {
+        showAttachmentPreviewFromStorage(informativoAnexoPreviewEl, item.attachment_path, item.attachment_type);
+      }
     }
     informativoModal.classList.remove('hidden');
   }
 
   if (btnNewInformativo) btnNewInformativo.addEventListener('click', function () { openInformativoModal(null); });
   if (informativoCancel) informativoCancel.addEventListener('click', function () { informativoModal.classList.add('hidden'); });
+  var informativoAnexoInput = document.getElementById('informativoAnexo');
+  if (informativoAnexoInput) informativoAnexoInput.addEventListener('change', function () {
+    showAttachmentPreviewFromFile(document.getElementById('informativoAnexoPreview'), informativoAnexoInput.files[0]);
+  });
   if (informativoForm) {
     informativoForm.addEventListener('submit', async function (e) {
       e.preventDefault();
@@ -5764,6 +5924,107 @@
   }
 
   // ---------------- Gate: avisos obrigatórios ao logar ----------------
+
+  // Aniversariantes de hoje, a partir dos eventos do Calendário (tipo "aniversario"),
+  // comparando só dia/mês (o ano do evento não importa — aniversário é sempre anual).
+  async function getAniversariantesHoje() {
+    var today = new Date();
+    var mm = pad2(today.getMonth() + 1);
+    var dd = pad2(today.getDate());
+    try {
+      var res = await supabase.from('eventos_calendario').select('*').eq('tipo', 'aniversario');
+      if (res.error) return [];
+      return (res.data || []).filter(function (ev) {
+        if (!ev.data) return false;
+        var parts = String(ev.data).split('-');
+        return parts.length === 3 && parts[1] === mm && parts[2] === dd;
+      });
+    } catch (e) {
+      return [];
+    }
+  }
+
+  function buildBirthdayBanner(aniversariantes) {
+    var names = aniversariantes.map(function (ev) {
+      var t = ev.titulo || '';
+      var m = t.match(/aniversári[oa]\s*[-–—:]\s*(.+)/i);
+      return (m ? m[1] : t).trim();
+    }).filter(Boolean);
+    var banner = document.createElement('div');
+    banner.className = 'gate-birthday-banner';
+    var emoji = document.createElement('div');
+    emoji.className = 'gate-birthday-emoji';
+    emoji.textContent = '🎉';
+    banner.appendChild(emoji);
+    var textWrap = document.createElement('div');
+    textWrap.className = 'gate-birthday-text';
+    var h4 = document.createElement('h4');
+    h4.textContent = names.length === 1 ? ('Feliz aniversário, ' + names[0] + '! 🎂') : 'Feliz aniversário! 🎂';
+    var p = document.createElement('p');
+    p.textContent = names.length > 1
+      ? 'Hoje é dia de comemorar: ' + names.join(', ') + '.'
+      : 'A equipe Facilita Empréstimo deseja um dia incrível!';
+    textWrap.appendChild(h4);
+    textWrap.appendChild(p);
+    banner.appendChild(textWrap);
+    return banner;
+  }
+
+  function buildGateItemEl(item) {
+    var el = document.createElement('div');
+    el.className = 'gate-item' + (item.importante ? ' gate-item-importante' : '');
+
+    var iconWrap = document.createElement('div');
+    iconWrap.className = 'gate-item-icon';
+    iconWrap.style.background = 'var(' + colorVarName(item.color) + ')';
+    iconWrap.innerHTML = '<svg class="ic" style="width:18px;height:18px;color:#fff"><use href="#i-bell"/></svg>';
+    el.appendChild(iconWrap);
+
+    var textWrap = document.createElement('div');
+    textWrap.style.minWidth = '0';
+    textWrap.style.flex = '1';
+
+    if (item.importante) {
+      var badgesRow = document.createElement('div');
+      badgesRow.className = 'gate-item-badges';
+      var badge = document.createElement('span');
+      badge.className = 'gate-item-important-badge';
+      badge.innerHTML = '<svg class="ic" style="width:10px;height:10px"><use href="#i-alert"/></svg> Importante';
+      badgesRow.appendChild(badge);
+      textWrap.appendChild(badgesRow);
+    }
+
+    var titleEl = document.createElement('p');
+    titleEl.className = 'gate-item-title';
+    titleEl.textContent = item.title || '';
+    textWrap.appendChild(titleEl);
+
+    var dateEl = document.createElement('p');
+    dateEl.className = 'gate-item-date';
+    dateEl.textContent = formatDateBR(item.created_at);
+    textWrap.appendChild(dateEl);
+
+    var descEl = document.createElement('p');
+    descEl.className = 'gate-item-desc';
+    linkifyInto(descEl, item.description || '');
+    textWrap.appendChild(descEl);
+
+    attachInlineMediaPreview(textWrap, item, 'gate-item-media');
+
+    if (item.link_url) {
+      var linkA = document.createElement('a');
+      linkA.className = 'gate-item-link';
+      linkA.href = item.link_url;
+      linkA.target = '_blank';
+      linkA.rel = 'noopener';
+      linkA.innerHTML = '<svg class="ic" style="width:13px;height:13px"><use href="#i-link"/></svg> Abrir link';
+      textWrap.appendChild(linkA);
+    }
+
+    el.appendChild(textWrap);
+    return el;
+  }
+
   async function loadGateComunicados() {
     var gateBody = document.getElementById('gateBody');
     var gateOverlayEl = document.getElementById('gateOverlay');
@@ -5771,29 +6032,23 @@
     if (!gateBody || !gateOverlayEl) { if (appEl) appEl.classList.remove('locked'); return; }
     var items = [];
     try {
-      var res = await supabase.from('comunicados').select('*').eq('show_in_gate', true).order('created_at', { ascending: false }).limit(8);
+      var res = await supabase.from('comunicados').select('*').eq('show_in_gate', true)
+        .order('importante', { ascending: false }).order('created_at', { ascending: false }).limit(8);
       items = (res && res.data) || [];
     } catch (e) {
       console.error('Erro ao carregar avisos da tela de entrada:', e);
       items = [];
     }
+    var aniversariantes = [];
+    try { aniversariantes = await getAniversariantesHoje(); } catch (e) { aniversariantes = []; }
     gateBody.innerHTML = '';
-    if (!items.length) {
+    if (!items.length && !aniversariantes.length) {
       gateOverlayEl.classList.add('hidden');
       if (appEl) appEl.classList.remove('locked');
       return;
     }
-    items.forEach(function (item) {
-      var el = document.createElement('div');
-      el.className = 'gate-item';
-      el.innerHTML = '<div class="gate-item-icon" style="background:var(' + colorVarName(item.color) + ')">' +
-        '<svg class="ic" style="width:18px;height:18px;color:#fff"><use href="#i-bell"/></svg></div>' +
-        '<div><p class="gate-item-title"></p><p class="gate-item-date"></p><p class="gate-item-desc"></p></div>';
-      el.querySelector('.gate-item-title').textContent = item.title || '';
-      el.querySelector('.gate-item-date').textContent = formatDateBR(item.created_at);
-      el.querySelector('.gate-item-desc').textContent = item.description || '';
-      gateBody.appendChild(el);
-    });
+    if (aniversariantes.length) gateBody.appendChild(buildBirthdayBanner(aniversariantes));
+    items.forEach(function (item) { gateBody.appendChild(buildGateItemEl(item)); });
     var ackCheckboxEl = document.getElementById('ackCheckbox');
     var ackButtonEl = document.getElementById('ackButton');
     if (ackCheckboxEl) ackCheckboxEl.checked = false;
