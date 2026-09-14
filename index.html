@@ -604,6 +604,26 @@
   .role-checks label{display:flex;align-items:center;gap:6px;cursor:pointer;font-weight:600;}
   .role-checks input{accent-color:var(--red);}
 
+  /* ---------- ADMINISTRAÇÃO: USUÁRIOS ---------- */
+  .admin-users-toolbar{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:14px;}
+  .admin-users-search{position:relative;flex:1;min-width:200px;max-width:320px;}
+  .admin-users-search input{width:100%;padding:9px 12px 9px 34px;border:1px solid var(--line);border-radius:9px;font-size:13px;font-family:inherit;background:var(--bg);}
+  .admin-users-search .ic-field{position:absolute;left:10px;top:50%;transform:translateY(-50%);width:15px;height:15px;color:var(--muted);pointer-events:none;}
+  .admin-users-count{font-size:12px;color:var(--muted);font-weight:600;white-space:nowrap;}
+  .admin-users-table-wrap{overflow-x:auto;}
+  table.admin-users-table{width:100%;border-collapse:collapse;font-size:13px;}
+  table.admin-users-table th{text-align:left;font-size:10.5px;text-transform:uppercase;letter-spacing:.3px;color:var(--muted);padding:8px 12px;border-bottom:2px solid var(--line);white-space:nowrap;}
+  table.admin-users-table td{padding:10px 12px;border-bottom:1px solid var(--line);vertical-align:middle;white-space:nowrap;}
+  table.admin-users-table tr.user-row-inactive{opacity:.55;}
+  .presence-dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px;background:#CBD5E1;vertical-align:middle;}
+  .presence-dot.online{background:#22C55E;box-shadow:0 0 0 3px rgba(34,197,94,.18);}
+  .admin-user-name{font-weight:700;color:var(--ink);white-space:normal;}
+  .admin-user-email{font-size:11px;color:var(--muted);white-space:normal;}
+  .admin-user-toggle-btn{border:1px solid var(--line);background:#fff;border-radius:8px;padding:5px 10px;font-size:11.5px;font-weight:700;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;gap:5px;color:var(--ink-2);}
+  .admin-user-toggle-btn:hover{background:var(--bg);}
+  .admin-user-toggle-btn.is-self{opacity:.4;cursor:not-allowed;}
+  .admin-user-toggle-btn.is-self:hover{background:#fff;}
+
   /* ---------- CALENDÁRIO ---------- */
   .badge-pink{background:#FCE7F3;color:#BE185D;}
   .badge-teal{background:#CCFBF1;color:#0F766E;}
@@ -1884,7 +1904,7 @@
 
         <div class="info-banner">
           <svg class="ic" style="width:16px;height:16px;color:#B45309;margin-top:1px"><use href="#i-alert"/></svg>
-          <div>Por segurança, a lista completa de usuários fica só no painel do Supabase (<b>Authentication → Users</b>) — daqui você consegue <b>criar novos acessos</b>, já com o cargo/nível correto, e <b>enviar link de redefinição de senha</b>. Esta página só é visível para quem tem permissão de administrador(a).</div>
+          <div>Nesta página você consegue <b>criar novos acessos</b>, já com o cargo/nível correto, <b>enviar link de redefinição de senha</b> e, na lista abaixo, ver todos os usuários do portal — ativos, inativos, quem está online agora, último acesso e data de criação — além de poder <b>ativar/desativar</b> o acesso de qualquer um. Esta página só é visível para quem tem permissão de administrador(a).</div>
         </div>
 
         <div class="home-grid-2col">
@@ -1942,6 +1962,37 @@
               </button>
             </form>
           </div>
+        </div>
+
+        <div class="card" style="margin-top:22px;">
+          <div class="panel-title" style="margin-bottom:4px;">
+            <h3><svg class="ic" style="width:16px;height:16px;vertical-align:-3px"><use href="#i-users"/></svg> Usuários do portal</h3>
+          </div>
+          <p style="font-size:12.5px;color:var(--muted);margin:0 0 14px;">Ativos, inativos, quem está online agora, último acesso e data de criação de cada usuário.</p>
+          <div class="admin-users-toolbar">
+            <div class="admin-users-search">
+              <svg class="ic ic-field"><use href="#i-search"/></svg>
+              <input type="text" id="adminUsersSearch" placeholder="Buscar por nome ou e-mail...">
+            </div>
+            <span class="admin-users-count" id="adminUsersCount"></span>
+          </div>
+          <div class="admin-users-table-wrap">
+            <table class="admin-users-table">
+              <thead>
+                <tr>
+                  <th>Nome</th>
+                  <th>Nível</th>
+                  <th>Status</th>
+                  <th>Online</th>
+                  <th>Último acesso</th>
+                  <th>Criado em</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody id="adminUsersTbody"></tbody>
+            </table>
+          </div>
+          <div id="adminUsersEmpty" style="display:none;text-align:center;color:var(--muted);font-size:13px;padding:20px;">Nenhum usuário encontrado.</div>
         </div>
       </section>
 
@@ -2002,6 +2053,9 @@
     session: null,
     profile: null
   };
+  var adminUsersRefreshTimer = null;
+  var presenceHeartbeatTimer = null;
+  var adminUsersCache = [];
 
   var loginOverlay = document.getElementById('loginOverlay');
   var gateOverlay2 = document.getElementById('gateOverlay');
@@ -2112,6 +2166,7 @@
       if (typeof updateTarefasBadges === 'function') updateTarefasBadges();
       if (typeof updateChamadosBadges === 'function') updateChamadosBadges();
       if (typeof updatePlanosBadges === 'function') updatePlanosBadges();
+      startPresenceHeartbeat();
     } else {
       appState.session = null;
       appState.profile = null;
@@ -2119,8 +2174,26 @@
       applyAdminVisibility(false);
       gateOverlay2.classList.add('hidden');
       loginOverlay.classList.remove('hidden');
+      stopPresenceHeartbeat();
     }
   }
+
+  // ---- Presença: marca "última vez visto" do próprio usuário periodicamente ----
+  function updateOwnLastSeen() {
+    if (!appState.session || !appState.session.user) return;
+    supabase.from('profiles').update({ last_seen_at: new Date().toISOString() }).eq('id', appState.session.user.id).then(function () {}).catch(function () {});
+  }
+  function startPresenceHeartbeat() {
+    updateOwnLastSeen();
+    if (presenceHeartbeatTimer) clearInterval(presenceHeartbeatTimer);
+    presenceHeartbeatTimer = setInterval(updateOwnLastSeen, 60000);
+  }
+  function stopPresenceHeartbeat() {
+    if (presenceHeartbeatTimer) { clearInterval(presenceHeartbeatTimer); presenceHeartbeatTimer = null; }
+  }
+  document.addEventListener('visibilitychange', function () {
+    if (document.visibilityState === 'visible' && appState.session) updateOwnLastSeen();
+  });
 
   if (loginForm) {
     loginForm.addEventListener('submit', function (e) {
@@ -2256,6 +2329,158 @@
       }
     });
   }
+
+  // ---- Administração: lista de usuários (ativos/inativos, online, último acesso, criado em) ----
+  var ONLINE_THRESHOLD_MS = 3 * 60 * 1000;
+
+  function timeAgoPT(iso) {
+    if (!iso) return null;
+    var diffMs = Date.now() - new Date(iso).getTime();
+    if (diffMs < 0) diffMs = 0;
+    var min = Math.floor(diffMs / 60000);
+    if (min < 1) return 'agora mesmo';
+    if (min < 60) return 'há ' + min + ' min';
+    var h = Math.floor(min / 60);
+    if (h < 24) return 'há ' + h + 'h';
+    var d = Math.floor(h / 24);
+    return 'há ' + d + ' dia' + (d > 1 ? 's' : '');
+  }
+
+  async function loadAdminUsuarios() {
+    var tbody = document.getElementById('adminUsersTbody');
+    if (!tbody) return;
+    tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--muted);padding:16px;">Carregando...</td></tr>';
+    try {
+      var res = await supabase.rpc('admin_list_usuarios');
+      if (res.error) {
+        tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--red);padding:16px;">Não foi possível carregar os usuários.</td></tr>';
+        return;
+      }
+      adminUsersCache = res.data || [];
+      renderAdminUsersTable();
+    } catch (e) {
+      tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--red);padding:16px;">Falha de conexão.</td></tr>';
+    }
+  }
+
+  function renderAdminUsersTable() {
+    var tbody = document.getElementById('adminUsersTbody');
+    var emptyEl = document.getElementById('adminUsersEmpty');
+    var countEl = document.getElementById('adminUsersCount');
+    var searchEl = document.getElementById('adminUsersSearch');
+    if (!tbody) return;
+    var q = ((searchEl && searchEl.value) || '').trim().toLowerCase();
+    var list = adminUsersCache.filter(function (u) {
+      if (!q) return true;
+      return (u.full_name || '').toLowerCase().indexOf(q) !== -1 || (u.email || '').toLowerCase().indexOf(q) !== -1;
+    });
+    tbody.innerHTML = '';
+    if (countEl) countEl.textContent = list.length + ' de ' + adminUsersCache.length + ' usuário' + (adminUsersCache.length !== 1 ? 's' : '');
+    if (!list.length) {
+      if (emptyEl) emptyEl.style.display = '';
+      return;
+    }
+    if (emptyEl) emptyEl.style.display = 'none';
+    var myId = appState.session && appState.session.user && appState.session.user.id;
+
+    list.forEach(function (u) {
+      var tr = document.createElement('tr');
+      if (!u.active) tr.className = 'user-row-inactive';
+
+      var tdNome = document.createElement('td');
+      var nameDiv = document.createElement('div');
+      nameDiv.className = 'admin-user-name';
+      nameDiv.textContent = u.full_name || u.email;
+      var emailDiv = document.createElement('div');
+      emailDiv.className = 'admin-user-email';
+      emailDiv.textContent = u.email;
+      tdNome.appendChild(nameDiv);
+      tdNome.appendChild(emailDiv);
+      tr.appendChild(tdNome);
+
+      var tdNivel = document.createElement('td');
+      var roleBadge = document.createElement('span');
+      roleBadge.className = 'badge badge-blue';
+      roleBadge.textContent = ROLE_LABELS[u.role] || u.role;
+      tdNivel.appendChild(roleBadge);
+      if (u.is_admin) {
+        var adminBadge = document.createElement('span');
+        adminBadge.className = 'badge badge-purple';
+        adminBadge.style.marginLeft = '5px';
+        adminBadge.textContent = 'Admin';
+        tdNivel.appendChild(adminBadge);
+      }
+      tr.appendChild(tdNivel);
+
+      var tdStatus = document.createElement('td');
+      var statusBadge = document.createElement('span');
+      statusBadge.className = 'badge ' + (u.active ? 'badge-green' : 'badge-red');
+      statusBadge.textContent = u.active ? 'Ativo' : 'Inativo';
+      tdStatus.appendChild(statusBadge);
+      tr.appendChild(tdStatus);
+
+      var tdOnline = document.createElement('td');
+      var isOnline = !!(u.last_seen_at && (Date.now() - new Date(u.last_seen_at).getTime()) < ONLINE_THRESHOLD_MS);
+      var dot = document.createElement('span');
+      dot.className = 'presence-dot' + (isOnline ? ' online' : '');
+      tdOnline.appendChild(dot);
+      var onlineText = document.createElement('span');
+      if (isOnline) {
+        onlineText.textContent = 'Online agora';
+      } else {
+        var ago = timeAgoPT(u.last_seen_at);
+        onlineText.textContent = ago ? ('Offline (visto ' + ago + ')') : 'Offline';
+      }
+      tdOnline.appendChild(onlineText);
+      tr.appendChild(tdOnline);
+
+      var tdUltimo = document.createElement('td');
+      tdUltimo.textContent = u.last_sign_in_at ? formatStampDate(new Date(u.last_sign_in_at)) : 'Nunca acessou';
+      tr.appendChild(tdUltimo);
+
+      var tdCriado = document.createElement('td');
+      tdCriado.textContent = u.created_at ? formatStampDate(new Date(u.created_at)) : '';
+      tr.appendChild(tdCriado);
+
+      var tdAcao = document.createElement('td');
+      var isSelf = !!(myId && u.id === myId);
+      var toggleBtn = document.createElement('button');
+      toggleBtn.type = 'button';
+      toggleBtn.className = 'admin-user-toggle-btn' + (isSelf ? ' is-self' : '');
+      toggleBtn.disabled = isSelf;
+      if (isSelf) toggleBtn.title = 'Você não pode desativar seu próprio acesso';
+      toggleBtn.innerHTML = u.active
+        ? '<svg class="ic" style="width:13px;height:13px"><use href="#i-x"/></svg> Desativar'
+        : '<svg class="ic" style="width:13px;height:13px"><use href="#i-check"/></svg> Ativar';
+      toggleBtn.addEventListener('click', function () { toggleAdminUserActive(u); });
+      tdAcao.appendChild(toggleBtn);
+      tr.appendChild(tdAcao);
+
+      tbody.appendChild(tr);
+    });
+  }
+
+  async function toggleAdminUserActive(u) {
+    var novoStatus = !u.active;
+    var confirmMsg = novoStatus
+      ? 'Reativar o acesso de "' + (u.full_name || u.email) + '"?'
+      : 'Desativar o acesso de "' + (u.full_name || u.email) + '"? A pessoa não conseguirá mais entrar no portal até ser reativada.';
+    if (!confirm(confirmMsg)) return;
+    try {
+      var res = await supabase.rpc('admin_set_user_active', { target_id: u.id, new_active: novoStatus });
+      if (res.error) {
+        alert('Não foi possível atualizar o status: ' + res.error.message);
+        return;
+      }
+      u.active = novoStatus;
+      renderAdminUsersTable();
+    } catch (e) {
+      alert('Falha de conexão ao atualizar o status.');
+    }
+  }
+
+  var adminUsersSearchEl = document.getElementById('adminUsersSearch');
+  if (adminUsersSearchEl) adminUsersSearchEl.addEventListener('input', renderAdminUsersTable);
 </script>
 
 <script>
@@ -3066,6 +3291,14 @@
     if (page === 'home' && typeof renderMiniCalendar === 'function') { renderMiniCalendar(); }
     if (page === 'calendario' && typeof initCalendarioPage === 'function') { initCalendarioPage(); }
     if (page === 'noticia' && typeof renderNoticiaDetalhe === 'function') { renderNoticiaDetalhe(currentNoticiaId); }
+    if (page === 'admin' && typeof loadAdminUsuarios === 'function') {
+      loadAdminUsuarios();
+      if (adminUsersRefreshTimer) clearInterval(adminUsersRefreshTimer);
+      adminUsersRefreshTimer = setInterval(loadAdminUsuarios, 30000);
+    } else if (adminUsersRefreshTimer) {
+      clearInterval(adminUsersRefreshTimer);
+      adminUsersRefreshTimer = null;
+    }
     window.scrollTo(0,0);
   }
 
