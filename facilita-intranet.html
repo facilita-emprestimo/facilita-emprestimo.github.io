@@ -1169,6 +1169,11 @@
                 <input type="checkbox" id="comunicadoShowGate"> Mostrar na tela de entrada (aviso obrigatório ao logar)
               </label>
             </div>
+            <div class="login-field">
+              <label for="comunicadoExpiraEm">Data de expiração (opcional)</label>
+              <input type="date" id="comunicadoExpiraEm">
+              <div style="font-size:11.5px;color:var(--muted,#6B7280);margin-top:5px;">Depois dessa data, o comunicado deixa de aparecer na tela de entrada — mas continua no histórico de Comunicados normalmente.</div>
+            </div>
             <div style="display:flex;gap:10px;margin-top:16px;">
               <button type="submit" class="login-btn" style="width:auto;padding:11px 20px;">Salvar</button>
               <button type="button" class="login-btn" id="comunicadoCancel" style="width:auto;padding:11px 20px;background:#9CA3AF;">Cancelar</button>
@@ -2713,6 +2718,15 @@
     }).catch(function () {});
   }
 
+  function todayDateStr() {
+    var d = new Date();
+    return d.getFullYear() + '-' + pad2(d.getMonth() + 1) + '-' + pad2(d.getDate());
+  }
+  function isComunicadoExpirado(item) {
+    if (!item || !item.expira_em) return false;
+    return item.expira_em < todayDateStr();
+  }
+
   function formatDateBR(iso) {
     if (!iso) return '';
     if (/^\d{4}-\d{2}-\d{2}$/.test(iso)) {
@@ -3480,6 +3494,14 @@
     var footer = document.createElement('div');
     footer.className = 'doc-footer';
     footer.innerHTML = '<span><svg class="ic" style="width:13px;height:13px"><use href="#i-clock"/></svg> ' + formatDateBR(item.created_at) + '</span>';
+    if (item.expira_em) {
+      var expirado = isComunicadoExpirado(item);
+      var expiraSpan = document.createElement('span');
+      expiraSpan.style.color = expirado ? '#B91C2B' : 'var(--muted)';
+      expiraSpan.innerHTML = '<svg class="ic" style="width:13px;height:13px"><use href="#i-calendar"/></svg> ' +
+        (expirado ? 'Saiu da tela de entrada em ' : 'Na tela de entrada até ') + formatDateBR(item.expira_em);
+      footer.appendChild(expiraSpan);
+    }
     body.appendChild(footer);
 
     card.appendChild(body);
@@ -3531,6 +3553,7 @@
     document.getElementById('comunicadoLink').value = item ? (item.link_url || '') : '';
     document.getElementById('comunicadoShowGate').checked = item ? !!item.show_in_gate : false;
     document.getElementById('comunicadoImportante').checked = item ? !!item.importante : false;
+    document.getElementById('comunicadoExpiraEm').value = item && item.expira_em ? item.expira_em : '';
     comunicadoEditingAttachmentPath = item ? (item.attachment_path || null) : null;
     var comunicadoAnexoAtualEl = document.getElementById('comunicadoAnexoAtual');
     var comunicadoRemoveAnexoWrapEl = document.getElementById('comunicadoRemoveAnexoWrap');
@@ -3572,6 +3595,8 @@
       };
       var linkVal = document.getElementById('comunicadoLink').value.trim();
       payload.link_url = linkVal || null;
+      var expiraEmVal = document.getElementById('comunicadoExpiraEm').value;
+      payload.expira_em = expiraEmVal || null;
       var fileInput = document.getElementById('comunicadoAnexo');
       var file = fileInput.files[0];
       var removeChecked = document.getElementById('comunicadoRemoveAnexo').checked;
@@ -6266,8 +6291,8 @@
     var items = [];
     try {
       var res = await supabase.from('comunicados').select('*').eq('show_in_gate', true)
-        .order('importante', { ascending: false }).order('created_at', { ascending: false }).limit(8);
-      items = (res && res.data) || [];
+        .order('importante', { ascending: false }).order('created_at', { ascending: false }).limit(50);
+      items = ((res && res.data) || []).filter(function (item) { return !isComunicadoExpirado(item); }).slice(0, 8);
     } catch (e) {
       console.error('Erro ao carregar avisos da tela de entrada:', e);
       items = [];
