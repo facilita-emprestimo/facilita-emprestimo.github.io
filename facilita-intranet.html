@@ -203,6 +203,36 @@
   .doc-footer{display:flex;gap:16px;margin-top:10px;font-size:11.5px;color:var(--muted);}
   .doc-footer span{display:flex;align-items:center;gap:5px;}
 
+  /* ---------- ENQUETES ---------- */
+  .enquetes-list{display:flex;flex-direction:column;gap:12px;}
+  .enquete-card{background:#fff;border:1px solid var(--line);border-left:4px solid var(--line);border-radius:12px;padding:16px 20px;display:flex;gap:16px;align-items:center;flex-wrap:wrap;}
+  .enquete-card.status-respondida{border-left-color:#16A34A;}
+  .enquete-card.status-pendente{border-left-color:#FB8500;}
+  .enquete-card.status-encerrada{border-left-color:#9CA3AF;}
+  .enquete-card-body{flex:1;min-width:220px;}
+  .enquete-card-title{font-size:14.5px;font-weight:700;margin:0 0 4px;}
+  .enquete-card-desc{font-size:13px;color:var(--muted);margin:0 0 8px;line-height:1.5;}
+  .enquete-card-meta{display:flex;gap:14px;flex-wrap:wrap;font-size:11.5px;color:var(--muted);}
+  .enquete-card-meta span{display:flex;align-items:center;gap:5px;}
+  .enquete-card-badges{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px;}
+  .enquete-card-actions{display:flex;gap:8px;flex-shrink:0;flex-wrap:wrap;}
+  .badge-gray{background:#F3F4F6;color:#4B5563;}
+  .pergunta-editor{border:1px solid var(--line);border-radius:10px;padding:14px;background:var(--bg);}
+  .pergunta-editor-top{display:flex;gap:8px;align-items:flex-start;margin-bottom:10px;}
+  .pergunta-opcoes-list{display:flex;flex-direction:column;gap:6px;margin-top:8px;}
+  .pergunta-opcao-row{display:flex;gap:6px;align-items:center;}
+  .pergunta-opcao-row input[type="text"]{flex:1;}
+  .escala-row{display:flex;gap:10px;flex-wrap:wrap;}
+  .escala-opt{display:flex;flex-direction:column;align-items:center;gap:4px;font-size:12px;color:var(--muted);cursor:pointer;}
+  .escala-opt input{width:18px;height:18px;}
+  .resultado-bloco{border:1px solid var(--line);border-radius:10px;padding:14px 16px;}
+  .resultado-pergunta{font-size:13.5px;font-weight:700;margin:0 0 10px;}
+  .resultado-opcao-row{margin-bottom:8px;}
+  .resultado-opcao-top{display:flex;justify-content:space-between;font-size:12.5px;margin-bottom:4px;}
+  .resultado-bar-track{background:#EAECF0;border-radius:20px;height:8px;overflow:hidden;}
+  .resultado-bar-fill{background:var(--red);height:100%;border-radius:20px;}
+  .resultado-media{font-size:22px;font-weight:800;color:var(--ink-2);}
+
   /* ---------- NOTÍCIAS (capa com imagem/vídeo na Home + matéria completa) ---------- */
   .noticias-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:16px;}
   .noticia-card{background:#fff;border:1px solid var(--line);border-radius:12px;overflow:hidden;cursor:pointer;display:flex;flex-direction:column;transition:box-shadow .15s,transform .15s;}
@@ -588,6 +618,7 @@
   .fp-icon .thumb-mini-play{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.28);z-index:1;}
   .fp-icon .thumb-mini-play svg{width:8px;height:8px;}
   .folder-card-del{position:absolute;top:10px;right:10px;z-index:2;background:rgba(2,48,71,.38);border:none;color:#fff;cursor:pointer;padding:5px;border-radius:7px;display:flex;}
+  .folder-card-new-badge{position:absolute;top:8px;left:8px;background:#16A34A;color:#fff;font-size:10px;font-weight:800;letter-spacing:.3px;text-transform:uppercase;padding:3px 8px;border-radius:20px;z-index:2;box-shadow:0 2px 5px rgba(0,0,0,.25);}
   .folder-card-del:hover{color:#fff;background:#B91C2B;}
   .doc-file-list{display:flex;flex-direction:column;gap:10px;}
   .doc-file-row{background:#fff;border:1px solid var(--line);border-radius:12px;padding:14px 16px;display:flex;align-items:center;gap:14px;}
@@ -760,6 +791,7 @@
     <symbol id="i-eye" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></symbol>
     <symbol id="i-eye-off" viewBox="0 0 24 24"><path d="M17.94 17.94A10.94 10.94 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></symbol>
     <symbol id="i-target" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></symbol>
+    <symbol id="i-bar-chart" viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></symbol>
     <symbol id="i-swap" viewBox="0 0 24 24"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></symbol>
     <symbol id="i-message" viewBox="0 0 24 24"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></symbol>
     <symbol id="i-send" viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></symbol>
@@ -868,6 +900,10 @@
       <button class="nav-link" data-page="informativos" onclick="navigate('informativos')">
         <svg class="ic"><use href="#i-file"/></svg> Informativos
       </button>
+      <button class="nav-link" data-page="enquetes" onclick="navigate('enquetes')">
+        <svg class="ic"><use href="#i-bar-chart"/></svg> Enquetes
+        <span class="nav-badge" id="navEnquetesBadge" style="display:none;"></span>
+      </button>
       <div class="nav-caption">Materiais</div>
       <button class="nav-link" data-page="marketing" onclick="navigate('marketing')">
         <svg class="ic"><use href="#i-image"/></svg> Marketing
@@ -951,6 +987,13 @@
             <button class="tile" data-tile-label="Informativos" onclick="navigate('informativos')">
               <div class="tile-icon" style="background:var(--purple)"><svg class="ic" style="color:#fff"><use href="#i-file"/></svg></div>
               <div class="tile-label">Informativos</div>
+            </button>
+            <button class="tile" data-tile-label="Enquetes" onclick="navigate('enquetes')">
+              <div class="tile-icon" style="background:var(--cyan)">
+                <svg class="ic" style="color:#fff"><use href="#i-bar-chart"/></svg>
+                <span class="tile-badge" id="homeEnquetesBadge" style="display:none;"></span>
+              </div>
+              <div class="tile-label">Enquetes</div>
             </button>
             <button class="tile" data-tile-label="Marketing" onclick="navigate('marketing')">
               <div class="tile-icon" style="background:var(--pink)"><svg class="ic" style="color:#fff"><use href="#i-image"/></svg></div>
@@ -1259,6 +1302,105 @@
         </div>
       </div>
 
+      <!-- ================= ENQUETES ================= -->
+      <section class="page" id="page-enquetes">
+        <div class="breadcrumb">Portal Interno / <b>Enquetes</b></div>
+        <div class="page-header">
+          <div><h1>Enquetes e Pesquisas</h1><p>Participe das enquetes e pesquisas internas da Facilita.</p></div>
+          <div class="docs-toolbar" id="enquetesAdminActions" style="display:none;">
+            <button type="button" class="doc-action-btn" id="btnNewEnquete">
+              <svg class="ic" style="width:15px;height:15px"><use href="#i-plus"/></svg> Nova enquete
+            </button>
+          </div>
+        </div>
+
+        <div class="login-msg error" id="enquetesMsg" style="margin-bottom:16px;"></div>
+        <div id="enquetesList" class="enquetes-list"></div>
+        <div class="docs-empty" id="enquetesEmpty" style="display:none;">Nenhuma enquete disponível no momento.</div>
+      </section>
+
+      <!-- ============ MODAL: NOVA/EDITAR ENQUETE ============ -->
+      <div class="modal-overlay hidden" id="enqueteModal">
+        <div class="modal-card" style="max-width:660px;max-height:88vh;overflow-y:auto;">
+          <h3 id="enqueteModalTitle">Nova enquete</h3>
+          <div class="login-msg error" id="enqueteModalMsg"></div>
+          <form id="enqueteForm">
+            <input type="hidden" id="enqueteId">
+            <div class="login-field">
+              <label for="enqueteTitulo">Título</label>
+              <input type="text" id="enqueteTitulo" required>
+            </div>
+            <div class="login-field">
+              <label for="enqueteDescricao">Descrição (opcional)</label>
+              <textarea id="enqueteDescricao" rows="2" style="width:100%;box-sizing:border-box;border:1px solid var(--line);border-radius:9px;padding:10px 12px;font-family:inherit;font-size:13.5px;resize:vertical;"></textarea>
+            </div>
+            <div style="display:flex;gap:12px;">
+              <div class="login-field" style="flex:1;">
+                <label for="enqueteInicio">Data de início</label>
+                <input type="date" id="enqueteInicio">
+              </div>
+              <div class="login-field" style="flex:1;">
+                <label for="enqueteFim">Data de término (opcional)</label>
+                <input type="date" id="enqueteFim">
+              </div>
+            </div>
+            <div style="display:flex;gap:12px;align-items:flex-end;">
+              <div class="login-field" style="flex:1;">
+                <label for="enqueteStatus">Status</label>
+                <select id="enqueteStatus">
+                  <option value="rascunho">Rascunho (ainda não visível)</option>
+                  <option value="publicada">Publicada</option>
+                  <option value="encerrada">Encerrada</option>
+                </select>
+              </div>
+              <label class="gate-check-row" style="margin-bottom:16px;">
+                <input type="checkbox" id="enqueteObrigatoria"> Resposta obrigatória
+              </label>
+            </div>
+
+            <div class="login-msg error" id="enquetePerguntasMsg" style="display:none;"></div>
+            <div class="panel-title" style="margin-top:8px;">
+              <h3>Perguntas</h3>
+              <button type="button" class="link-more" id="btnAddPergunta">+ Adicionar pergunta</button>
+            </div>
+            <div id="enquetePerguntasList" style="display:flex;flex-direction:column;gap:12px;margin-bottom:8px;"></div>
+
+            <div style="display:flex;gap:10px;margin-top:16px;">
+              <button type="submit" class="login-btn" style="width:auto;padding:11px 20px;">Salvar</button>
+              <button type="button" class="login-btn" id="enqueteCancel" style="width:auto;padding:11px 20px;background:#9CA3AF;">Cancelar</button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- ============ MODAL: RESPONDER ENQUETE ============ -->
+      <div class="modal-overlay hidden" id="enqueteResponderModal">
+        <div class="modal-card" style="max-width:640px;max-height:88vh;overflow-y:auto;">
+          <h3 id="enqueteResponderTitle">Responder enquete</h3>
+          <p id="enqueteResponderDesc" style="color:var(--muted);font-size:13px;margin:-8px 0 16px;"></p>
+          <div class="login-msg error" id="enqueteResponderMsg"></div>
+          <form id="enqueteResponderForm">
+            <div id="enqueteResponderPerguntas" style="display:flex;flex-direction:column;gap:18px;"></div>
+            <div style="display:flex;gap:10px;margin-top:20px;">
+              <button type="submit" class="login-btn" style="width:auto;padding:11px 20px;">Enviar respostas</button>
+              <button type="button" class="login-btn" id="enqueteResponderCancel" style="width:auto;padding:11px 20px;background:#9CA3AF;">Cancelar</button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- ============ MODAL: RESULTADOS DA ENQUETE ============ -->
+      <div class="modal-overlay hidden" id="enqueteResultadosModal">
+        <div class="modal-card" style="max-width:640px;max-height:88vh;overflow-y:auto;">
+          <h3 id="enqueteResultadosTitle">Resultados</h3>
+          <div class="login-msg error" id="enqueteResultadosMsg" style="display:none;"></div>
+          <div id="enqueteResultadosBody" style="display:flex;flex-direction:column;gap:20px;"></div>
+          <div style="display:flex;gap:10px;margin-top:20px;">
+            <button type="button" class="login-btn" id="enqueteResultadosClose" style="width:auto;padding:11px 20px;background:#9CA3AF;">Fechar</button>
+          </div>
+        </div>
+      </div>
+
       <!-- ================= DOCUMENTOS ================= -->
       <section class="page" id="page-documentos">
         <div class="breadcrumb">Portal Interno / <b id="docsAreaCrumb">Documentos</b></div>
@@ -1278,6 +1420,10 @@
           <div class="docs-main">
             <div id="docsBreadcrumb" class="docs-breadcrumb" style="display:none;"></div>
             <div class="login-msg error" id="docsMsg" style="margin-bottom:16px;"></div>
+            <div class="module-search-wrap" style="max-width:420px;">
+              <svg class="ic module-search-ic"><use href="#i-search"/></svg>
+              <input type="text" id="docsSearchInput" placeholder="Buscar pastas e arquivos..." oninput="filterDocsView(this.value)">
+            </div>
 
             <div id="docsFolderView">
               <div id="docsFolderGrid" class="folder-grid"></div>
@@ -2103,7 +2249,8 @@
     { key: 'calendario.gerenciar', label: 'Gerenciar calendário' },
     { key: 'chamados.gerenciar', label: 'Responder/gerenciar chamados' },
     { key: 'colaboradores.gerenciar', label: 'Editar colaboradores' },
-    { key: 'unidades.gerenciar', label: 'Editar lojas' }
+    { key: 'unidades.gerenciar', label: 'Editar lojas' },
+    { key: 'enquetes.gerenciar', label: 'Criar enquetes/pesquisas' }
   ];
   // { 'comunicados.gerenciar': { rh_dp: true, financeiro: false, ... }, ... }
   var rolePermissions = {};
@@ -2244,6 +2391,7 @@
       if (typeof updateTarefasBadges === 'function') updateTarefasBadges();
       if (typeof updateChamadosBadges === 'function') updateChamadosBadges();
       if (typeof updatePlanosBadges === 'function') updatePlanosBadges();
+      if (typeof updateEnquetesBadges === 'function') updateEnquetesBadges();
       startPresenceHeartbeat();
     } else {
       appState.session = null;
@@ -2932,6 +3080,16 @@
     cover.appendChild(coverIcon);
     card.appendChild(cover);
 
+    if (previewDocs && previewDocs[0] && previewDocs[0].created_at) {
+      var ageMs = Date.now() - new Date(previewDocs[0].created_at).getTime();
+      if (ageMs >= 0 && ageMs < 14 * 24 * 60 * 60 * 1000) {
+        var newBadge = document.createElement('div');
+        newBadge.className = 'folder-card-new-badge';
+        newBadge.textContent = 'Novo';
+        cover.appendChild(newBadge);
+      }
+    }
+
     // Se algum arquivo recente da pasta for imagem ou vídeo, usa uma prévia real como capa
     // (para vídeo, captura um quadro automaticamente e mostra um ícone de "play").
     var coverDoc = (previewDocs || []).find(function (d) {
@@ -3045,6 +3203,8 @@
   async function loadRootFolders() {
     if (!appState.session) return;
     setDocsMsg('');
+    var docsSearchEl = document.getElementById('docsSearchInput');
+    if (docsSearchEl) docsSearchEl.value = '';
     docsState.path = [];
     var toolbar = document.getElementById('docsAdminActions');
     if (toolbar) toolbar.style.display = (appState.profile && appState.profile.is_admin) ? 'flex' : 'none';
@@ -3111,6 +3271,8 @@
 
   async function renderInsideFolder(folderId) {
     setDocsMsg('');
+    var docsSearchEl2 = document.getElementById('docsSearchInput');
+    if (docsSearchEl2) docsSearchEl2.value = '';
     document.getElementById('docsFolderView').style.display = 'none';
     document.getElementById('docsInsideView').style.display = '';
     var toolbar = document.getElementById('docsAdminActions');
@@ -3417,6 +3579,30 @@
     return String(s || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
   }
 
+  function filterDocsView(query) {
+    var q = normalizeSearchText(query).trim();
+    var folderViewVisible = document.getElementById('docsFolderView').style.display !== 'none';
+    var grids = folderViewVisible
+      ? [document.getElementById('docsFolderGrid')]
+      : [document.getElementById('docsSubfolderGrid')];
+    grids.forEach(function (grid) {
+      if (!grid) return;
+      grid.querySelectorAll('.folder-card').forEach(function (card) {
+        var nameEl = card.querySelector('.folder-card-name');
+        var name = normalizeSearchText(nameEl ? nameEl.textContent : '');
+        card.style.display = (!q || name.indexOf(q) !== -1) ? '' : 'none';
+      });
+    });
+    if (!folderViewVisible) {
+      var rows = document.querySelectorAll('#docsFileList .doc-file-row');
+      rows.forEach(function (row) {
+        var nameEl = row.querySelector('.doc-file-name');
+        var name = normalizeSearchText(nameEl ? nameEl.textContent : '');
+        row.style.display = (!q || name.indexOf(q) !== -1) ? '' : 'none';
+      });
+    }
+  }
+
   function filterHomeModules(query) {
     var grid = document.getElementById('homeTileGrid');
     var emptyEl = document.getElementById('homeTileEmpty');
@@ -3451,6 +3637,7 @@
       loadRootFolders();
     }
     if (page === 'comunicados' && typeof loadComunicados === 'function') { loadComunicados(); }
+    if (page === 'enquetes' && typeof loadEnquetes === 'function') { loadEnquetes(); }
     if (page === 'informativos' && typeof loadInformativos === 'function') { loadInformativos(); }
     if (page === 'unidades' && typeof initUnidadesPage === 'function') { initUnidadesPage(); }
     if (page === 'tarefas' && typeof loadTarefas === 'function') { loadTarefas(); }
@@ -6382,6 +6569,662 @@
         var res2 = await supabase.from('planos_acao').select('id, status, quem_fara').eq('quem_fara', uid).in('status', ['novo', 'em_andamento']);
         count = ((res2 && res2.data) || []).length;
       }
+      if (homeBadge) { if (count > 0) { homeBadge.textContent = count; homeBadge.style.display = 'flex'; } else { homeBadge.style.display = 'none'; } }
+      if (navBadge) { if (count > 0) { navBadge.textContent = count; navBadge.style.display = 'flex'; } else { navBadge.style.display = 'none'; } }
+    } catch (e) {
+      if (homeBadge) homeBadge.style.display = 'none';
+      if (navBadge) navBadge.style.display = 'none';
+    }
+  }
+
+  // ---------------- Enquetes e Pesquisas ----------------
+  var enquetesMsgEl = document.getElementById('enquetesMsg');
+  var enqueteModal = document.getElementById('enqueteModal');
+  var enqueteForm = document.getElementById('enqueteForm');
+  var enqueteModalMsg = document.getElementById('enqueteModalMsg');
+  var enqueteModalTitle = document.getElementById('enqueteModalTitle');
+  var btnNewEnquete = document.getElementById('btnNewEnquete');
+  var enqueteCancel = document.getElementById('enqueteCancel');
+  var enquetesCache = [];
+  var enquetePerguntasEditing = [];
+  var enquetePerguntasLocked = false;
+  var PERGUNTA_TIPO_LABELS = { unica: 'Escolha única', multipla: 'Múltipla escolha', texto: 'Texto livre', escala: 'Escala (1 a 5)' };
+
+  function fmtDateBR(iso) {
+    if (!iso) return '';
+    var p = iso.split('-');
+    return p.length === 3 ? (p[2] + '/' + p[1] + '/' + p[0]) : iso;
+  }
+
+  function enqueteStatusInfo(item, respondida) {
+    var hoje = new Date().toISOString().slice(0, 10);
+    if (item.status === 'encerrada' || (item.ends_at && item.ends_at < hoje)) {
+      return { key: 'encerrada', label: 'Encerrada', badgeClass: 'badge-gray' };
+    }
+    if (respondida) return { key: 'respondida', label: 'Respondida', badgeClass: 'badge-green' };
+    return { key: 'pendente', label: 'Pendente', badgeClass: 'badge-orange' };
+  }
+
+  function buildEnqueteCard(item, respondida) {
+    var isAdmin = hasPermission('enquetes.gerenciar');
+    var status = enqueteStatusInfo(item, respondida);
+    var card = document.createElement('div');
+    card.className = 'enquete-card status-' + status.key;
+
+    var body = document.createElement('div');
+    body.className = 'enquete-card-body';
+
+    var badgesRow = document.createElement('div');
+    badgesRow.className = 'enquete-card-badges';
+    var statusBadge = document.createElement('span');
+    statusBadge.className = 'badge ' + status.badgeClass;
+    statusBadge.textContent = status.label;
+    badgesRow.appendChild(statusBadge);
+    if (item.obrigatoria) {
+      var obrBadge = document.createElement('span');
+      obrBadge.className = 'badge badge-blue';
+      obrBadge.textContent = 'Obrigatória';
+      badgesRow.appendChild(obrBadge);
+    }
+    body.appendChild(badgesRow);
+
+    var title = document.createElement('p');
+    title.className = 'enquete-card-title';
+    title.textContent = item.title;
+    body.appendChild(title);
+
+    if (item.description) {
+      var desc = document.createElement('p');
+      desc.className = 'enquete-card-desc';
+      desc.textContent = item.description;
+      body.appendChild(desc);
+    }
+
+    if (item.starts_at || item.ends_at) {
+      var meta = document.createElement('div');
+      meta.className = 'enquete-card-meta';
+      var period = document.createElement('span');
+      period.innerHTML = '<svg class="ic" style="width:13px;height:13px"><use href="#i-calendar"/></svg>';
+      var txt = item.starts_at ? fmtDateBR(item.starts_at) : '';
+      if (item.ends_at) txt += (txt ? ' — ' : '') + fmtDateBR(item.ends_at);
+      period.appendChild(document.createTextNode(txt));
+      meta.appendChild(period);
+      body.appendChild(meta);
+    }
+    card.appendChild(body);
+
+    var actions = document.createElement('div');
+    actions.className = 'enquete-card-actions';
+    if (respondida || status.key === 'encerrada') {
+      var resultBtn = document.createElement('button');
+      resultBtn.type = 'button';
+      resultBtn.className = 'doc-action-btn';
+      resultBtn.innerHTML = '<svg class="ic" style="width:14px;height:14px"><use href="#i-bar-chart"/></svg> Ver resultados';
+      resultBtn.addEventListener('click', function () { openResultadosModal(item); });
+      actions.appendChild(resultBtn);
+    } else {
+      var responderBtn = document.createElement('button');
+      responderBtn.type = 'button';
+      responderBtn.className = 'doc-action-btn';
+      responderBtn.textContent = 'Responder';
+      responderBtn.addEventListener('click', function () { openResponderModal(item); });
+      actions.appendChild(responderBtn);
+    }
+    if (isAdmin) {
+      actions.appendChild(buildActionBtn('i-edit', 'Editar', function () { openEnqueteModal(item); }));
+      actions.appendChild(buildActionBtn('i-trash', 'Excluir', function () { deleteEnquete(item); }));
+    }
+    card.appendChild(actions);
+    return card;
+  }
+
+  async function loadEnquetes() {
+    if (!appState.session) return;
+    hideMsgEl(enquetesMsgEl);
+    var toolbar = document.getElementById('enquetesAdminActions');
+    if (toolbar) toolbar.style.display = hasPermission('enquetes.gerenciar') ? 'flex' : 'none';
+
+    var res = await supabase.from('enquetes').select('*').order('created_at', { ascending: false });
+    if (res.error) { showMsgEl(enquetesMsgEl, 'Não foi possível carregar as enquetes.', 'error'); return; }
+    var items = res.data || [];
+    enquetesCache = items;
+
+    var uid = appState.session.user.id;
+    var respRes = await supabase.from('enquete_respostas').select('enquete_id').eq('user_id', uid);
+    var respondidaIds = {};
+    (respRes.data || []).forEach(function (r) { respondidaIds[r.enquete_id] = true; });
+
+    var listEl = document.getElementById('enquetesList');
+    var emptyEl = document.getElementById('enquetesEmpty');
+    listEl.innerHTML = '';
+    if (!items.length) { emptyEl.style.display = 'block'; return; }
+    emptyEl.style.display = 'none';
+    items.forEach(function (item) {
+      listEl.appendChild(buildEnqueteCard(item, !!respondidaIds[item.id]));
+    });
+  }
+
+  function buildPerguntaEditorNode(data, index) {
+    var wrap = document.createElement('div');
+    wrap.className = 'pergunta-editor';
+
+    var top = document.createElement('div');
+    top.className = 'pergunta-editor-top';
+    var texto = document.createElement('input');
+    texto.type = 'text';
+    texto.placeholder = 'Texto da pergunta';
+    texto.value = data.texto || '';
+    texto.style.flex = '1';
+    texto.disabled = enquetePerguntasLocked;
+    texto.addEventListener('input', function () { enquetePerguntasEditing[index].texto = texto.value; });
+    top.appendChild(texto);
+
+    var tipoSel = document.createElement('select');
+    tipoSel.style.width = '170px';
+    tipoSel.disabled = enquetePerguntasLocked;
+    ['unica', 'multipla', 'texto', 'escala'].forEach(function (t) {
+      var opt = document.createElement('option');
+      opt.value = t; opt.textContent = PERGUNTA_TIPO_LABELS[t];
+      if (t === data.tipo) opt.selected = true;
+      tipoSel.appendChild(opt);
+    });
+    tipoSel.addEventListener('change', function () {
+      enquetePerguntasEditing[index].tipo = tipoSel.value;
+      if ((tipoSel.value === 'unica' || tipoSel.value === 'multipla') && !enquetePerguntasEditing[index].opcoes) {
+        enquetePerguntasEditing[index].opcoes = ['', ''];
+      }
+      renderPerguntasEditor();
+    });
+    top.appendChild(tipoSel);
+
+    if (!enquetePerguntasLocked) {
+      var delBtn = document.createElement('button');
+      delBtn.type = 'button';
+      delBtn.className = 'folder-card-del';
+      delBtn.style.position = 'static';
+      delBtn.title = 'Remover pergunta';
+      delBtn.innerHTML = '<svg class="ic" style="width:14px;height:14px"><use href="#i-trash"/></svg>';
+      delBtn.addEventListener('click', function () {
+        enquetePerguntasEditing.splice(index, 1);
+        renderPerguntasEditor();
+      });
+      top.appendChild(delBtn);
+    }
+    wrap.appendChild(top);
+
+    var obrRow = document.createElement('label');
+    obrRow.className = 'gate-check-row';
+    obrRow.style.marginBottom = '8px';
+    var obrCheck = document.createElement('input');
+    obrCheck.type = 'checkbox';
+    obrCheck.checked = data.obrigatoria !== false;
+    obrCheck.disabled = enquetePerguntasLocked;
+    obrCheck.addEventListener('change', function () { enquetePerguntasEditing[index].obrigatoria = obrCheck.checked; });
+    obrRow.appendChild(obrCheck);
+    obrRow.appendChild(document.createTextNode('Obrigatória'));
+    wrap.appendChild(obrRow);
+
+    if (data.tipo === 'unica' || data.tipo === 'multipla') {
+      var opcoesWrap = document.createElement('div');
+      opcoesWrap.className = 'pergunta-opcoes-list';
+      (data.opcoes || []).forEach(function (opt, oi) {
+        var row = document.createElement('div');
+        row.className = 'pergunta-opcao-row';
+        var input = document.createElement('input');
+        input.type = 'text';
+        input.value = opt;
+        input.placeholder = 'Opção ' + (oi + 1);
+        input.disabled = enquetePerguntasLocked;
+        input.addEventListener('input', function () { enquetePerguntasEditing[index].opcoes[oi] = input.value; });
+        row.appendChild(input);
+        if (!enquetePerguntasLocked) {
+          var rm = document.createElement('button');
+          rm.type = 'button';
+          rm.className = 'folder-card-del';
+          rm.style.position = 'static';
+          rm.innerHTML = '<svg class="ic" style="width:13px;height:13px"><use href="#i-x"/></svg>';
+          rm.addEventListener('click', function () {
+            enquetePerguntasEditing[index].opcoes.splice(oi, 1);
+            renderPerguntasEditor();
+          });
+          row.appendChild(rm);
+        }
+        opcoesWrap.appendChild(row);
+      });
+      if (!enquetePerguntasLocked) {
+        var addOptBtn = document.createElement('button');
+        addOptBtn.type = 'button';
+        addOptBtn.className = 'link-more';
+        addOptBtn.textContent = '+ Adicionar opção';
+        addOptBtn.style.textAlign = 'left';
+        addOptBtn.addEventListener('click', function () {
+          if (!enquetePerguntasEditing[index].opcoes) enquetePerguntasEditing[index].opcoes = [];
+          enquetePerguntasEditing[index].opcoes.push('');
+          renderPerguntasEditor();
+        });
+        opcoesWrap.appendChild(addOptBtn);
+      }
+      wrap.appendChild(opcoesWrap);
+    }
+
+    return wrap;
+  }
+
+  function renderPerguntasEditor() {
+    var listEl = document.getElementById('enquetePerguntasList');
+    listEl.innerHTML = '';
+    enquetePerguntasEditing.forEach(function (data, index) {
+      listEl.appendChild(buildPerguntaEditorNode(data, index));
+    });
+    var addBtn = document.getElementById('btnAddPergunta');
+    if (addBtn) addBtn.style.display = enquetePerguntasLocked ? 'none' : '';
+    var lockMsg = document.getElementById('enquetePerguntasMsg');
+    if (lockMsg) {
+      if (enquetePerguntasLocked) {
+        lockMsg.style.display = 'block';
+        lockMsg.className = 'login-msg show error';
+        lockMsg.textContent = 'Esta enquete já recebeu respostas — as perguntas não podem mais ser alteradas. Você ainda pode editar título, descrição, datas e status.';
+      } else {
+        lockMsg.style.display = 'none';
+      }
+    }
+  }
+
+  async function openEnqueteModal(item) {
+    hideMsgEl(enqueteModalMsg);
+    enqueteForm.reset();
+    document.getElementById('enqueteId').value = item ? item.id : '';
+    enqueteModalTitle.textContent = item ? 'Editar enquete' : 'Nova enquete';
+    document.getElementById('enqueteTitulo').value = item ? item.title : '';
+    document.getElementById('enqueteDescricao').value = item ? (item.description || '') : '';
+    document.getElementById('enqueteInicio').value = item && item.starts_at ? item.starts_at : '';
+    document.getElementById('enqueteFim').value = item && item.ends_at ? item.ends_at : '';
+    document.getElementById('enqueteStatus').value = item ? item.status : 'rascunho';
+    document.getElementById('enqueteObrigatoria').checked = item ? !!item.obrigatoria : false;
+
+    enquetePerguntasLocked = false;
+    enquetePerguntasEditing = [];
+
+    if (item) {
+      var respCountRes = await supabase.from('enquete_respostas').select('id', { count: 'exact', head: true }).eq('enquete_id', item.id);
+      enquetePerguntasLocked = (respCountRes.count || 0) > 0;
+
+      var perguntasRes = await supabase.from('enquete_perguntas').select('*').eq('enquete_id', item.id).order('ordem');
+      enquetePerguntasEditing = (perguntasRes.data || []).map(function (p) {
+        return { id: p.id, texto: p.texto, tipo: p.tipo, obrigatoria: p.obrigatoria, opcoes: (p.opcoes || []).slice() };
+      });
+    }
+    renderPerguntasEditor();
+    enqueteModal.classList.remove('hidden');
+  }
+
+  if (btnNewEnquete) btnNewEnquete.addEventListener('click', function () { openEnqueteModal(null); });
+  if (enqueteCancel) enqueteCancel.addEventListener('click', function () { enqueteModal.classList.add('hidden'); });
+  var btnAddPerguntaEl = document.getElementById('btnAddPergunta');
+  if (btnAddPerguntaEl) {
+    btnAddPerguntaEl.addEventListener('click', function () {
+      enquetePerguntasEditing.push({ texto: '', tipo: 'unica', obrigatoria: true, opcoes: ['', ''] });
+      renderPerguntasEditor();
+    });
+  }
+
+  if (enqueteForm) {
+    enqueteForm.addEventListener('submit', async function (e) {
+      e.preventDefault();
+      hideMsgEl(enqueteModalMsg);
+      var id = document.getElementById('enqueteId').value;
+      var titulo = document.getElementById('enqueteTitulo').value.trim();
+      if (!titulo) { showMsgEl(enqueteModalMsg, 'Informe um título.', 'error'); return; }
+
+      if (!enquetePerguntasLocked) {
+        for (var i = 0; i < enquetePerguntasEditing.length; i++) {
+          var pg = enquetePerguntasEditing[i];
+          if (!pg.texto || !pg.texto.trim()) { showMsgEl(enqueteModalMsg, 'Preencha o texto de todas as perguntas.', 'error'); return; }
+          if (pg.tipo === 'unica' || pg.tipo === 'multipla') {
+            var validOpts = (pg.opcoes || []).filter(function (o) { return o && o.trim(); });
+            if (validOpts.length < 2) { showMsgEl(enqueteModalMsg, 'Perguntas de escolha precisam de ao menos 2 opções preenchidas.', 'error'); return; }
+          }
+        }
+      }
+
+      var payload = {
+        title: titulo,
+        description: document.getElementById('enqueteDescricao').value.trim() || null,
+        starts_at: document.getElementById('enqueteInicio').value || null,
+        ends_at: document.getElementById('enqueteFim').value || null,
+        status: document.getElementById('enqueteStatus').value,
+        obrigatoria: document.getElementById('enqueteObrigatoria').checked,
+        updated_at: new Date().toISOString()
+      };
+
+      var enqueteId = id;
+      var res;
+      if (id) {
+        res = await supabase.from('enquetes').update(payload).eq('id', id);
+      } else {
+        payload.created_by = appState.session.user.id;
+        res = await supabase.from('enquetes').insert(payload).select('id').single();
+        if (!res.error) enqueteId = res.data.id;
+      }
+      if (res.error) { showMsgEl(enqueteModalMsg, 'Não foi possível salvar a enquete.', 'error'); return; }
+
+      if (!enquetePerguntasLocked) {
+        if (id) {
+          await supabase.from('enquete_perguntas').delete().eq('enquete_id', enqueteId);
+        }
+        var rows = enquetePerguntasEditing.map(function (pg, idx) {
+          var row = { enquete_id: enqueteId, ordem: idx, texto: pg.texto.trim(), tipo: pg.tipo, obrigatoria: pg.obrigatoria !== false };
+          row.opcoes = (pg.tipo === 'unica' || pg.tipo === 'multipla') ? (pg.opcoes || []).filter(function (o) { return o && o.trim(); }) : null;
+          return row;
+        });
+        if (rows.length) {
+          var pgRes = await supabase.from('enquete_perguntas').insert(rows);
+          if (pgRes.error) { showMsgEl(enqueteModalMsg, 'Enquete salva, mas houve um erro ao salvar as perguntas.', 'error'); return; }
+        }
+      }
+
+      enqueteModal.classList.add('hidden');
+      loadEnquetes();
+      updateEnquetesBadges();
+    });
+  }
+
+  async function deleteEnquete(item) {
+    if (!confirm('Excluir a enquete "' + item.title + '"? Todas as respostas também serão apagadas. Esta ação não pode ser desfeita.')) return;
+    var res = await supabase.from('enquetes').delete().eq('id', item.id);
+    if (res.error) { alert('Não foi possível excluir a enquete.'); return; }
+    loadEnquetes();
+    updateEnquetesBadges();
+  }
+
+  // ---------------- Enquetes: responder ----------------
+  var enqueteResponderModal = document.getElementById('enqueteResponderModal');
+  var enqueteResponderForm = document.getElementById('enqueteResponderForm');
+  var enqueteResponderMsg = document.getElementById('enqueteResponderMsg');
+  var enqueteResponderCancel = document.getElementById('enqueteResponderCancel');
+  var enqueteRespondendoAtual = null;
+  var enqueteRespondendoPerguntas = [];
+
+  function buildResponderPerguntaNode(pg, idx) {
+    var box = document.createElement('div');
+    var label = document.createElement('p');
+    label.style.cssText = 'font-size:13.5px;font-weight:700;margin:0 0 8px;';
+    label.textContent = (idx + 1) + '. ' + pg.texto + (pg.obrigatoria ? ' *' : '');
+    box.appendChild(label);
+
+    if (pg.tipo === 'texto') {
+      var ta = document.createElement('textarea');
+      ta.id = 'resp_' + pg.id;
+      ta.rows = 3;
+      ta.style.cssText = 'width:100%;box-sizing:border-box;border:1px solid var(--line);border-radius:9px;padding:10px 12px;font-family:inherit;font-size:13.5px;resize:vertical;';
+      box.appendChild(ta);
+    } else if (pg.tipo === 'escala') {
+      var row = document.createElement('div');
+      row.className = 'escala-row';
+      for (var n = 1; n <= 5; n++) {
+        var opt = document.createElement('label');
+        opt.className = 'escala-opt';
+        var input = document.createElement('input');
+        input.type = 'radio';
+        input.name = 'resp_' + pg.id;
+        input.value = n;
+        opt.appendChild(input);
+        opt.appendChild(document.createTextNode(String(n)));
+        row.appendChild(opt);
+      }
+      box.appendChild(row);
+    } else {
+      (pg.opcoes || []).forEach(function (opt) {
+        var optRow = document.createElement('label');
+        optRow.className = 'gate-check-row';
+        optRow.style.marginBottom = '6px';
+        var input = document.createElement('input');
+        input.type = pg.tipo === 'multipla' ? 'checkbox' : 'radio';
+        input.name = 'resp_' + pg.id;
+        input.value = opt;
+        optRow.appendChild(input);
+        optRow.appendChild(document.createTextNode(opt));
+        box.appendChild(optRow);
+      });
+    }
+    return box;
+  }
+
+  async function openResponderModal(item) {
+    hideMsgEl(enqueteResponderMsg);
+    enqueteRespondendoAtual = item;
+    document.getElementById('enqueteResponderTitle').textContent = item.title;
+    document.getElementById('enqueteResponderDesc').textContent = item.description || '';
+
+    var res = await supabase.from('enquete_perguntas').select('*').eq('enquete_id', item.id).order('ordem');
+    enqueteRespondendoPerguntas = res.data || [];
+
+    var wrap = document.getElementById('enqueteResponderPerguntas');
+    wrap.innerHTML = '';
+    if (!enqueteRespondendoPerguntas.length) {
+      wrap.innerHTML = '<p style="color:var(--muted);font-size:13px;">Esta enquete ainda não tem perguntas.</p>';
+    } else {
+      enqueteRespondendoPerguntas.forEach(function (pg, idx) {
+        wrap.appendChild(buildResponderPerguntaNode(pg, idx));
+      });
+    }
+    enqueteResponderModal.classList.remove('hidden');
+  }
+
+  if (enqueteResponderCancel) enqueteResponderCancel.addEventListener('click', function () { enqueteResponderModal.classList.add('hidden'); });
+
+  if (enqueteResponderForm) {
+    enqueteResponderForm.addEventListener('submit', async function (e) {
+      e.preventDefault();
+      hideMsgEl(enqueteResponderMsg);
+      var itens = [];
+      for (var i = 0; i < enqueteRespondendoPerguntas.length; i++) {
+        var pg = enqueteRespondendoPerguntas[i];
+        var item = { pergunta_id: pg.id };
+        if (pg.tipo === 'texto') {
+          var valEl = document.getElementById('resp_' + pg.id);
+          var val = valEl ? valEl.value.trim() : '';
+          if (pg.obrigatoria && !val) { showMsgEl(enqueteResponderMsg, 'Responda a pergunta ' + (i + 1) + '.', 'error'); return; }
+          if (!val) continue;
+          item.valor_texto = val;
+        } else if (pg.tipo === 'escala') {
+          var checked = enqueteResponderForm.querySelector('input[name="resp_' + pg.id + '"]:checked');
+          if (pg.obrigatoria && !checked) { showMsgEl(enqueteResponderMsg, 'Responda a pergunta ' + (i + 1) + '.', 'error'); return; }
+          if (!checked) continue;
+          item.valor_escala = parseInt(checked.value, 10);
+        } else {
+          var checks = enqueteResponderForm.querySelectorAll('input[name="resp_' + pg.id + '"]:checked');
+          var vals = Array.prototype.map.call(checks, function (c) { return c.value; });
+          if (pg.obrigatoria && !vals.length) { showMsgEl(enqueteResponderMsg, 'Responda a pergunta ' + (i + 1) + '.', 'error'); return; }
+          if (!vals.length) continue;
+          item.valor_opcoes = vals;
+        }
+        itens.push(item);
+      }
+
+      var submitBtn = enqueteResponderForm.querySelector('button[type="submit"]');
+      if (submitBtn) submitBtn.disabled = true;
+
+      var respRes = await supabase.from('enquete_respostas').insert({
+        enquete_id: enqueteRespondendoAtual.id,
+        user_id: appState.session.user.id
+      }).select('id').single();
+
+      if (respRes.error) {
+        showMsgEl(enqueteResponderMsg, respRes.error.code === '23505' ? 'Você já respondeu esta enquete.' : 'Não foi possível registrar sua resposta.', 'error');
+        if (submitBtn) submitBtn.disabled = false;
+        return;
+      }
+
+      var respostaId = respRes.data.id;
+      itens.forEach(function (it) { it.resposta_id = respostaId; });
+      if (itens.length) {
+        var itensRes = await supabase.from('enquete_resposta_itens').insert(itens);
+        if (itensRes.error) {
+          showMsgEl(enqueteResponderMsg, 'Sua resposta foi registrada, mas houve um erro ao salvar alguns itens.', 'error');
+          if (submitBtn) submitBtn.disabled = false;
+          return;
+        }
+      }
+
+      if (submitBtn) submitBtn.disabled = false;
+      enqueteResponderModal.classList.add('hidden');
+      loadEnquetes();
+      updateEnquetesBadges();
+    });
+  }
+
+  // ---------------- Enquetes: resultados ----------------
+  var enqueteResultadosModal = document.getElementById('enqueteResultadosModal');
+  var enqueteResultadosClose = document.getElementById('enqueteResultadosClose');
+  if (enqueteResultadosClose) enqueteResultadosClose.addEventListener('click', function () { enqueteResultadosModal.classList.add('hidden'); });
+
+  function buildResultadoBloco(pg, textoAnswers) {
+    var box = document.createElement('div');
+    box.className = 'resultado-bloco';
+    var title = document.createElement('p');
+    title.className = 'resultado-pergunta';
+    title.textContent = pg.texto;
+    box.appendChild(title);
+
+    if (pg.tipo === 'unica' || pg.tipo === 'multipla') {
+      var total = pg.total_respostas || 0;
+      (pg.opcoes || []).forEach(function (opt) {
+        var pct = total > 0 ? Math.round((opt.count / total) * 100) : 0;
+        var row = document.createElement('div');
+        row.className = 'resultado-opcao-row';
+        var top = document.createElement('div');
+        top.className = 'resultado-opcao-top';
+        var leftSpan = document.createElement('span');
+        leftSpan.textContent = opt.opcao;
+        var rightSpan = document.createElement('span');
+        rightSpan.textContent = opt.count + ' (' + pct + '%)';
+        top.appendChild(leftSpan);
+        top.appendChild(rightSpan);
+        row.appendChild(top);
+        var track = document.createElement('div');
+        track.className = 'resultado-bar-track';
+        var fill = document.createElement('div');
+        fill.className = 'resultado-bar-fill';
+        fill.style.width = pct + '%';
+        track.appendChild(fill);
+        row.appendChild(track);
+        box.appendChild(row);
+      });
+      var totalLabel = document.createElement('p');
+      totalLabel.style.cssText = 'font-size:11.5px;color:var(--muted);margin:8px 0 0;';
+      totalLabel.textContent = total + (total === 1 ? ' resposta' : ' respostas');
+      box.appendChild(totalLabel);
+    } else if (pg.tipo === 'escala') {
+      var mediaWrap = document.createElement('div');
+      mediaWrap.style.cssText = 'display:flex;align-items:baseline;gap:8px;margin-bottom:10px;';
+      var media = document.createElement('span');
+      media.className = 'resultado-media';
+      media.textContent = pg.escala_media || 0;
+      mediaWrap.appendChild(media);
+      var mediaSub = document.createElement('span');
+      mediaSub.style.cssText = 'font-size:12px;color:var(--muted);';
+      mediaSub.textContent = 'média de ' + (pg.total_respostas || 0) + (pg.total_respostas === 1 ? ' resposta' : ' respostas');
+      mediaWrap.appendChild(mediaSub);
+      box.appendChild(mediaWrap);
+
+      var dist = pg.escala_dist || {};
+      var maxCount = 1;
+      Object.keys(dist).forEach(function (k) { if (dist[k] > maxCount) maxCount = dist[k]; });
+      for (var n = 1; n <= 5; n++) {
+        var cnt = dist[String(n)] || 0;
+        var pct2 = Math.round((cnt / maxCount) * 100);
+        var row2 = document.createElement('div');
+        row2.className = 'resultado-opcao-row';
+        var top2 = document.createElement('div');
+        top2.className = 'resultado-opcao-top';
+        var leftSpan2 = document.createElement('span');
+        leftSpan2.textContent = String(n);
+        var rightSpan2 = document.createElement('span');
+        rightSpan2.textContent = String(cnt);
+        top2.appendChild(leftSpan2);
+        top2.appendChild(rightSpan2);
+        row2.appendChild(top2);
+        var track2 = document.createElement('div');
+        track2.className = 'resultado-bar-track';
+        var fill2 = document.createElement('div');
+        fill2.className = 'resultado-bar-fill';
+        fill2.style.width = pct2 + '%';
+        track2.appendChild(fill2);
+        row2.appendChild(track2);
+        box.appendChild(row2);
+      }
+    } else {
+      var count = pg.total_respostas || 0;
+      var p = document.createElement('p');
+      p.style.cssText = 'font-size:12.5px;color:var(--muted);margin:0 0 8px;';
+      p.textContent = count + (count === 1 ? ' resposta em texto livre' : ' respostas em texto livre');
+      box.appendChild(p);
+      if (textoAnswers && textoAnswers.length) {
+        var list = document.createElement('div');
+        list.style.cssText = 'display:flex;flex-direction:column;gap:6px;';
+        textoAnswers.forEach(function (t) {
+          var item = document.createElement('div');
+          item.style.cssText = 'background:var(--bg);border-radius:8px;padding:8px 10px;font-size:12.5px;color:var(--text);';
+          item.textContent = t;
+          list.appendChild(item);
+        });
+        box.appendChild(list);
+      }
+    }
+    return box;
+  }
+
+  async function openResultadosModal(item) {
+    document.getElementById('enqueteResultadosTitle').textContent = 'Resultados — ' + item.title;
+    var msgEl = document.getElementById('enqueteResultadosMsg');
+    var bodyEl = document.getElementById('enqueteResultadosBody');
+    bodyEl.innerHTML = '';
+    msgEl.style.display = 'none';
+    enqueteResultadosModal.classList.remove('hidden');
+
+    var res = await supabase.rpc('get_enquete_resultados', { p_enquete_id: item.id });
+    if (res.error || !res.data) {
+      msgEl.textContent = 'Não foi possível carregar os resultados.';
+      msgEl.style.display = 'block';
+      return;
+    }
+    var perguntas = res.data || [];
+    if (!perguntas.length) {
+      bodyEl.innerHTML = '<p style="color:var(--muted);font-size:13px;">Ainda não há perguntas nesta enquete.</p>';
+      return;
+    }
+
+    var textoAnswersMap = {};
+    if (hasPermission('enquetes.gerenciar')) {
+      var textoPerguntaIds = perguntas.filter(function (p) { return p.tipo === 'texto'; }).map(function (p) { return p.pergunta_id; });
+      if (textoPerguntaIds.length) {
+        var textoRes = await supabase.from('enquete_resposta_itens').select('pergunta_id, valor_texto').in('pergunta_id', textoPerguntaIds).not('valor_texto', 'is', null);
+        (textoRes.data || []).forEach(function (row) {
+          if (!textoAnswersMap[row.pergunta_id]) textoAnswersMap[row.pergunta_id] = [];
+          if (row.valor_texto) textoAnswersMap[row.pergunta_id].push(row.valor_texto);
+        });
+      }
+    }
+
+    perguntas.forEach(function (pg) {
+      bodyEl.appendChild(buildResultadoBloco(pg, textoAnswersMap[pg.pergunta_id]));
+    });
+  }
+
+  async function updateEnquetesBadges() {
+    if (!appState.session) return;
+    var homeBadge = document.getElementById('homeEnquetesBadge');
+    var navBadge = document.getElementById('navEnquetesBadge');
+    try {
+      var uid = appState.session.user.id;
+      var hoje = new Date().toISOString().slice(0, 10);
+      var res = await supabase.from('enquetes').select('id, status, ends_at, obrigatoria').eq('status', 'publicada').eq('obrigatoria', true);
+      var items = ((res && res.data) || []).filter(function (e) { return !e.ends_at || e.ends_at >= hoje; });
+      var respRes = await supabase.from('enquete_respostas').select('enquete_id').eq('user_id', uid);
+      var respondidaIds = {};
+      ((respRes && respRes.data) || []).forEach(function (r) { respondidaIds[r.enquete_id] = true; });
+      var count = items.filter(function (e) { return !respondidaIds[e.id]; }).length;
       if (homeBadge) { if (count > 0) { homeBadge.textContent = count; homeBadge.style.display = 'flex'; } else { homeBadge.style.display = 'none'; } }
       if (navBadge) { if (count > 0) { navBadge.textContent = count; navBadge.style.display = 'flex'; } else { navBadge.style.display = 'none'; } }
     } catch (e) {
