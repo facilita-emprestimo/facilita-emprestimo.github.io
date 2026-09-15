@@ -866,7 +866,7 @@
       </button>
       <div class="nav-caption">Estrutura</div>
       <button class="nav-link" data-page="unidades" onclick="navigate('unidades')">
-        <svg class="ic"><use href="#i-store"/></svg> Unidades
+        <svg class="ic"><use href="#i-store"/></svg> Lojas
       </button>
       <div class="nav-caption">Institucional</div>
       <button class="nav-link" data-page="pessoas-cultura" onclick="navigate('pessoas-cultura')">
@@ -946,7 +946,7 @@
           </button>
           <button class="tile" style="background:var(--teal)" onclick="navigate('unidades')">
             <div class="tile-icon"><svg class="ic" style="color:#fff"><use href="#i-store"/></svg></div>
-            <div class="tile-label">Unidades</div>
+            <div class="tile-label">Lojas</div>
           </button>
           <button class="tile" style="background:var(--violet)" onclick="navigate('pessoas-cultura')">
             <div class="tile-icon"><svg class="ic" style="color:#fff"><use href="#i-users"/></svg></div>
@@ -1102,7 +1102,7 @@
       <section class="page" id="page-comunicados">
         <div class="breadcrumb">Portal Interno / <b>Comunicados</b></div>
         <div class="page-header">
-          <div><h1>Comunicados</h1><p>Avisos internos da empresa, por área e por unidade.</p></div>
+          <div><h1>Comunicados</h1><p>Avisos internos da empresa, por área e por loja.</p></div>
           <div class="docs-toolbar" id="comunicadosAdminActions" style="display:none;">
             <button type="button" class="doc-action-btn" id="btnNewComunicado">
               <svg class="ic" style="width:15px;height:15px"><use href="#i-plus"/></svg> Novo comunicado
@@ -1312,16 +1312,16 @@
 
       <!-- ================= UNIDADES ================= -->
       <section class="page" id="page-unidades">
-        <div class="breadcrumb">Portal Interno / <b>Unidades</b></div>
+        <div class="breadcrumb">Portal Interno / <b>Lojas</b></div>
         <div class="page-header">
-          <div><h1>Unidades</h1><p>Lojas, estrutura e colaboradores da Facilita Empréstimo em São Luís.</p></div>
+          <div><h1>Lojas</h1><p>Lojas, estrutura e colaboradores da Facilita Empréstimo em São Luís.</p></div>
         </div>
 
         <div class="unidades-layout">
           <div class="unidades-sidebar">
             <button type="button" class="unidades-side-btn active" id="unidadesSideUnidades" onclick="switchUnidadesSubtab('unidades')">
               <svg class="ic"><use href="#i-store"/></svg>
-              <span>Unidades</span>
+              <span>Lojas</span>
               <span class="unidades-side-count" id="unidadesSideCountUnidades"></span>
             </button>
             <button type="button" class="unidades-side-btn" id="unidadesSideColaboradores" onclick="switchUnidadesSubtab('colaboradores')">
@@ -1335,12 +1335,12 @@
             <div id="unidadesSubview">
               <div class="docs-toolbar" id="unidadesAdminActions" style="display:none;margin-bottom:16px;">
                 <button type="button" class="doc-action-btn" id="btnNewUnidade">
-                  <svg class="ic" style="width:15px;height:15px"><use href="#i-plus"/></svg> Nova unidade
+                  <svg class="ic" style="width:15px;height:15px"><use href="#i-plus"/></svg> Nova loja
                 </button>
               </div>
               <div class="login-msg error" id="unidadesMsg" style="margin-bottom:16px;"></div>
               <div class="unit-grid" id="unidadesGrid"></div>
-              <div class="docs-empty" id="unidadesEmpty" style="display:none;">Nenhuma unidade cadastrada ainda.</div>
+              <div class="docs-empty" id="unidadesEmpty" style="display:none;">Nenhuma loja cadastrada ainda.</div>
             </div>
 
             <div id="colaboradoresSubview" style="display:none;">
@@ -1360,7 +1360,7 @@
       <!-- ============ MODAL: NOVA/EDITAR UNIDADE ============ -->
       <div class="modal-overlay hidden" id="unidadeModal">
         <div class="modal-card">
-          <h3 id="unidadeModalTitle">Nova unidade</h3>
+          <h3 id="unidadeModalTitle">Nova loja</h3>
           <div class="login-msg error" id="unidadeModalMsg"></div>
           <form id="unidadeForm">
             <input type="hidden" id="unidadeId">
@@ -1377,8 +1377,10 @@
               <input type="text" id="unidadeCargo" placeholder="Ex: Supervisora, Gestão comercial...">
             </div>
             <div class="login-field">
-              <label for="unidadeResponsavel">Nome do responsável</label>
-              <input type="text" id="unidadeResponsavel">
+              <label for="unidadeResponsavel">Responsável (supervisor) — a foto vem do cadastro dele em Colaboradores</label>
+              <select id="unidadeResponsavel">
+                <option value="">Selecione...</option>
+              </select>
             </div>
             <div class="login-field">
               <label for="unidadeEndereco">Endereço</label>
@@ -1398,7 +1400,7 @@
               </select>
             </div>
             <div class="login-field">
-              <label for="unidadeFoto">Foto (opcional)</label>
+              <label for="unidadeFoto">Foto de capa da loja (opcional)</label>
               <input type="file" id="unidadeFoto" accept="image/*">
               <div id="unidadeFotoAtual" style="font-size:12.5px;color:var(--muted,#6B7280);margin-top:6px;display:none;"></div>
               <label class="gate-check-row" id="unidadeRemoveFotoWrap" style="display:none;margin-top:6px;">
@@ -1441,9 +1443,9 @@
               <input type="email" id="colaboradorEmail">
             </div>
             <div class="login-field">
-              <label for="colaboradorUnidade">Unidade</label>
+              <label for="colaboradorUnidade">Loja</label>
               <select id="colaboradorUnidade">
-                <option value="">Sem unidade</option>
+                <option value="">Sem loja</option>
               </select>
             </div>
             <div class="login-field">
@@ -1493,12 +1495,12 @@
       <!-- ============ MODAL: TRANSFERIR COLABORADOR ============ -->
       <div class="modal-overlay hidden" id="transferirModal">
         <div class="modal-card" style="max-width:380px;">
-          <h3>Transferir de unidade</h3>
+          <h3>Transferir de loja</h3>
           <p id="transferirModalNome" style="font-size:13px;color:var(--muted);margin:-4px 0 14px;"></p>
           <div class="login-msg error" id="transferirModalMsg"></div>
           <input type="hidden" id="transferirColaboradorId">
           <div class="login-field">
-            <label for="transferirUnidadeSelect">Nova unidade</label>
+            <label for="transferirUnidadeSelect">Nova loja</label>
             <select id="transferirUnidadeSelect"></select>
           </div>
           <div style="display:flex;gap:10px;margin-top:16px;">
@@ -1784,7 +1786,7 @@
       <section class="page" id="page-planos-acao">
         <div class="breadcrumb">Portal Interno / <b>Planos de Ação</b></div>
         <div class="page-header">
-          <div><h1>Planos de Ação</h1><p>Ações corretivas por unidade — responsável, prazo e aprovação.</p></div>
+          <div><h1>Planos de Ação</h1><p>Ações corretivas por loja — responsável, prazo e aprovação.</p></div>
           <div class="docs-toolbar" id="planosAdminActions" style="display:none;">
             <button type="button" class="doc-action-btn" id="btnNewPlano">
               <svg class="ic" style="width:15px;height:15px"><use href="#i-plus"/></svg> Novo plano de ação
@@ -1811,7 +1813,7 @@
           <form id="planoForm">
             <input type="hidden" id="planoId">
             <div class="login-field">
-              <label for="planoUnidade">Unidade</label>
+              <label for="planoUnidade">Loja</label>
               <select id="planoUnidade" required></select>
             </div>
             <div class="login-field">
@@ -1944,6 +1946,7 @@
                   <option value="estagiarios">Estagiários</option>
                   <option value="rh_dp">RH/DP</option>
                   <option value="financeiro">Financeiro</option>
+                  <option value="marketing">Marketing</option>
                 </select>
               </div>
               <button type="submit" class="login-btn" id="adminCreateBtn" style="width:auto;padding:11px 20px;">
@@ -1999,6 +2002,24 @@
           </div>
           <div id="adminUsersEmpty" style="display:none;text-align:center;color:var(--muted);font-size:13px;padding:20px;">Nenhum usuário encontrado.</div>
         </div>
+
+        <div class="card" style="margin-top:22px;">
+          <div class="panel-title" style="margin-bottom:4px;">
+            <h3><svg class="ic" style="width:16px;height:16px;vertical-align:-3px"><use href="#i-key"/></svg> Permissões por cargo</h3>
+          </div>
+          <p style="font-size:12.5px;color:var(--muted);margin:0 0 14px;">Marque o que cada cargo pode fazer no portal, além de visualizar. Administradores sempre podem tudo, independente do que estiver marcado aqui. A alteração é salva na hora, assim que você marca ou desmarca.</p>
+          <div class="admin-users-table-wrap" style="overflow-x:auto;">
+            <table class="admin-users-table" id="permissoesTable" style="min-width:920px;">
+              <thead>
+                <tr id="permissoesTableHeadRow">
+                  <th style="text-align:left;">Permissão</th>
+                </tr>
+              </thead>
+              <tbody id="permissoesTbody"></tbody>
+            </table>
+          </div>
+          <div id="permissoesMsg" style="font-size:12px;color:var(--muted);margin-top:10px;min-height:16px;"></div>
+        </div>
       </section>
 
     </div>
@@ -2050,9 +2071,42 @@
     backoffice: 'Backoffice',
     estagiarios: 'Estagiários',
     rh_dp: 'RH/DP',
-    financeiro: 'Financeiro'
+    financeiro: 'Financeiro',
+    marketing: 'Marketing'
   };
   var ALL_ROLES = Object.keys(ROLE_LABELS);
+
+  var PERMISSION_DEFS = [
+    { key: 'comunicados.gerenciar', label: 'Publicar comunicados/avisos' },
+    { key: 'informativos.gerenciar', label: 'Publicar informativos/notícias' },
+    { key: 'documentos.gerenciar', label: 'Upload de documentos' },
+    { key: 'planos_acao.gerenciar', label: 'Criar planos de ação' },
+    { key: 'tarefas.gerenciar', label: 'Delegar tarefas' },
+    { key: 'calendario.gerenciar', label: 'Gerenciar calendário' },
+    { key: 'chamados.gerenciar', label: 'Responder/gerenciar chamados' },
+    { key: 'colaboradores.gerenciar', label: 'Editar colaboradores' },
+    { key: 'unidades.gerenciar', label: 'Editar lojas' }
+  ];
+  // { 'comunicados.gerenciar': { rh_dp: true, financeiro: false, ... }, ... }
+  var rolePermissions = {};
+
+  function hasPermission(key) {
+    if (appState.profile && appState.profile.is_admin) return true;
+    var role = appState.profile && appState.profile.role;
+    if (!role) return false;
+    return !!(rolePermissions[key] && rolePermissions[key][role]);
+  }
+
+  async function loadRolePermissions() {
+    var res = await supabase.from('role_permissions').select('role, permission_key, allowed');
+    var data = (res && res.data) || [];
+    var map = {};
+    data.forEach(function (row) {
+      if (!map[row.permission_key]) map[row.permission_key] = {};
+      map[row.permission_key][row.role] = !!row.allowed;
+    });
+    rolePermissions = map;
+  }
 
   var appState = {
     session: null,
@@ -2162,6 +2216,7 @@
       appState.profile = profile;
       updateUserChip(profile, session.user.email);
       applyAdminVisibility(!!(profile && profile.is_admin));
+      if (typeof loadRolePermissions === 'function') { loadRolePermissions(); }
       loginOverlay.classList.add('hidden');
       if (typeof loadGateComunicados === 'function') { loadGateComunicados(); } else { gateOverlay2.classList.remove('hidden'); }
       if (typeof loadRootFolders === 'function') loadRootFolders();
@@ -2333,6 +2388,69 @@
         adminResetBtn.disabled = false;
       }
     });
+  }
+
+  // ---- Administração: matriz de permissões por cargo ----
+  function renderPermissoesMatrix() {
+    var headRow = document.getElementById('permissoesTableHeadRow');
+    var tbody = document.getElementById('permissoesTbody');
+    if (!headRow || !tbody) return;
+    headRow.innerHTML = '<th style="text-align:left;">Permissão</th>' + ALL_ROLES.map(function (r) {
+      return '<th style="text-align:center;white-space:nowrap;">' + ROLE_LABELS[r] + '</th>';
+    }).join('');
+    tbody.innerHTML = '';
+    PERMISSION_DEFS.forEach(function (perm) {
+      var tr = document.createElement('tr');
+      var tdLabel = document.createElement('td');
+      tdLabel.textContent = perm.label;
+      tr.appendChild(tdLabel);
+      ALL_ROLES.forEach(function (role) {
+        var td = document.createElement('td');
+        td.style.textAlign = 'center';
+        var checkbox = document.createElement('input');
+        checkbox.type = 'checkbox';
+        checkbox.style.cursor = 'pointer';
+        checkbox.checked = !!(rolePermissions[perm.key] && rolePermissions[perm.key][role]);
+        checkbox.addEventListener('change', function () {
+          savePermissao(role, perm.key, checkbox.checked, checkbox);
+        });
+        td.appendChild(checkbox);
+        tr.appendChild(td);
+      });
+      tbody.appendChild(tr);
+    });
+  }
+
+  async function savePermissao(role, key, allowed, checkboxEl) {
+    var msgEl = document.getElementById('permissoesMsg');
+    if (checkboxEl) checkboxEl.disabled = true;
+    try {
+      var res = await supabase.from('role_permissions').upsert({
+        role: role,
+        permission_key: key,
+        allowed: allowed,
+        updated_at: new Date().toISOString(),
+        updated_by: appState.session && appState.session.user ? appState.session.user.id : null
+      }, { onConflict: 'role,permission_key' });
+      if (res.error) {
+        if (msgEl) showMsgEl(msgEl, friendlyErrorMessage(res.error), 'error');
+        if (checkboxEl) checkboxEl.checked = !allowed;
+        return;
+      }
+      if (!rolePermissions[key]) rolePermissions[key] = {};
+      rolePermissions[key][role] = allowed;
+      if (msgEl) showMsgEl(msgEl, 'Permissão salva.', 'success');
+    } catch (e) {
+      if (msgEl) showMsgEl(msgEl, 'Falha de conexão. Verifique sua internet.', 'error');
+      if (checkboxEl) checkboxEl.checked = !allowed;
+    } finally {
+      if (checkboxEl) checkboxEl.disabled = false;
+    }
+  }
+
+  async function loadPermissoesMatrix() {
+    await loadRolePermissions();
+    renderPermissoesMatrix();
   }
 
   // ---- Administração: lista de usuários (ativos/inativos, online, último acesso, criado em) ----
@@ -2980,7 +3098,7 @@
     var toolbar = document.getElementById('docsAdminActions');
     var isAdmin = !!(appState.profile && appState.profile.is_admin);
     if (toolbar) toolbar.style.display = isAdmin ? 'flex' : 'none';
-    document.getElementById('docsUploadWrap').style.display = isAdmin ? 'inline-flex' : 'none';
+    document.getElementById('docsUploadWrap').style.display = hasPermission('documentos.gerenciar') ? 'inline-flex' : 'none';
     renderBreadcrumb();
 
     var subRes = await supabase.from('folders').select('*').eq('parent_id', folderId).order('name');
@@ -3058,7 +3176,7 @@
     dlBtn.addEventListener('click', function () { downloadDocument(doc, dlBtn); });
     actionsEl.appendChild(dlBtn);
 
-    if (appState.profile && appState.profile.is_admin) {
+    if (hasPermission('documentos.gerenciar')) {
       var delBtn = document.createElement('button');
       delBtn.type = 'button';
       delBtn.className = 'doc-del-btn';
@@ -3305,6 +3423,7 @@
     if (page === 'home' && typeof renderMiniCalendar === 'function') { renderMiniCalendar(); }
     if (page === 'calendario' && typeof initCalendarioPage === 'function') { initCalendarioPage(); }
     if (page === 'noticia' && typeof renderNoticiaDetalhe === 'function') { renderNoticiaDetalhe(currentNoticiaId); }
+    if (page === 'admin' && typeof loadPermissoesMatrix === 'function') { loadPermissoesMatrix(); }
     if (page === 'admin' && typeof loadAdminUsuarios === 'function') {
       loadAdminUsuarios();
       if (adminUsersRefreshTimer) clearInterval(adminUsersRefreshTimer);
@@ -3414,7 +3533,7 @@
   var comunicadoEditingAttachmentPath = null;
 
   function buildComunicadoCard(item) {
-    var isAdmin = !!(appState.profile && appState.profile.is_admin);
+    var isAdmin = hasPermission('comunicados.gerenciar');
     var card = document.createElement('div');
     card.className = 'doc-card' + (item.importante ? ' doc-card-importante' : '');
 
@@ -3529,7 +3648,7 @@
     if (!appState.session) return;
     if (comunicadosMsgEl) hideMsgEl(comunicadosMsgEl);
     var toolbar = document.getElementById('comunicadosAdminActions');
-    if (toolbar) toolbar.style.display = (appState.profile && appState.profile.is_admin) ? 'flex' : 'none';
+    if (toolbar) toolbar.style.display = hasPermission('comunicados.gerenciar') ? 'flex' : 'none';
     var res = await supabase.from('comunicados').select('*').order('created_at', { ascending: false });
     if (res.error) { if (comunicadosMsgEl) showMsgEl(comunicadosMsgEl, 'Não foi possível carregar os comunicados.', 'error'); return; }
     var items = res.data || [];
@@ -3961,8 +4080,7 @@
       actionsEl.appendChild(attBtn);
     }
 
-    var isAdmin = !!(appState.profile && appState.profile.is_admin);
-    if (isAdmin) {
+    if (hasPermission('comunicados.gerenciar')) {
       adminActionsEl.style.display = 'flex';
       adminActionsEl.appendChild(buildActionBtn('i-edit', 'Editar', function () { openComunicadoModal(item); }));
       adminActionsEl.appendChild(buildActionBtn('i-trash', 'Excluir', function () { deleteComunicado(item); }));
@@ -3982,7 +4100,7 @@
   var informativoEditingAttachmentPath = null;
 
   function buildInformativoCard(item) {
-    var isAdmin = !!(appState.profile && appState.profile.is_admin);
+    var isAdmin = hasPermission('informativos.gerenciar');
     var isArquivado = item.status === 'arquivado';
     var card = document.createElement('div');
     card.className = 'doc-card';
@@ -4088,7 +4206,7 @@
     if (!appState.session) return;
     if (informativosMsgEl) hideMsgEl(informativosMsgEl);
     var toolbar = document.getElementById('informativosAdminActions');
-    if (toolbar) toolbar.style.display = (appState.profile && appState.profile.is_admin) ? 'flex' : 'none';
+    if (toolbar) toolbar.style.display = hasPermission('informativos.gerenciar') ? 'flex' : 'none';
     var res = await supabase.from('informativos').select('*').order('created_at', { ascending: false });
     if (res.error) { if (informativosMsgEl) showMsgEl(informativosMsgEl, 'Não foi possível carregar os informativos.', 'error'); return; }
     var items = res.data || [];
@@ -4211,7 +4329,7 @@
   var unidadeEditingPhotoPath = null;
 
   function buildUnitCard(item) {
-    var isAdmin = !!(appState.profile && appState.profile.is_admin);
+    var isAdmin = hasPermission('unidades.gerenciar');
     var card = document.createElement('div');
     card.className = 'unit-card';
 
@@ -4240,7 +4358,33 @@
     var body = document.createElement('div');
     body.className = 'unit-body';
 
-    if (item.role_label || item.person_name) {
+    var supervisor = (item.supervisor_colaborador_id && colaboradoresCache && colaboradoresCache.length)
+      ? colaboradoresCache.filter(function (c) { return c.id === item.supervisor_colaborador_id; })[0]
+      : null;
+    if (supervisor) {
+      var row1 = document.createElement('div');
+      row1.className = 'unit-row';
+      row1.style.alignItems = 'center';
+      var supAvatarWrap = document.createElement('span');
+      supAvatarWrap.style.cssText = 'display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:50%;overflow:hidden;flex-shrink:0;color:#fff;font-size:11px;font-weight:700;background:' + avatarColor(supervisor.nome) + ';';
+      var supAvatarInner = buildColaboradorAvatarInner(supervisor);
+      if (supAvatarInner.tagName === 'IMG') {
+        supAvatarInner.style.width = '100%';
+        supAvatarInner.style.height = '100%';
+        supAvatarInner.style.objectFit = 'cover';
+      }
+      supAvatarWrap.appendChild(supAvatarInner);
+      row1.appendChild(supAvatarWrap);
+      if (item.role_label) {
+        var lbl = document.createElement('b');
+        lbl.textContent = item.role_label;
+        row1.appendChild(lbl);
+        row1.appendChild(document.createTextNode(': ' + supervisor.nome));
+      } else {
+        row1.appendChild(document.createTextNode(supervisor.nome));
+      }
+      body.appendChild(row1);
+    } else if (item.role_label || item.person_name) {
       var row1 = document.createElement('div');
       row1.className = 'unit-row';
       row1.innerHTML = '<svg class="ic"><use href="#i-user"/></svg>';
@@ -4300,14 +4444,15 @@
     if (!appState.session) return;
     if (unidadesMsgEl) hideMsgEl(unidadesMsgEl);
     var toolbar = document.getElementById('unidadesAdminActions');
-    if (toolbar) toolbar.style.display = (appState.profile && appState.profile.is_admin) ? 'flex' : 'none';
+    if (toolbar) toolbar.style.display = hasPermission('unidades.gerenciar') ? 'flex' : 'none';
     var res = await supabase.from('unidades').select('*').order('created_at');
-    if (res.error) { if (unidadesMsgEl) showMsgEl(unidadesMsgEl, 'Não foi possível carregar as unidades.', 'error'); return; }
+    if (res.error) { if (unidadesMsgEl) showMsgEl(unidadesMsgEl, 'Não foi possível carregar as lojas.', 'error'); return; }
     var items = res.data || [];
     unidadesCache = items;
     var countEl = document.getElementById('unidadesSideCountUnidades');
     if (countEl) countEl.textContent = '(' + items.length + ')';
     populateColaboradorUnidadeSelect();
+    await ensureColaboradoresCache();
     var grid = document.getElementById('unidadesGrid');
     var emptyEl = document.getElementById('unidadesEmpty');
     grid.innerHTML = '';
@@ -4356,7 +4501,7 @@
     var sel = document.getElementById('colaboradorUnidade');
     if (!sel) return;
     var current = sel.value;
-    sel.innerHTML = '<option value="">Sem unidade</option>';
+    sel.innerHTML = '<option value="">Sem loja</option>';
     unidadesCache.forEach(function (u) {
       var opt = document.createElement('option');
       opt.value = u.id;
@@ -4379,6 +4524,31 @@
   var colaboradorEditingPhotoPath = null;
   var colaboradoresCache = [];
   var colaboradorProfileCurrentId = null;
+
+  async function ensureColaboradoresCache() {
+    if (!appState.session) return colaboradoresCache;
+    if (colaboradoresCache && colaboradoresCache.length) return colaboradoresCache;
+    var res = await supabase.from('colaboradores').select('*').order('created_at');
+    if (!res.error) colaboradoresCache = res.data || [];
+    return colaboradoresCache;
+  }
+
+  function populateUnidadeResponsavelSelect(selectedId) {
+    var sel = document.getElementById('unidadeResponsavel');
+    if (!sel) return;
+    sel.innerHTML = '<option value="">Selecione...</option>';
+    var ativos = colaboradoresCache
+      .filter(function (c) { return c.status !== 'desligado'; })
+      .slice()
+      .sort(function (a, b) { return String(a.nome || '').localeCompare(String(b.nome || '')); });
+    ativos.forEach(function (c) {
+      var opt = document.createElement('option');
+      opt.value = c.id;
+      opt.textContent = c.nome;
+      sel.appendChild(opt);
+    });
+    sel.value = selectedId || '';
+  }
   var N_CONQUISTAS = 12;
 
   var AVATAR_PALETTE = ['#219EBC', '#2C7DA0', '#4A5C7A', '#C9668B', '#FB8500', '#2EC4B6', '#16A34A', '#7C3AED', '#D97706', '#0891B2', '#F43F5E', '#4338CA'];
@@ -4417,7 +4587,7 @@
   }
 
   function buildColaboradorCard(item, unidadeName) {
-    var isAdmin = !!(appState.profile && appState.profile.is_admin);
+    var isAdmin = hasPermission('colaboradores.gerenciar');
     var isDesligado = item.status === 'desligado';
     var card = document.createElement('div');
     card.className = 'colaborador-card' + (isDesligado ? ' colaborador-card-desligado' : '');
@@ -4526,7 +4696,7 @@
         var transferBtn = document.createElement('button');
         transferBtn.type = 'button';
         transferBtn.className = 'colaborador-transfer';
-        transferBtn.title = 'Transferir de unidade';
+        transferBtn.title = 'Transferir de loja';
         transferBtn.innerHTML = '<svg class="ic" style="width:14px;height:14px"><use href="#i-swap"/></svg>';
         transferBtn.addEventListener('click', function () { openTransferirModal(item); });
         card.appendChild(transferBtn);
@@ -4585,7 +4755,7 @@
   async function loadColaboradores() {
     if (!appState.session) return;
     if (colaboradoresMsgEl) hideMsgEl(colaboradoresMsgEl);
-    var isAdmin = !!(appState.profile && appState.profile.is_admin);
+    var isAdmin = hasPermission('colaboradores.gerenciar');
     var toolbar = document.getElementById('colaboradoresAdminActions');
     if (toolbar) toolbar.style.display = isAdmin ? 'flex' : 'none';
     var res = await supabase.from('colaboradores').select('*').order('created_at');
@@ -4605,7 +4775,7 @@
       var backBtn = document.createElement('button');
       backBtn.type = 'button';
       backBtn.className = 'colaboradores-unit-header-back';
-      backBtn.innerHTML = '<svg class="ic" style="width:14px;height:14px"><use href="#i-chevron-left"/></svg> Voltar para Unidades';
+      backBtn.innerHTML = '<svg class="ic" style="width:14px;height:14px"><use href="#i-chevron-left"/></svg> Voltar para Lojas';
       backBtn.addEventListener('click', function () { switchUnidadesSubtab('unidades'); });
       container.appendChild(backBtn);
 
@@ -4626,7 +4796,7 @@
       } else {
         var fnone = document.createElement('div');
         fnone.className = 'docs-empty';
-        fnone.textContent = 'Nenhum colaborador ativo nesta unidade.';
+        fnone.textContent = 'Nenhum colaborador ativo nesta loja.';
         fsection.appendChild(fnone);
       }
       container.appendChild(fsection);
@@ -4645,7 +4815,7 @@
       groupByUnidade[u.id] = g;
       groups.push(g);
     });
-    var semUnidade = { id: null, name: 'Sem unidade', items: [] };
+    var semUnidade = { id: null, name: 'Sem loja', items: [] };
     ativos.forEach(function (item) {
       var g = item.unidade_id ? groupByUnidade[item.unidade_id] : null;
       if (g) { g.items.push(item); } else { semUnidade.items.push(item); }
@@ -4925,7 +5095,7 @@
     var actionsEl = document.getElementById('colaboradorProfileActions');
     var existingExtra = actionsEl.querySelectorAll('.profile-admin-btn');
     existingExtra.forEach(function (b) { b.remove(); });
-    if (appState.profile && appState.profile.is_admin) {
+    if (hasPermission('colaboradores.gerenciar')) {
       var editBtn = document.createElement('button');
       editBtn.type = 'button';
       editBtn.className = 'login-btn profile-admin-btn';
@@ -4941,7 +5111,7 @@
     colaboradorProfileCurrentId = item.id;
     var obsWrapEl = document.getElementById('colaboradorProfileObsWrap');
     if (obsWrapEl) {
-      if (appState.profile && appState.profile.is_admin) {
+      if (hasPermission('colaboradores.gerenciar')) {
         obsWrapEl.style.display = 'block';
         var obsInputEl = document.getElementById('colaboradorProfileObsInput');
         if (obsInputEl) obsInputEl.value = '';
@@ -5017,15 +5187,16 @@
     });
   }
 
-  function openUnidadeModal(item) {
+  async function openUnidadeModal(item) {
     hideMsgEl(unidadeModalMsg);
     unidadeForm.reset();
     document.getElementById('unidadeId').value = item ? item.id : '';
-    unidadeModalTitle.textContent = item ? 'Editar unidade' : 'Nova unidade';
+    unidadeModalTitle.textContent = item ? 'Editar loja' : 'Nova loja';
     document.getElementById('unidadeNome').value = item ? item.name : '';
     document.getElementById('unidadeSubtitulo').value = item ? (item.subtitle || '') : '';
     document.getElementById('unidadeCargo').value = item ? (item.role_label || '') : '';
-    document.getElementById('unidadeResponsavel').value = item ? (item.person_name || '') : '';
+    await ensureColaboradoresCache();
+    populateUnidadeResponsavelSelect(item ? (item.supervisor_colaborador_id || '') : '');
     document.getElementById('unidadeEndereco').value = item ? (item.address || '') : '';
     document.getElementById('unidadeCor').value = item ? (item.color || 'blue') : 'blue';
     document.getElementById('unidadeVideo').value = item ? (item.video_url || '') : '';
@@ -5054,7 +5225,7 @@
         name: document.getElementById('unidadeNome').value.trim(),
         subtitle: document.getElementById('unidadeSubtitulo').value.trim(),
         role_label: document.getElementById('unidadeCargo').value.trim(),
-        person_name: document.getElementById('unidadeResponsavel').value.trim(),
+        supervisor_colaborador_id: document.getElementById('unidadeResponsavel').value || null,
         address: document.getElementById('unidadeEndereco').value.trim(),
         color: document.getElementById('unidadeCor').value
       };
@@ -5092,19 +5263,19 @@
         payload.created_by = appState.session.user.id;
         res = await supabase.from('unidades').insert(payload);
       }
-      if (res.error) { showMsgEl(unidadeModalMsg, 'Não foi possível salvar a unidade.', 'error'); return; }
+      if (res.error) { showMsgEl(unidadeModalMsg, 'Não foi possível salvar a loja.', 'error'); return; }
       unidadeModal.classList.add('hidden');
       loadUnidades();
     });
   }
 
   async function deleteUnidade(item) {
-    if (!confirm('Excluir a unidade "' + item.name + '"? Esta ação não pode ser desfeita.')) return;
+    if (!confirm('Excluir a loja "' + item.name + '"? Esta ação não pode ser desfeita.')) return;
     if (item.photo_path) {
       try { await supabase.storage.from('conteudo').remove([item.photo_path]); } catch (ignoreErr) {}
     }
     var res = await supabase.from('unidades').delete().eq('id', item.id);
-    if (res.error) { alert('Não foi possível excluir a unidade.'); return; }
+    if (res.error) { alert('Não foi possível excluir a loja.'); return; }
     loadUnidades();
   }
 
@@ -5133,7 +5304,7 @@
   }
 
   function buildTarefaCard(item, profiles) {
-    var isAdmin = !!(appState.profile && appState.profile.is_admin);
+    var isAdmin = hasPermission('tarefas.gerenciar');
     var isMine = !!(appState.session && item.assigned_to === appState.session.user.id);
     var canToggle = isAdmin || isMine || !item.assigned_to;
     var card = document.createElement('div');
@@ -5210,7 +5381,7 @@
     if (!appState.session) return;
     if (tarefasMsgEl) hideMsgEl(tarefasMsgEl);
     var toolbar = document.getElementById('tarefasAdminActions');
-    if (toolbar) toolbar.style.display = (appState.profile && appState.profile.is_admin) ? 'flex' : 'none';
+    if (toolbar) toolbar.style.display = hasPermission('tarefas.gerenciar') ? 'flex' : 'none';
     var profiles = await fetchProfilesForSelect();
     var res = await supabase.from('tasks').select('*').order('created_at', { ascending: false });
     if (res.error) { if (tarefasMsgEl) showMsgEl(tarefasMsgEl, 'Não foi possível carregar as tarefas.', 'error'); return; }
@@ -5415,7 +5586,7 @@
   }
 
   function buildChamadoCard(item, profiles, anexosByChamado) {
-    var isAdmin = !!(appState.profile && appState.profile.is_admin);
+    var isAdmin = hasPermission('chamados.gerenciar');
     var card = document.createElement('div');
     card.className = 'doc-card';
 
@@ -5755,7 +5926,7 @@
   }
 
   function buildPlanoCard(item, profiles, unidades, anexosByPlano, atualizacoesByPlano) {
-    var isAdmin = !!(appState.profile && appState.profile.is_admin);
+    var isAdmin = hasPermission('planos_acao.gerenciar');
     var isMine = !!(appState.session && item.quem_fara === appState.session.user.id);
     var card = document.createElement('div');
     card.className = 'doc-card';
@@ -5984,7 +6155,7 @@
     if (!appState.session) return;
     if (planosMsgEl) hideMsgEl(planosMsgEl);
     var toolbar = document.getElementById('planosAdminActions');
-    if (toolbar) toolbar.style.display = (appState.profile && appState.profile.is_admin) ? 'flex' : 'none';
+    if (toolbar) toolbar.style.display = hasPermission('planos_acao.gerenciar') ? 'flex' : 'none';
     var profiles = await fetchProfilesForSelect();
     var unidades = await fetchUnidadesForSelect();
     var res = await supabase.from('planos_acao').select('*').order('created_at', { ascending: false });
@@ -6163,7 +6334,7 @@
     var homeBadge = document.getElementById('homePlanosBadge');
     var navBadge = document.getElementById('navPlanosBadge');
     try {
-      var isAdmin = !!(appState.profile && appState.profile.is_admin);
+      var isAdmin = hasPermission('planos_acao.gerenciar');
       var uid = appState.session.user.id;
       var count = 0;
       if (isAdmin) {
@@ -6534,7 +6705,7 @@
     if (labelEl) labelEl.textContent = calMonthLabel(year, month);
     var gridWrap = document.getElementById('calGridWrap');
     if (gridWrap) gridWrap.innerHTML = calBuildGridHTML(year, month);
-    var isAdmin = !!(appState.profile && appState.profile.is_admin);
+    var isAdmin = hasPermission('calendario.gerenciar');
     if (isAdmin && gridWrap) {
       gridWrap.querySelectorAll('.cal-event-chip').forEach(function (chip) {
         chip.addEventListener('click', function () {
@@ -6572,7 +6743,7 @@
 
   function initCalendarioPage() {
     if (!calendarioState.loaded) { loadCalendarioEventos(); }
-    var isAdmin = !!(appState.profile && appState.profile.is_admin);
+    var isAdmin = hasPermission('calendario.gerenciar');
     var toolbar = document.getElementById('calendarioAdminActions');
     if (toolbar) toolbar.style.display = isAdmin ? 'flex' : 'none';
     renderCalPage();
