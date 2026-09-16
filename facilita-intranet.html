@@ -1755,6 +1755,22 @@
         </div>
       </div>
 
+      <!-- ============ MODAL: PRÉ-VISUALIZAÇÃO DE ARQUIVO ============ -->
+      <div class="modal-overlay hidden" id="filePreviewModal">
+        <div class="modal-card" style="max-width:860px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:12px;">
+            <h3 id="filePreviewTitle" style="margin:0;font-size:14.5px;word-break:break-word;">Pré-visualização</h3>
+            <button type="button" class="folder-card-del" style="position:static;background:var(--bg);color:var(--ink-2);flex-shrink:0;" id="filePreviewClose"><svg class="ic" style="width:16px;height:16px"><use href="#i-x"/></svg></button>
+          </div>
+          <div id="filePreviewBody" style="min-height:220px;max-height:68vh;overflow:auto;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;background:var(--bg);border-radius:10px;padding:12px;"></div>
+          <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:16px;">
+            <button type="button" class="login-btn" id="filePreviewDownloadBtn" style="width:auto;padding:10px 18px;background:#9CA3AF;">
+              <svg class="ic" style="width:14px;height:14px;vertical-align:-2px;margin-right:4px;"><use href="#i-download"/></svg> Baixar arquivo
+            </button>
+          </div>
+        </div>
+      </div>
+
       <!-- ============ MODAL: NOVO/EDITAR EVENTO ============ -->
       <div class="modal-overlay hidden" id="eventoModal">
         <div class="modal-card">
@@ -3356,6 +3372,15 @@
 
     var actionsEl = document.createElement('div');
     actionsEl.className = 'doc-file-actions';
+    if (isPreviewable(doc.name, doc.file_type)) {
+      actionsEl.appendChild(buildPreviewBtn({
+        bucket: 'documentos',
+        path: doc.storage_path,
+        name: doc.name,
+        fileType: doc.file_type,
+        onDownload: function () { downloadDocument(doc); }
+      }));
+    }
     var dlBtn = document.createElement('button');
     dlBtn.type = 'button';
     dlBtn.className = 'doc-dl-btn';
@@ -3385,6 +3410,105 @@
     a.click();
     document.body.removeChild(a);
     setTimeout(function () { URL.revokeObjectURL(url); }, 4000);
+  }
+
+  // ---------------- Pré-visualização genérica de arquivos (sem precisar baixar) ----------------
+  var filePreviewModal = document.getElementById('filePreviewModal');
+  var filePreviewTitle = document.getElementById('filePreviewTitle');
+  var filePreviewBody = document.getElementById('filePreviewBody');
+  var filePreviewClose = document.getElementById('filePreviewClose');
+  var filePreviewDownloadBtn = document.getElementById('filePreviewDownloadBtn');
+
+  function closeFilePreview() {
+    if (!filePreviewModal) return;
+    filePreviewModal.classList.add('hidden');
+    if (filePreviewBody) filePreviewBody.innerHTML = '';
+  }
+  if (filePreviewClose) filePreviewClose.addEventListener('click', closeFilePreview);
+  if (filePreviewModal) {
+    filePreviewModal.addEventListener('click', function (e) { if (e.target === filePreviewModal) closeFilePreview(); });
+  }
+
+  function previewKindOf(name, fileType) {
+    var ext = ((fileType || '') || (name || '').split('.').pop() || '').toLowerCase();
+    if (['png', 'jpg', 'jpeg', 'gif', 'webp', 'svg'].indexOf(ext) !== -1) return 'image';
+    if (['mp4', 'webm', 'mov', 'avi', 'mkv', 'm4v'].indexOf(ext) !== -1) return 'video';
+    if (ext === 'pdf') return 'pdf';
+    if (['doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx'].indexOf(ext) !== -1) return 'office';
+    return 'other';
+  }
+
+  // Diz se um arquivo (pelo nome/tipo) tem alguma forma de pré-visualização disponível.
+  function isPreviewable(name, fileType) {
+    return previewKindOf(name, fileType) !== 'other';
+  }
+
+  // Abre o modal de pré-visualização. opts: { bucket, path, name, fileType, onDownload }
+  async function openFilePreview(opts) {
+    if (!filePreviewModal || !filePreviewBody) return;
+    filePreviewTitle.textContent = opts.name || 'Arquivo';
+    filePreviewBody.innerHTML = '<p style="color:var(--muted);font-size:13px;margin:0;">Carregando pré-visualização…</p>';
+    filePreviewModal.classList.remove('hidden');
+    filePreviewDownloadBtn.onclick = function () { if (opts.onDownload) opts.onDownload(); };
+
+    var kind = previewKindOf(opts.name, opts.fileType);
+    if (kind === 'other') {
+      filePreviewBody.innerHTML =
+        '<svg class="ic" style="width:34px;height:34px;color:var(--muted)"><use href="#i-file"/></svg>' +
+        '<p style="color:var(--muted);font-size:13px;text-align:center;margin:0;">Este tipo de arquivo não tem pré-visualização no navegador.<br>Use o botão \"Baixar arquivo\" para abri-lo.</p>';
+      return;
+    }
+
+    try {
+      var signedRes = await supabase.storage.from(opts.bucket).createSignedUrl(opts.path, 3600);
+      if (signedRes.error || !signedRes.data) throw new Error('Não foi possível gerar o link de pré-visualização.');
+      var url = signedRes.data.signedUrl;
+      filePreviewBody.innerHTML = '';
+
+      if (kind === 'image') {
+        var img = document.createElement('img');
+        img.alt = '';
+        img.style.cssText = 'max-width:100%;max-height:64vh;display:block;border-radius:6px;';
+        img.src = url;
+        filePreviewBody.appendChild(img);
+      } else if (kind === 'video') {
+        var video = document.createElement('video');
+        video.controls = true;
+        video.autoplay = true;
+        video.style.cssText = 'max-width:100%;max-height:64vh;display:block;border-radius:6px;';
+        video.src = url;
+        filePreviewBody.appendChild(video);
+      } else if (kind === 'pdf') {
+        var iframe = document.createElement('iframe');
+        iframe.src = url;
+        iframe.style.cssText = 'width:100%;height:64vh;border:none;border-radius:6px;background:#fff;';
+        filePreviewBody.appendChild(iframe);
+      } else if (kind === 'office') {
+        var iframe2 = document.createElement('iframe');
+        iframe2.src = 'https://view.officeapps.live.com/op/embed.aspx?src=' + encodeURIComponent(url);
+        iframe2.style.cssText = 'width:100%;height:64vh;border:none;border-radius:6px;background:#fff;';
+        filePreviewBody.appendChild(iframe2);
+        var note = document.createElement('p');
+        note.style.cssText = 'font-size:11px;color:var(--muted);margin:0;text-align:center;';
+        note.textContent = 'Se a pré-visualização não carregar, use o botão "Baixar arquivo" para abrir no seu computador.';
+        filePreviewBody.appendChild(note);
+      }
+    } catch (err) {
+      filePreviewBody.innerHTML = '<p style="color:#B91C2B;font-size:13px;text-align:center;margin:0;">' +
+        ((err && err.message) || 'Não foi possível carregar a pré-visualização.') + '</p>';
+    }
+  }
+
+  // Cria um botão "Visualizar" padrão (ícone de olho) que abre o modal de pré-visualização.
+  function buildPreviewBtn(opts) {
+    var btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'doc-action-btn';
+    btn.style.background = 'var(--ink-2)';
+    btn.title = 'Pré-visualizar';
+    btn.innerHTML = '<svg class="ic" style="width:14px;height:14px"><use href="#i-eye"/></svg> Visualizar';
+    btn.addEventListener('click', function () { openFilePreview(opts); });
+    return btn;
   }
 
   function logDownload(doc) {
@@ -3830,6 +3954,16 @@
         linkBtn.innerHTML = '<svg class="ic" style="width:14px;height:14px"><use href="#i-link"/></svg> Abrir link';
         linkBtn.addEventListener('click', function () { window.open(item.link_url, '_blank', 'noopener'); });
         actionsRow.appendChild(linkBtn);
+      }
+      if (item.attachment_path && item.attachment_type !== 'image' && item.attachment_type !== 'video' &&
+          isPreviewable(item.attachment_name, item.attachment_type)) {
+        actionsRow.appendChild(buildPreviewBtn({
+          bucket: 'conteudo',
+          path: item.attachment_path,
+          name: item.attachment_name,
+          fileType: item.attachment_type,
+          onDownload: function () { downloadComunicadoAttachment(item); }
+        }));
       }
       if (item.attachment_path) {
         var attBtn = document.createElement('button');
@@ -4303,6 +4437,16 @@
       linkBtn.addEventListener('click', function () { window.open(item.link_url, '_blank', 'noopener'); });
       actionsEl.appendChild(linkBtn);
     }
+    if (item.attachment_path && item.attachment_type !== 'image' && item.attachment_type !== 'video' &&
+        isPreviewable(item.attachment_name, item.attachment_type)) {
+      actionsEl.appendChild(buildPreviewBtn({
+        bucket: 'conteudo',
+        path: item.attachment_path,
+        name: item.attachment_name,
+        fileType: item.attachment_type,
+        onDownload: function () { downloadComunicadoAttachment(item); }
+      }));
+    }
     if (item.attachment_path) {
       var attBtn = document.createElement('button');
       attBtn.type = 'button';
@@ -4396,6 +4540,16 @@
         linkBtn.innerHTML = '<svg class="ic" style="width:14px;height:14px"><use href="#i-link"/></svg> Abrir link';
         linkBtn.addEventListener('click', function () { window.open(item.link_url, '_blank', 'noopener'); });
         actionsRow.appendChild(linkBtn);
+      }
+      if (item.attachment_path && item.attachment_type !== 'image' && item.attachment_type !== 'video' &&
+          isPreviewable(item.attachment_name, item.attachment_type)) {
+        actionsRow.appendChild(buildPreviewBtn({
+          bucket: 'conteudo',
+          path: item.attachment_path,
+          name: item.attachment_name,
+          fileType: item.attachment_type,
+          onDownload: function () { downloadInformativoAttachment(item); }
+        }));
       }
       if (item.attachment_path) {
         var attBtn = document.createElement('button');
@@ -5762,6 +5916,15 @@
     }
     row.appendChild(metaEl);
 
+    if (isPreviewable(anexo.name, anexo.file_type)) {
+      row.appendChild(buildPreviewBtn({
+        bucket: 'conteudo',
+        path: anexo.storage_path,
+        name: anexo.name,
+        fileType: anexo.file_type,
+        onDownload: function () { downloadChamadoAnexo(anexo); }
+      }));
+    }
     var downloadBtn = document.createElement('button');
     downloadBtn.type = 'button';
     downloadBtn.className = 'doc-action-btn';
@@ -6091,6 +6254,15 @@
     }
     row.appendChild(metaEl);
 
+    if (isPreviewable(anexo.name, anexo.file_type)) {
+      row.appendChild(buildPreviewBtn({
+        bucket: 'conteudo',
+        path: anexo.storage_path,
+        name: anexo.name,
+        fileType: anexo.file_type,
+        onDownload: function () { downloadPlanoAnexo(anexo); }
+      }));
+    }
     var downloadBtn = document.createElement('button');
     downloadBtn.type = 'button';
     downloadBtn.className = 'doc-action-btn';
