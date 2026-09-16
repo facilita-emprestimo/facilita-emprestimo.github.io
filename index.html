@@ -112,7 +112,7 @@
   }
 
   /* ---------- HOME TILES (estilo "módulos" grande e intuitivo) ---------- */
-  .home-tiles-card{padding:24px 24px 28px;}
+  .home-tiles-card{padding:24px 24px 28px;container-type:inline-size;}
   .module-search-wrap{position:relative;margin-bottom:24px;max-width:360px;}
   .module-search-wrap .module-search-ic{position:absolute;left:14px;top:50%;transform:translateY(-50%);width:15px;height:15px;color:var(--muted);pointer-events:none;}
   .module-search-wrap input{width:100%;box-sizing:border-box;border:1px solid var(--line);background:var(--bg);border-radius:24px;padding:11px 16px 11px 38px;font-size:13.5px;font-family:inherit;color:var(--text);}
@@ -120,6 +120,8 @@
   .tile-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:28px 16px;margin-bottom:0;}
   @media (max-width:900px){.tile-grid{grid-template-columns:repeat(4,1fr);}}
   @media (max-width:520px){.tile-grid{grid-template-columns:repeat(2,1fr);}}
+  @container (max-width:640px){.tile-grid{grid-template-columns:repeat(4,1fr);}}
+  @container (max-width:340px){.tile-grid{grid-template-columns:repeat(2,1fr);}}
   .tile{
     background:none;border:none;cursor:pointer;font-family:inherit;color:var(--text);
     display:flex;flex-direction:column;align-items:center;gap:10px;padding:4px;text-align:center;
@@ -671,16 +673,16 @@
   .badge-pink{background:#FCE7F3;color:#BE185D;}
   .badge-teal{background:#CCFBF1;color:#0F766E;}
   .mini-cal{cursor:pointer;border:none;background:none;padding:0;text-align:left;font-family:inherit;width:100%;display:block;}
-  .mini-cal-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
-  .mini-cal-head b{font-size:14px;text-transform:capitalize;}
-  .mini-cal-head span{font-size:11px;color:var(--red);font-weight:700;}
-  .mini-cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;}
-  .mini-cal-dow{font-size:9.5px;color:var(--muted);text-align:center;font-weight:700;padding-bottom:2px;}
-  .mini-cal-day{aspect-ratio:1;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:11px;border-radius:6px;position:relative;color:var(--text);}
+  .mini-cal-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
+  .mini-cal-head b{font-size:18px;text-transform:capitalize;}
+  .mini-cal-head span{font-size:12px;color:var(--red);font-weight:700;}
+  .mini-cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;}
+  .mini-cal-dow{font-size:13px;color:var(--muted);text-align:center;font-weight:700;padding-bottom:4px;}
+  .mini-cal-day{aspect-ratio:1;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:16px;border-radius:8px;position:relative;color:var(--text);}
   .mini-cal-day.is-today{background:var(--ink);color:#fff;font-weight:700;}
   .mini-cal-day.is-empty{visibility:hidden;}
-  .mini-cal-dots{display:flex;gap:2px;position:absolute;bottom:2px;}
-  .mini-cal-dots span{width:4px;height:4px;border-radius:50%;display:block;}
+  .mini-cal-dots{display:flex;gap:3px;position:absolute;bottom:3px;}
+  .mini-cal-dots span{width:5px;height:5px;border-radius:50%;display:block;}
 
   .cal-toolbar{display:flex;align-items:center;gap:12px;flex-wrap:wrap;}
   .cal-nav-btn{background:var(--bg);border:1px solid var(--line);border-radius:8px;width:32px;height:32px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--ink-2);}
@@ -976,6 +978,7 @@
           </div>
         </div>
 
+        <div class="home-grid-2col" style="align-items:start;">
         <div class="card home-tiles-card">
           <div class="module-search-wrap">
             <svg class="ic module-search-ic"><use href="#i-search"/></svg>
@@ -1046,6 +1049,17 @@
           <div class="tile-empty" id="homeTileEmpty" style="display:none;">Nenhum módulo encontrado.</div>
         </div>
 
+        <div class="card">
+          <div class="panel-title">
+            <h3>Calendário</h3>
+            <button class="link-more" onclick="navigate('calendario')">ver tudo</button>
+          </div>
+          <button type="button" class="mini-cal" id="miniCalBtn" title="Clique para ver o calendário completo">
+            <div id="miniCalWrap"></div>
+          </button>
+        </div>
+        </div>
+
         <div class="card" style="margin-top:20px;">
           <div class="panel-title">
             <h3>Ferramentas</h3>
@@ -1093,15 +1107,6 @@
                 <b id="homeBrandName">Colaborador(a)</b>
                 <span id="homeBrandRole">Portal Interno</span>
               </div>
-            </div>
-            <div class="card">
-              <div class="panel-title">
-                <h3>Calendário</h3>
-                <button class="link-more" onclick="navigate('calendario')">ver tudo</button>
-              </div>
-              <button type="button" class="mini-cal" id="miniCalBtn" title="Clique para ver o calendário completo">
-                <div id="miniCalWrap"></div>
-              </button>
             </div>
             <div class="card">
               <div class="panel-title">
