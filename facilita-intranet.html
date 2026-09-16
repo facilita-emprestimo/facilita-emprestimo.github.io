@@ -6588,7 +6588,7 @@
   var enquetesCache = [];
   var enquetePerguntasEditing = [];
   var enquetePerguntasLocked = false;
-  var PERGUNTA_TIPO_LABELS = { unica: 'Escolha única', multipla: 'Múltipla escolha', texto: 'Texto livre', escala: 'Escala (1 a 5)' };
+  var PERGUNTA_TIPO_LABELS = { unica: 'Escolha única', multipla: 'Múltipla escolha', mista: 'Mista (múltipla + escrever opção/justificativa)', texto: 'Texto livre', escala: 'Escala (1 a 5)' };
 
   function fmtDateBR(iso) {
     if (!iso) return '';
@@ -6722,7 +6722,7 @@
     var tipoSel = document.createElement('select');
     tipoSel.style.width = '170px';
     tipoSel.disabled = enquetePerguntasLocked;
-    ['unica', 'multipla', 'texto', 'escala'].forEach(function (t) {
+    ['unica', 'multipla', 'mista', 'texto', 'escala'].forEach(function (t) {
       var opt = document.createElement('option');
       opt.value = t; opt.textContent = PERGUNTA_TIPO_LABELS[t];
       if (t === data.tipo) opt.selected = true;
@@ -6730,7 +6730,7 @@
     });
     tipoSel.addEventListener('change', function () {
       enquetePerguntasEditing[index].tipo = tipoSel.value;
-      if ((tipoSel.value === 'unica' || tipoSel.value === 'multipla') && !enquetePerguntasEditing[index].opcoes) {
+      if ((tipoSel.value === 'unica' || tipoSel.value === 'multipla' || tipoSel.value === 'mista') && !enquetePerguntasEditing[index].opcoes) {
         enquetePerguntasEditing[index].opcoes = ['', ''];
       }
       renderPerguntasEditor();
@@ -6764,9 +6764,15 @@
     obrRow.appendChild(document.createTextNode('Obrigatória'));
     wrap.appendChild(obrRow);
 
-    if (data.tipo === 'unica' || data.tipo === 'multipla') {
+    if (data.tipo === 'unica' || data.tipo === 'multipla' || data.tipo === 'mista') {
       var opcoesWrap = document.createElement('div');
       opcoesWrap.className = 'pergunta-opcoes-list';
+      if (data.tipo === 'mista') {
+        var mistaHint = document.createElement('p');
+        mistaHint.style.cssText = 'font-size:11.5px;color:var(--muted);margin:0 0 6px;';
+        mistaHint.textContent = 'Além destas opções, o colaborador também poderá escrever uma opção própria ou justificativa.';
+        opcoesWrap.appendChild(mistaHint);
+      }
       (data.opcoes || []).forEach(function (opt, oi) {
         var row = document.createElement('div');
         row.className = 'pergunta-opcao-row';
@@ -6880,7 +6886,7 @@
         for (var i = 0; i < enquetePerguntasEditing.length; i++) {
           var pg = enquetePerguntasEditing[i];
           if (!pg.texto || !pg.texto.trim()) { showMsgEl(enqueteModalMsg, 'Preencha o texto de todas as perguntas.', 'error'); return; }
-          if (pg.tipo === 'unica' || pg.tipo === 'multipla') {
+          if (pg.tipo === 'unica' || pg.tipo === 'multipla' || pg.tipo === 'mista') {
             var validOpts = (pg.opcoes || []).filter(function (o) { return o && o.trim(); });
             if (validOpts.length < 2) { showMsgEl(enqueteModalMsg, 'Perguntas de escolha precisam de ao menos 2 opções preenchidas.', 'error'); return; }
           }
@@ -6914,7 +6920,7 @@
         }
         var rows = enquetePerguntasEditing.map(function (pg, idx) {
           var row = { enquete_id: enqueteId, ordem: idx, texto: pg.texto.trim(), tipo: pg.tipo, obrigatoria: pg.obrigatoria !== false };
-          row.opcoes = (pg.tipo === 'unica' || pg.tipo === 'multipla') ? (pg.opcoes || []).filter(function (o) { return o && o.trim(); }) : null;
+          row.opcoes = (pg.tipo === 'unica' || pg.tipo === 'multipla' || pg.tipo === 'mista') ? (pg.opcoes || []).filter(function (o) { return o && o.trim(); }) : null;
           return row;
         });
         if (rows.length) {
@@ -6979,13 +6985,24 @@
         optRow.className = 'gate-check-row';
         optRow.style.marginBottom = '6px';
         var input = document.createElement('input');
-        input.type = pg.tipo === 'multipla' ? 'checkbox' : 'radio';
+        input.type = (pg.tipo === 'multipla' || pg.tipo === 'mista') ? 'checkbox' : 'radio';
         input.name = 'resp_' + pg.id;
         input.value = opt;
         optRow.appendChild(input);
         optRow.appendChild(document.createTextNode(opt));
         box.appendChild(optRow);
       });
+      if (pg.tipo === 'mista') {
+        var mistaLabel = document.createElement('p');
+        mistaLabel.style.cssText = 'font-size:12px;color:var(--muted);margin:8px 0 4px;';
+        mistaLabel.textContent = 'Outra opção ou justificativa (opcional)';
+        box.appendChild(mistaLabel);
+        var mistaTa = document.createElement('textarea');
+        mistaTa.id = 'resp_txt_' + pg.id;
+        mistaTa.rows = 2;
+        mistaTa.style.cssText = 'width:100%;box-sizing:border-box;border:1px solid var(--line);border-radius:9px;padding:10px 12px;font-family:inherit;font-size:13.5px;resize:vertical;';
+        box.appendChild(mistaTa);
+      }
     }
     return box;
   }
@@ -7032,6 +7049,15 @@
           if (pg.obrigatoria && !checked) { showMsgEl(enqueteResponderMsg, 'Responda a pergunta ' + (i + 1) + '.', 'error'); return; }
           if (!checked) continue;
           item.valor_escala = parseInt(checked.value, 10);
+        } else if (pg.tipo === 'mista') {
+          var checksM = enqueteResponderForm.querySelectorAll('input[name="resp_' + pg.id + '"]:checked');
+          var valsM = Array.prototype.map.call(checksM, function (c) { return c.value; });
+          var txtElM = document.getElementById('resp_txt_' + pg.id);
+          var txtM = txtElM ? txtElM.value.trim() : '';
+          if (pg.obrigatoria && !valsM.length && !txtM) { showMsgEl(enqueteResponderMsg, 'Responda a pergunta ' + (i + 1) + '.', 'error'); return; }
+          if (!valsM.length && !txtM) continue;
+          if (valsM.length) item.valor_opcoes = valsM;
+          if (txtM) item.valor_texto = txtM;
         } else {
           var checks = enqueteResponderForm.querySelectorAll('input[name="resp_' + pg.id + '"]:checked');
           var vals = Array.prototype.map.call(checks, function (c) { return c.value; });
@@ -7079,7 +7105,7 @@
   var enqueteResultadosClose = document.getElementById('enqueteResultadosClose');
   if (enqueteResultadosClose) enqueteResultadosClose.addEventListener('click', function () { enqueteResultadosModal.classList.add('hidden'); });
 
-  function buildResultadoBloco(pg, textoAnswers) {
+  function buildResultadoBloco(pg) {
     var box = document.createElement('div');
     box.className = 'resultado-bloco';
     var title = document.createElement('p');
@@ -7087,7 +7113,7 @@
     title.textContent = pg.texto;
     box.appendChild(title);
 
-    if (pg.tipo === 'unica' || pg.tipo === 'multipla') {
+    if (pg.tipo === 'unica' || pg.tipo === 'multipla' || pg.tipo === 'mista') {
       var total = pg.total_respostas || 0;
       (pg.opcoes || []).forEach(function (opt) {
         var pct = total > 0 ? Math.round((opt.count / total) * 100) : 0;
@@ -7154,22 +7180,39 @@
         row2.appendChild(track2);
         box.appendChild(row2);
       }
-    } else {
+    }
+
+    if (pg.tipo === 'texto') {
       var count = pg.total_respostas || 0;
       var p = document.createElement('p');
-      p.style.cssText = 'font-size:12.5px;color:var(--muted);margin:0 0 8px;';
+      p.style.cssText = 'font-size:12.5px;color:var(--muted);margin:8px 0 8px;';
       p.textContent = count + (count === 1 ? ' resposta em texto livre' : ' respostas em texto livre');
       box.appendChild(p);
-      if (textoAnswers && textoAnswers.length) {
+    }
+
+    if (pg.tipo === 'texto' || pg.tipo === 'mista') {
+      var textos = pg.respostas_texto || null;
+      if (textos && textos.length) {
+        if (pg.tipo === 'mista') {
+          var heading = document.createElement('p');
+          heading.style.cssText = 'font-size:11.5px;color:var(--muted);margin:10px 0 6px;font-weight:600;';
+          heading.textContent = 'Opções escritas / justificativas (' + textos.length + ')';
+          box.appendChild(heading);
+        }
         var list = document.createElement('div');
         list.style.cssText = 'display:flex;flex-direction:column;gap:6px;';
-        textoAnswers.forEach(function (t) {
+        textos.forEach(function (t) {
           var item = document.createElement('div');
           item.style.cssText = 'background:var(--bg);border-radius:8px;padding:8px 10px;font-size:12.5px;color:var(--text);';
           item.textContent = t;
           list.appendChild(item);
         });
         box.appendChild(list);
+      } else if (pg.tipo === 'texto' && (pg.total_respostas || 0) > 0 && !hasPermission('enquetes.gerenciar')) {
+        var lockNote = document.createElement('p');
+        lockNote.style.cssText = 'font-size:11.5px;color:var(--muted);margin:0;font-style:italic;';
+        lockNote.textContent = 'As respostas em texto ficam visíveis apenas para administradores.';
+        box.appendChild(lockNote);
       }
     }
     return box;
@@ -7195,20 +7238,8 @@
       return;
     }
 
-    var textoAnswersMap = {};
-    if (hasPermission('enquetes.gerenciar')) {
-      var textoPerguntaIds = perguntas.filter(function (p) { return p.tipo === 'texto'; }).map(function (p) { return p.pergunta_id; });
-      if (textoPerguntaIds.length) {
-        var textoRes = await supabase.from('enquete_resposta_itens').select('pergunta_id, valor_texto').in('pergunta_id', textoPerguntaIds).not('valor_texto', 'is', null);
-        (textoRes.data || []).forEach(function (row) {
-          if (!textoAnswersMap[row.pergunta_id]) textoAnswersMap[row.pergunta_id] = [];
-          if (row.valor_texto) textoAnswersMap[row.pergunta_id].push(row.valor_texto);
-        });
-      }
-    }
-
     perguntas.forEach(function (pg) {
-      bodyEl.appendChild(buildResultadoBloco(pg, textoAnswersMap[pg.pergunta_id]));
+      bodyEl.appendChild(buildResultadoBloco(pg));
     });
   }
 
