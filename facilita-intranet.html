@@ -179,6 +179,43 @@
   .li-title{font-size:13.5px;font-weight:600;line-height:1.4;}
   .li-sub{font-size:11.5px;color:var(--muted);margin-top:3px;}
 
+  /* ---------- Home: módulos rápidos (colapsáveis) ---------- */
+  .tile-extra{display:none;}
+  .tile-grid.open .tile-extra{display:flex;}
+  .tile-grid-more{display:flex;justify-content:center;margin-top:18px;}
+  .tile-grid-more-btn{display:flex;align-items:center;gap:6px;background:none;border:none;color:var(--muted);font-size:12.5px;font-weight:700;font-family:inherit;cursor:pointer;padding:8px 14px;border-radius:20px;transition:background .15s,color .15s;}
+  .tile-grid-more-btn:hover{background:var(--bg);color:var(--red);}
+  .tile-grid-more-btn svg{width:14px;height:14px;transition:transform .15s;}
+  .tile-grid-more-btn.open svg{transform:rotate(180deg);}
+
+  /* ---------- Home: Atualizações Recentes (destaque fixado) ---------- */
+  .updates-pinned{background:linear-gradient(135deg,var(--teal),#1AA79A);color:#fff;border-radius:14px;padding:16px 18px;margin-bottom:14px;cursor:pointer;transition:transform .15s,box-shadow .15s;}
+  .updates-pinned:hover{transform:translateY(-2px);box-shadow:0 8px 18px rgba(46,196,182,.35);}
+  .updates-pinned-tag{font-size:10.5px;font-weight:800;letter-spacing:.8px;text-transform:uppercase;opacity:.9;margin-bottom:6px;}
+  .updates-pinned-title{font-size:14.5px;font-weight:700;line-height:1.35;}
+  .updates-pinned-date{font-size:11.5px;opacity:.9;margin-top:8px;}
+
+  /* ---------- Home: feed de atualizações (estilo post) ---------- */
+  .feed-post{background:#fff;border:1px solid var(--line);border-radius:14px;overflow:hidden;margin-bottom:16px;cursor:pointer;transition:box-shadow .15s;}
+  .feed-post:last-child{margin-bottom:0;}
+  .feed-post:hover{box-shadow:0 4px 14px rgba(16,24,40,.08);}
+  .feed-post-head{display:flex;align-items:center;gap:10px;padding:14px 16px 0;}
+  .feed-post-avatar{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;flex-shrink:0;}
+  .feed-post-avatar .ic{width:16px;height:16px;}
+  .feed-post-headtext{flex:1;min-width:0;}
+  .feed-post-area{font-size:12.5px;font-weight:700;}
+  .feed-post-date{font-size:11px;color:var(--muted);margin-top:1px;}
+  .feed-post-cover{position:relative;margin-top:12px;width:100%;height:220px;overflow:hidden;display:flex;align-items:center;justify-content:center;}
+  .feed-post-cover-icon{display:flex;}
+  .feed-post-cover .ic{width:34px;height:34px;color:rgba(255,255,255,.9);position:relative;z-index:1;stroke-width:1.6;}
+  .feed-post-body{padding:14px 16px 6px;}
+  .feed-post-title{font-size:15.5px;font-weight:700;line-height:1.35;margin:0 0 6px;}
+  .feed-post:hover .feed-post-title{color:var(--red);}
+  .feed-post-excerpt{font-size:13px;color:var(--muted);line-height:1.55;margin:0;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+  .feed-post-readmore{display:inline-block;font-size:12.5px;font-weight:700;color:var(--red);margin-top:8px;}
+  .feed-post-foot{display:flex;align-items:center;padding:10px 16px 14px;border-top:1px solid #F1F2F5;margin-top:12px;}
+  .feed-post-foot .like-btn{margin-left:0;}
+
   .badge{font-size:10.5px;font-weight:700;padding:2px 9px;border-radius:20px;white-space:nowrap;}
   .badge-red{background:#FEE2E2;color:#B91C2B;}
   .badge-green{background:#DCFCE7;color:#15803D;}
@@ -841,6 +878,7 @@
     <symbol id="i-printer" viewBox="0 0 24 24"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></symbol>
     <symbol id="i-chevron-left" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></symbol>
     <symbol id="i-chevron-right" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></symbol>
+    <symbol id="i-chevron-down" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></symbol>
     <symbol id="i-heart" viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></symbol>
     <symbol id="i-megaphone" viewBox="0 0 24 24"><path d="M3 11v3a1 1 0 0 0 1 1h2l3.6 5a1 1 0 0 0 1.8-.6V16"/><path d="M3 11l14-6v16L3 15"/><path d="M17 9a4 4 0 0 1 0 6"/><path d="M20 6a8 8 0 0 1 0 12"/></symbol>
   </defs>
@@ -1056,7 +1094,7 @@
               </div>
               <div class="tile-label">Enquetes</div>
             </button>
-            <button class="tile" data-tile-label="Marketing" onclick="navigate('marketing')">
+            <button class="tile tile-extra" data-tile-label="Marketing" onclick="navigate('marketing')">
               <div class="tile-icon" style="background:var(--pink)"><svg class="ic" style="color:#fff"><use href="#i-image"/></svg></div>
               <div class="tile-label">Marketing</div>
             </button>
@@ -1064,15 +1102,15 @@
               <div class="tile-icon" style="background:var(--orange)"><svg class="ic" style="color:#fff"><use href="#i-file"/></svg></div>
               <div class="tile-label">Documentos</div>
             </button>
-            <button class="tile" data-tile-label="Lojas" onclick="navigate('unidades')">
+            <button class="tile tile-extra" data-tile-label="Lojas" onclick="navigate('unidades')">
               <div class="tile-icon" style="background:var(--teal)"><svg class="ic" style="color:#fff"><use href="#i-store"/></svg></div>
               <div class="tile-label">Lojas</div>
             </button>
-            <button class="tile" data-tile-label="Pessoas e Cultura" onclick="navigate('pessoas-cultura')">
+            <button class="tile tile-extra" data-tile-label="Pessoas e Cultura" onclick="navigate('pessoas-cultura')">
               <div class="tile-icon" style="background:var(--violet)"><svg class="ic" style="color:#fff"><use href="#i-users"/></svg></div>
               <div class="tile-label">Pessoas e Cultura</div>
             </button>
-            <button class="tile" data-tile-label="Sobre Nós" onclick="navigate('sobre-nos')">
+            <button class="tile tile-extra" data-tile-label="Sobre Nós" onclick="navigate('sobre-nos')">
               <div class="tile-icon" style="background:var(--cyan)"><svg class="ic" style="color:#fff"><use href="#i-info"/></svg></div>
               <div class="tile-label">Sobre Nós</div>
             </button>
@@ -1080,7 +1118,7 @@
               <div class="tile-icon" style="background:var(--amber)"><svg class="ic" style="color:#fff"><use href="#i-book"/></svg></div>
               <div class="tile-label">Trilha do Conhecimento</div>
             </button>
-            <button class="tile" data-tile-label="Tarefas" onclick="navigate('tarefas')">
+            <button class="tile tile-extra" data-tile-label="Tarefas" onclick="navigate('tarefas')">
               <div class="tile-icon" style="background:var(--green)">
                 <svg class="ic" style="color:#fff"><use href="#i-clipboard-check"/></svg>
                 <span class="tile-badge" id="homeTarefasBadge" style="display:none;"></span>
@@ -1094,12 +1132,18 @@
               </div>
               <div class="tile-label">Chamados</div>
             </button>
-            <button class="tile" data-tile-label="Planos de Ação" onclick="navigate('planos-acao')">
+            <button class="tile tile-extra" data-tile-label="Planos de Ação" onclick="navigate('planos-acao')">
               <div class="tile-icon" style="background:var(--indigo)">
                 <svg class="ic" style="color:#fff"><use href="#i-target"/></svg>
                 <span class="tile-badge" id="homePlanosBadge" style="display:none;"></span>
               </div>
               <div class="tile-label">Planos de Ação</div>
+            </button>
+          </div>
+          <div class="tile-grid-more">
+            <button type="button" class="tile-grid-more-btn" id="homeTileMoreBtn" onclick="toggleHomeTileGrid()">
+              <span id="homeTileMoreLabel">Ver todos os módulos</span>
+              <svg class="ic"><use href="#i-chevron-down"/></svg>
             </button>
           </div>
           <div class="tile-empty" id="homeTileEmpty" style="display:none;">Nenhum módulo encontrado.</div>
@@ -1146,13 +1190,12 @@
 
         <div class="home-grid-2col">
           <div class="card">
-            <span class="destaque-tag">EM DESTAQUE</span>
-            <h2>Treinamento Comercial — Turma Agosto/2026</h2>
-            <p class="desc">Módulo sobre argumentação por convênio (estadual, municipal, INSS e federal) e atualização das regras de bonificação. Vagas abertas para consultores e supervisores de todas as unidades.</p>
-            <div class="meta-row">
-              <span><svg class="ic" style="width:14px;height:14px"><use href="#i-clock"/></svg> 20/08/2026 · 9h</span>
-              <span><svg class="ic" style="width:14px;height:14px"><use href="#i-user"/></svg> Universidade Corporativa</span>
+            <div class="panel-title">
+              <h3>Atualizações</h3>
+              <button class="link-more" onclick="navigate('comunicados')">ver todos</button>
             </div>
+            <div id="homeFeedList"></div>
+            <div class="docs-empty" id="homeFeedEmpty" style="display:none;padding:18px 10px;">Nenhuma atualização com imagem ou vídeo publicada ainda.</div>
           </div>
 
           <div class="home-side-stack">
@@ -1166,23 +1209,16 @@
             </div>
             <div class="card">
               <div class="panel-title">
-                <h3>Comunicados recentes</h3>
+                <h3>Atualizações Recentes</h3>
                 <button class="link-more" onclick="navigate('comunicados')">ver todos</button>
               </div>
+              <div class="updates-pinned" id="homeAtualizacoesPinned" style="display:none;"></div>
               <div id="homeComunicadosList"></div>
               <div class="docs-empty" id="homeComunicadosEmpty" style="display:none;padding:18px 10px;">Nenhum comunicado publicado ainda.</div>
             </div>
           </div>
         </div>
 
-        <div class="card" style="margin-top:20px;">
-          <div class="panel-title">
-            <h3>Notícias</h3>
-            <button class="link-more" onclick="navigate('comunicados')">ver todos</button>
-          </div>
-          <div class="noticias-grid" id="homeNoticiasGrid"></div>
-          <div class="docs-empty" id="homeNoticiasEmpty" style="display:none;padding:18px 10px;">Nenhuma notícia com imagem ou vídeo publicada ainda.</div>
-        </div>
       </section>
 
       <!-- ================= NOTÍCIA (matéria completa) ================= -->
@@ -4038,10 +4074,20 @@
     tiles.forEach(function (tile) {
       var label = normalizeSearchText(tile.getAttribute('data-tile-label'));
       var match = !q || label.indexOf(q) !== -1;
-      tile.style.display = match ? '' : 'none';
+      tile.style.display = match ? 'flex' : 'none';
       if (match) visibleCount++;
     });
     if (emptyEl) emptyEl.style.display = visibleCount === 0 ? 'block' : 'none';
+  }
+
+  function toggleHomeTileGrid() {
+    var grid = document.getElementById('homeTileGrid');
+    var btn = document.getElementById('homeTileMoreBtn');
+    var label = document.getElementById('homeTileMoreLabel');
+    if (!grid || !btn) return;
+    var open = grid.classList.toggle('open');
+    btn.classList.toggle('open', open);
+    if (label) label.textContent = open ? 'Ver menos módulos' : 'Ver todos os módulos';
   }
 
   function navigate(page){
@@ -4651,15 +4697,77 @@
     return card;
   }
 
+  function buildFeedPostCard(item, authorProfile) {
+    var card = document.createElement('div');
+    card.className = 'feed-post';
+    card.addEventListener('click', function () { openNoticia(item.id); });
+
+    var head = document.createElement('div');
+    head.className = 'feed-post-head';
+    var avatar = document.createElement('div');
+    avatar.className = 'feed-post-avatar';
+    avatar.style.background = 'var(' + colorVarName(item.color) + ')';
+    avatar.innerHTML = '<svg class="ic"><use href="#i-bell"/></svg>';
+    var headText = document.createElement('div');
+    headText.className = 'feed-post-headtext';
+    var areaEl = document.createElement('div');
+    areaEl.className = 'feed-post-area';
+    areaEl.style.color = 'var(' + colorVarName(item.color) + ')';
+    areaEl.textContent = item.area || 'Comunicado';
+    var dateEl = document.createElement('div');
+    dateEl.className = 'feed-post-date';
+    dateEl.textContent = formatDateBR(item.created_at) + (authorProfile ? ' · ' + (authorProfile.full_name || authorProfile.email) : '');
+    headText.appendChild(areaEl);
+    headText.appendChild(dateEl);
+    head.appendChild(avatar);
+    head.appendChild(headText);
+    card.appendChild(head);
+
+    var cover = document.createElement('div');
+    cover.className = 'feed-post-cover';
+    cover.style.background = 'linear-gradient(135deg,var(' + colorVarName(item.color) + '),#023047)';
+    var coverIcon = document.createElement('div');
+    coverIcon.className = 'feed-post-cover-icon';
+    coverIcon.innerHTML = '<svg class="ic"><use href="#i-bell"/></svg>';
+    cover.appendChild(coverIcon);
+    card.appendChild(cover);
+    attachComunicadoCover(cover, coverIcon, item);
+
+    var body = document.createElement('div');
+    body.className = 'feed-post-body';
+    var title = document.createElement('p');
+    title.className = 'feed-post-title';
+    title.textContent = item.title;
+    body.appendChild(title);
+    if (item.description) {
+      var excerpt = document.createElement('p');
+      excerpt.className = 'feed-post-excerpt';
+      excerpt.textContent = item.description;
+      body.appendChild(excerpt);
+    }
+    var readMore = document.createElement('span');
+    readMore.className = 'feed-post-readmore';
+    readMore.textContent = 'Ler artigo completo →';
+    body.appendChild(readMore);
+    card.appendChild(body);
+
+    var foot = document.createElement('div');
+    foot.className = 'feed-post-foot';
+    if (typeof buildLikeBtn === 'function') foot.appendChild(buildLikeBtn('comunicado', item.id));
+    card.appendChild(foot);
+
+    return card;
+  }
+
   async function loadHomeNoticias() {
-    var gridEl = document.getElementById('homeNoticiasGrid');
-    var emptyEl = document.getElementById('homeNoticiasEmpty');
-    if (!gridEl || !appState.session) return;
+    var listEl = document.getElementById('homeFeedList');
+    var emptyEl = document.getElementById('homeFeedEmpty');
+    if (!listEl || !appState.session) return;
     var res = await supabase.from('comunicados').select('*').order('created_at', { ascending: false }).limit(30);
     var items = (res.data || []).filter(function (it) {
       return it.attachment_path && (it.attachment_type === 'image' || it.attachment_type === 'video');
-    }).slice(0, 8);
-    gridEl.innerHTML = '';
+    }).slice(0, 5);
+    listEl.innerHTML = '';
     if (!items.length) { emptyEl.style.display = 'block'; return; }
     emptyEl.style.display = 'none';
     var ids = [];
@@ -4669,7 +4777,8 @@
       var pr = await supabase.from('profiles').select('id,full_name,email').in('id', ids);
       (pr.data || []).forEach(function (p) { authorsMap[p.id] = p; });
     }
-    items.forEach(function (it) { gridEl.appendChild(buildNoticiaCard(it, authorsMap[it.created_by])); });
+    if (typeof loadCurtidas === 'function') { await loadCurtidas('comunicado', items.map(function (it) { return it.id; })); }
+    items.forEach(function (it) { listEl.appendChild(buildFeedPostCard(it, authorsMap[it.created_by])); });
   }
 
   async function loadNoticiaSidebarData() {
@@ -8274,13 +8383,27 @@
     if (!appState.session) return;
     var listEl = document.getElementById('homeComunicadosList');
     var emptyEl = document.getElementById('homeComunicadosEmpty');
+    var pinnedEl = document.getElementById('homeAtualizacoesPinned');
     if (!listEl) return;
-    var res = await supabase.from('comunicados').select('*').order('created_at', { ascending: false }).limit(3);
+    var res = await supabase.from('comunicados').select('*').order('created_at', { ascending: false }).limit(4);
     var items = (res && res.data) || [];
     listEl.innerHTML = '';
+    if (pinnedEl) { pinnedEl.innerHTML = ''; pinnedEl.style.display = 'none'; pinnedEl.onclick = null; }
     if (!items.length) { if (emptyEl) emptyEl.style.display = 'block'; return; }
     if (emptyEl) emptyEl.style.display = 'none';
-    items.forEach(function (item) {
+    var pinned = items[0];
+    var rest = items.slice(1);
+    if (pinnedEl && pinned) {
+      pinnedEl.style.display = 'block';
+      pinnedEl.innerHTML =
+        '<div class="updates-pinned-tag">Atualização recente</div>' +
+        '<div class="updates-pinned-title"></div>' +
+        '<div class="updates-pinned-date"></div>';
+      pinnedEl.querySelector('.updates-pinned-title').textContent = pinned.title;
+      pinnedEl.querySelector('.updates-pinned-date').textContent = (pinned.area || 'Geral') + ' · ' + formatDateBR(pinned.created_at);
+      pinnedEl.onclick = function () { navigate('comunicados'); };
+    }
+    rest.forEach(function (item) {
       var row = document.createElement('div');
       row.className = 'list-item';
       row.addEventListener('click', function () { navigate('comunicados'); });
