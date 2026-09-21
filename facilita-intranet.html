@@ -204,8 +204,41 @@
   .doc-media img,.doc-media video{display:block;width:100%;max-height:320px;object-fit:cover;cursor:pointer;}
   .attach-preview{margin-top:8px;border-radius:10px;overflow:hidden;max-width:100%;background:#000;line-height:0;}
   .attach-preview img,.attach-preview video{display:block;width:100%;max-height:220px;object-fit:contain;background:#000;}
-  .doc-footer{display:flex;gap:16px;margin-top:10px;font-size:11.5px;color:var(--muted);}
+  .doc-footer{display:flex;gap:16px;margin-top:10px;font-size:11.5px;color:var(--muted);align-items:center;}
   .doc-footer span{display:flex;align-items:center;gap:5px;}
+
+  /* ---------- CURTIDAS (like) ---------- */
+  .like-btn{display:inline-flex;align-items:center;gap:5px;background:none;border:none;cursor:pointer;padding:2px 6px;border-radius:20px;font-size:12px;font-weight:600;color:var(--muted);margin-left:auto;transition:color .15s ease,background .15s ease;}
+  .like-btn:hover{background:#FEE2E2;color:#B91C2B;}
+  .like-btn .ic{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:2;transition:fill .15s ease,stroke .15s ease;}
+  .like-btn.liked{color:#E11D48;}
+  .like-btn.liked .ic{fill:#E11D48;stroke:#E11D48;}
+  .like-btn:disabled{opacity:.6;cursor:default;}
+
+  /* ---------- AVALIAÇÃO POR ESTRELAS ---------- */
+  .star-rate{display:inline-flex;gap:2px;align-items:center;}
+  .star-rate button{background:none;border:none;padding:1px;cursor:pointer;line-height:0;}
+  .star-rate .ic{width:16px;height:16px;fill:none;stroke:#CBD5E1;stroke-width:1.6;}
+  .star-rate .ic.filled{fill:#FB8500;stroke:#FB8500;}
+  .star-rate-readonly button{cursor:default;}
+
+  /* ---------- TRILHA: AULA EM VÍDEO ---------- */
+  .aula-card{background:#fff;border:1px solid var(--line);border-radius:14px;overflow:hidden;margin-bottom:16px;}
+  .aula-card video{display:block;width:100%;max-height:360px;background:#000;}
+  .aula-card-body{padding:14px 18px;}
+  .aula-card-title{font-size:14.5px;font-weight:700;margin-bottom:8px;}
+  .aula-card-row{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-top:10px;}
+  .aula-card-rating-avg{font-size:11.5px;color:var(--muted);display:flex;align-items:center;gap:4px;}
+
+  /* ---------- CAIXA DE SUGESTÃO ---------- */
+  .sugestao-widget{background:linear-gradient(135deg,#023047,#046a9e);border-radius:16px;padding:20px 22px;display:flex;align-items:center;gap:16px;color:#fff;cursor:pointer;transition:transform .15s ease,box-shadow .15s ease;}
+  .sugestao-widget:hover{transform:translateY(-2px);box-shadow:0 10px 22px rgba(2,48,71,.22);}
+  .sugestao-widget-icon{width:48px;height:48px;border-radius:12px;background:rgba(255,255,255,.15);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+  .sugestao-widget-icon .ic{width:26px;height:26px;color:#fff;}
+  .sugestao-widget-text h3{font-size:15.5px;margin-bottom:3px;}
+  .sugestao-widget-text p{font-size:12.5px;opacity:.88;margin:0;}
+  .sugestao-card{background:#fff;border:1px solid var(--line);border-radius:12px;padding:14px 18px;margin-bottom:12px;}
+  .sugestao-card .badge{margin-right:6px;}
 
   /* ---------- ENQUETES ---------- */
   .enquetes-list{display:flex;flex-direction:column;gap:12px;}
@@ -808,6 +841,8 @@
     <symbol id="i-printer" viewBox="0 0 24 24"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></symbol>
     <symbol id="i-chevron-left" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></symbol>
     <symbol id="i-chevron-right" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></symbol>
+    <symbol id="i-heart" viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></symbol>
+    <symbol id="i-megaphone" viewBox="0 0 24 24"><path d="M3 11v3a1 1 0 0 0 1 1h2l3.6 5a1 1 0 0 0 1.8-.6V16"/><path d="M3 11l14-6v16L3 15"/><path d="M17 9a4 4 0 0 1 0 6"/><path d="M20 6a8 8 0 0 1 0 12"/></symbol>
   </defs>
 </svg>
 
@@ -909,6 +944,10 @@
       <button class="nav-link" data-page="informativos" onclick="navigate('informativos')">
         <svg class="ic"><use href="#i-file"/></svg> Informativos
       </button>
+      <button class="nav-link" data-page="sugestoes" onclick="navigate('sugestoes')">
+        <svg class="ic"><use href="#i-megaphone"/></svg> Fala aí! (Sugestões)
+        <span class="nav-badge" id="navSugestoesBadge" style="display:none;"></span>
+      </button>
       <button class="nav-link" data-page="enquetes" onclick="navigate('enquetes')">
         <svg class="ic"><use href="#i-bar-chart"/></svg> Enquetes
         <span class="nav-badge" id="navEnquetesBadge" style="display:none;"></span>
@@ -983,6 +1022,14 @@
           </div>
         </div>
 
+        <div class="sugestao-widget" id="homeSugestaoWidget" onclick="navigate('sugestoes')" style="margin-bottom:18px;">
+          <div class="sugestao-widget-icon"><svg class="ic"><use href="#i-megaphone"/></svg></div>
+          <div class="sugestao-widget-text">
+            <h3>Fala aí! 📣 Deixe sua sugestão</h3>
+            <p>Ideias, críticas e elogios sobre o sistema ou a empresa — com opção de anonimato garantido.</p>
+          </div>
+        </div>
+
         <div class="home-grid-2col" style="align-items:start;">
         <div class="card home-tiles-card">
           <div class="module-search-wrap">
@@ -997,6 +1044,10 @@
             <button class="tile" data-tile-label="Informativos" onclick="navigate('informativos')">
               <div class="tile-icon" style="background:var(--purple)"><svg class="ic" style="color:#fff"><use href="#i-file"/></svg></div>
               <div class="tile-label">Informativos</div>
+            </button>
+            <button class="tile" data-tile-label="Sugestões" onclick="navigate('sugestoes')">
+              <div class="tile-icon" style="background:#023047"><svg class="ic" style="color:#fff"><use href="#i-megaphone"/></svg></div>
+              <div class="tile-label">Fala aí! (Sugestões)</div>
             </button>
             <button class="tile" data-tile-label="Enquetes" onclick="navigate('enquetes')">
               <div class="tile-icon" style="background:var(--cyan)">
@@ -1410,6 +1461,118 @@
           <div style="display:flex;gap:10px;margin-top:20px;">
             <button type="button" class="login-btn" id="enqueteResultadosClose" style="width:auto;padding:11px 20px;background:#9CA3AF;">Fechar</button>
           </div>
+        </div>
+      </div>
+
+      <!-- ================= SUGESTÕES (FALA AÍ!) ================= -->
+      <section class="page" id="page-sugestoes">
+        <div class="breadcrumb">Portal Interno / <b>Fala aí! (Sugestões)</b></div>
+        <div class="page-header">
+          <div><h1>Fala aí! 📣</h1><p>Sugestões, críticas e elogios sobre o sistema ou a empresa — com opção de anonimato garantido.</p></div>
+          <div class="docs-toolbar">
+            <button type="button" class="doc-action-btn" id="btnNovaSugestao">
+              <svg class="ic" style="width:15px;height:15px"><use href="#i-plus"/></svg> Nova sugestão
+            </button>
+          </div>
+        </div>
+
+        <div class="login-msg error" id="sugestoesMsg" style="margin-bottom:16px;"></div>
+
+        <div id="sugestoesInboxSection" style="display:none;margin-bottom:28px;">
+          <div class="panel-title"><h3>Caixa de entrada (só administradores)</h3></div>
+          <div id="sugestoesInboxList"></div>
+          <div class="docs-empty" id="sugestoesInboxEmpty" style="display:none;">Nenhuma sugestão recebida ainda.</div>
+        </div>
+
+        <div class="panel-title"><h3>Sugestões respondidas</h3></div>
+        <div id="sugestoesRespondidasList"></div>
+        <div class="docs-empty" id="sugestoesRespondidasEmpty" style="display:none;">Nenhuma sugestão divulgada ainda.</div>
+      </section>
+
+      <!-- ============ MODAL: NOVA SUGESTÃO ============ -->
+      <div class="modal-overlay hidden" id="sugestaoModal">
+        <div class="modal-card">
+          <h3>Nova sugestão</h3>
+          <div class="login-msg error" id="sugestaoModalMsg"></div>
+          <form id="sugestaoForm">
+            <div class="login-field">
+              <label for="sugestaoDirecionamentoTipo">Direcionar para</label>
+              <select id="sugestaoDirecionamentoTipo">
+                <option value="empresa">Empresa em geral</option>
+                <option value="departamento">Departamento</option>
+                <option value="pessoa">Pessoa específica</option>
+              </select>
+            </div>
+            <div class="login-field" id="sugestaoDeptWrap" style="display:none;">
+              <label for="sugestaoDept">Departamento</label>
+              <select id="sugestaoDept">
+                <option value="Comercial">Comercial</option>
+                <option value="Back Office">Back Office</option>
+                <option value="Administrativo">Administrativo</option>
+              </select>
+            </div>
+            <div class="login-field" id="sugestaoPessoaWrap" style="display:none;">
+              <label for="sugestaoPessoa">Pessoa</label>
+              <select id="sugestaoPessoa"></select>
+            </div>
+            <div class="login-field">
+              <label for="sugestaoDescricao">Descrição</label>
+              <textarea id="sugestaoDescricao" rows="4" required style="width:100%;box-sizing:border-box;padding:11px 13px;border:1px solid var(--line);border-radius:9px;font-family:inherit;font-size:13.5px;background:var(--bg);resize:vertical;"></textarea>
+            </div>
+            <div class="login-field">
+              <label for="sugestaoAnexo">Anexo — imagem, PDF, etc. (opcional)</label>
+              <input type="file" id="sugestaoAnexo">
+            </div>
+            <div class="login-field">
+              <label>Quero me identificar?</label>
+              <div style="display:flex;gap:18px;margin-top:6px;">
+                <label class="gate-check-row"><input type="radio" name="sugestaoIdent" value="sim" id="sugestaoIdentSim"> Sim</label>
+                <label class="gate-check-row"><input type="radio" name="sugestaoIdent" value="nao" id="sugestaoIdentNao" checked> Não</label>
+              </div>
+            </div>
+            <div class="login-field" id="sugestaoNomeWrap" style="display:none;">
+              <label for="sugestaoNome">Seu nome</label>
+              <input type="text" id="sugestaoNome">
+            </div>
+            <p id="sugestaoSigiloMsg" style="font-size:12px;color:var(--muted);background:var(--bg);padding:10px 12px;border-radius:8px;">🔒 Sua identidade não será registrada. O sigilo é garantido.</p>
+            <div style="display:flex;gap:10px;margin-top:16px;">
+              <button type="submit" class="login-btn" style="width:auto;padding:11px 20px;">Enviar</button>
+              <button type="button" class="login-btn" id="sugestaoCancel" style="width:auto;padding:11px 20px;background:#9CA3AF;">Cancelar</button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- ============ MODAL: RESPONDER SUGESTÃO (admin) ============ -->
+      <div class="modal-overlay hidden" id="sugestaoRespostaModal">
+        <div class="modal-card">
+          <h3>Responder sugestão</h3>
+          <div class="login-msg error" id="sugestaoRespostaModalMsg"></div>
+          <form id="sugestaoRespostaForm">
+            <input type="hidden" id="sugestaoRespostaId">
+            <div class="login-field">
+              <label for="sugestaoRespostaStatus">Status</label>
+              <select id="sugestaoRespostaStatus">
+                <option value="novo">Novo</option>
+                <option value="em_analise">Em análise</option>
+                <option value="aceita">Aceita</option>
+                <option value="aplicada">Aplicada</option>
+                <option value="nao_aplicada">Não aplicada no momento</option>
+                <option value="improcedente">Improcedente</option>
+              </select>
+            </div>
+            <div class="login-field">
+              <label for="sugestaoRespostaTexto">Resposta / observação</label>
+              <textarea id="sugestaoRespostaTexto" rows="3" style="width:100%;box-sizing:border-box;padding:11px 13px;border:1px solid var(--line);border-radius:9px;font-family:inherit;font-size:13.5px;background:var(--bg);resize:vertical;"></textarea>
+            </div>
+            <label class="gate-check-row">
+              <input type="checkbox" id="sugestaoRespostaDivulgar"> Divulgar esta sugestão (aparece para todos em "Sugestões respondidas", sem revelar quem enviou)
+            </label>
+            <div style="display:flex;gap:10px;margin-top:16px;">
+              <button type="submit" class="login-btn" style="width:auto;padding:11px 20px;">Salvar</button>
+              <button type="button" class="login-btn" id="sugestaoRespostaCancel" style="width:auto;padding:11px 20px;background:#9CA3AF;">Cancelar</button>
+            </div>
+          </form>
         </div>
       </div>
 
@@ -2300,7 +2463,8 @@
     { key: 'chamados.gerenciar', label: 'Responder/gerenciar chamados' },
     { key: 'colaboradores.gerenciar', label: 'Editar colaboradores' },
     { key: 'unidades.gerenciar', label: 'Editar lojas' },
-    { key: 'enquetes.gerenciar', label: 'Criar enquetes/pesquisas' }
+    { key: 'enquetes.gerenciar', label: 'Criar enquetes/pesquisas' },
+    { key: 'sugestoes.gerenciar', label: 'Ver e responder sugestões (Fala aí!)' }
   ];
   // { 'comunicados.gerenciar': { rh_dp: true, financeiro: false, ... }, ... }
   var rolePermissions = {};
@@ -3367,9 +3531,112 @@
       var pr = await supabase.from('profiles').select('id,full_name,email').in('id', ids);
       (pr.data || []).forEach(function (p) { profilesMap[p.id] = p; });
     }
-    docs.forEach(function (d) {
+
+    var isTrilha = docsState.area === 'trilha-conhecimento';
+    var videoDocs = isTrilha ? docs.filter(function (d) { return previewKindOf(d.name, d.file_type) === 'video'; }) : [];
+    var outrosDocs = isTrilha ? docs.filter(function (d) { return previewKindOf(d.name, d.file_type) !== 'video'; }) : docs;
+
+    if (videoDocs.length) {
+      await loadCurtidas('documento', videoDocs.map(function (d) { return d.id; }));
+      await loadAvaliacoes(videoDocs.map(function (d) { return d.id; }));
+      videoDocs.forEach(function (d) { listEl.appendChild(buildAulaCard(d, profilesMap[d.uploaded_by])); });
+    }
+    outrosDocs.forEach(function (d) {
       listEl.appendChild(buildFileRow(d, profilesMap[d.uploaded_by]));
     });
+  }
+
+  // Card de "aula em vídeo" — usado só dentro da Trilha do Conhecimento.
+  // Toca o vídeo direto no card (sem precisar clicar em "Visualizar"), com link externo opcional,
+  // curtida e avaliação por estrelas.
+  function buildAulaCard(doc, uploaderProfile) {
+    var isAdmin = hasPermission('documentos.gerenciar');
+    var card = document.createElement('div');
+    card.className = 'aula-card';
+
+    var video = document.createElement('video');
+    video.controls = true;
+    video.preload = 'metadata';
+    card.appendChild(video);
+    supabase.storage.from('documentos').createSignedUrl(doc.storage_path, 3600).then(function (res) {
+      if (res.data) video.src = res.data.signedUrl;
+    });
+
+    var body = document.createElement('div');
+    body.className = 'aula-card-body';
+
+    var titleRow = document.createElement('div');
+    titleRow.style.cssText = 'display:flex;justify-content:space-between;align-items:flex-start;gap:10px;';
+    var title = document.createElement('div');
+    title.className = 'aula-card-title';
+    title.textContent = doc.name;
+    titleRow.appendChild(title);
+    if (isAdmin) {
+      var editLinkBtn = document.createElement('button');
+      editLinkBtn.type = 'button';
+      editLinkBtn.className = 'doc-action-btn';
+      editLinkBtn.style.cssText = 'background:var(--ink-2);flex-shrink:0;';
+      editLinkBtn.innerHTML = '<svg class="ic" style="width:13px;height:13px"><use href="#i-link"/></svg> ' + (doc.link_externo ? 'Editar link' : 'Adicionar link');
+      editLinkBtn.addEventListener('click', async function () {
+        var novo = prompt('Link externo para acessar esta aula (opcional, ex: YouTube ou Drive):', doc.link_externo || '');
+        if (novo === null) return;
+        novo = novo.trim();
+        var upd = await supabase.from('documents').update({ link_externo: novo || null }).eq('id', doc.id);
+        if (upd.error) { alert('Não foi possível salvar o link.'); return; }
+        doc.link_externo = novo || null;
+        var folderId = currentFolderId();
+        if (folderId) renderInsideFolder(folderId);
+      });
+      titleRow.appendChild(editLinkBtn);
+    }
+    body.appendChild(titleRow);
+
+    var sub = document.createElement('div');
+    sub.className = 'doc-file-sub';
+    sub.style.marginTop = '2px';
+    var uploaderName = uploaderProfile ? (uploaderProfile.full_name || uploaderProfile.email) : '—';
+    sub.textContent = 'Enviado por ' + uploaderName + ' · ' + formatDateBR(doc.created_at);
+    body.appendChild(sub);
+
+    var row = document.createElement('div');
+    row.className = 'aula-card-row';
+
+    if (doc.link_externo) {
+      var linkBtn = document.createElement('button');
+      linkBtn.type = 'button';
+      linkBtn.className = 'doc-action-btn';
+      linkBtn.innerHTML = '<svg class="ic" style="width:14px;height:14px"><use href="#i-link"/></svg> Acessar link';
+      linkBtn.addEventListener('click', function () { window.open(doc.link_externo, '_blank', 'noopener'); });
+      row.appendChild(linkBtn);
+    }
+
+    var dlBtn = document.createElement('button');
+    dlBtn.type = 'button';
+    dlBtn.className = 'doc-dl-btn';
+    dlBtn.innerHTML = '<svg class="ic" style="width:14px;height:14px"><use href="#i-download"/></svg> Download';
+    dlBtn.addEventListener('click', function () { downloadDocument(doc, dlBtn); });
+    row.appendChild(dlBtn);
+
+    if (isAdmin) {
+      var delBtn = document.createElement('button');
+      delBtn.type = 'button';
+      delBtn.className = 'doc-del-btn';
+      delBtn.title = 'Excluir arquivo';
+      delBtn.innerHTML = '<svg class="ic" style="width:15px;height:15px"><use href="#i-trash"/></svg>';
+      delBtn.addEventListener('click', function () { deleteDocument(doc); });
+      row.appendChild(delBtn);
+    }
+
+    row.appendChild(buildLikeBtn('documento', doc.id));
+    body.appendChild(row);
+
+    var ratingRow = document.createElement('div');
+    ratingRow.style.marginTop = '8px';
+    ratingRow.appendChild(buildStarRating(doc.id));
+    body.appendChild(ratingRow);
+
+    card.appendChild(body);
+    return card;
   }
 
   function buildFileRow(doc, uploaderProfile) {
@@ -3801,6 +4068,7 @@
     if (page === 'tarefas' && typeof loadTarefas === 'function') { loadTarefas(); }
     if (page === 'chamados' && typeof loadChamados === 'function') { loadChamados(); }
     if (page === 'planos-acao' && typeof loadPlanos === 'function') { loadPlanos(); }
+    if (page === 'sugestoes' && typeof loadSugestoes === 'function') { loadSugestoes(); }
     if (page === 'home' && typeof loadHomeComunicados === 'function') { loadHomeComunicados(); }
     if (page === 'home' && typeof loadHomeNoticias === 'function') { loadHomeNoticias(); }
     if (page === 'home' && typeof renderMiniCalendar === 'function') { renderMiniCalendar(); }
@@ -3915,6 +4183,119 @@
   var comunicadoCancel = document.getElementById('comunicadoCancel');
   var comunicadoEditingAttachmentPath = null;
 
+  // ---------------- Curtidas (like em coração) — genérico ----------------
+  // content_type: 'informativo' | 'comunicado' | 'unidade' | 'colaborador'
+  var curtidasCache = {}; // 'tipo:id' -> { count, mine }
+
+  function curtidaKey(type, id) { return type + ':' + id; }
+
+  async function loadCurtidas(type, ids) {
+    ids = (ids || []).filter(Boolean);
+    ids.forEach(function (id) { curtidasCache[curtidaKey(type, id)] = { count: 0, mine: false }; });
+    if (!ids.length) return;
+    var res = await supabase.from('curtidas').select('content_id,user_id').eq('content_type', type).in('content_id', ids);
+    if (res.error) { console.error('Falha ao carregar curtidas:', res.error); return; }
+    var myId = appState.session && appState.session.user && appState.session.user.id;
+    (res.data || []).forEach(function (row) {
+      var k = curtidaKey(type, row.content_id);
+      if (!curtidasCache[k]) curtidasCache[k] = { count: 0, mine: false };
+      curtidasCache[k].count++;
+      if (row.user_id === myId) curtidasCache[k].mine = true;
+    });
+  }
+
+  function buildLikeBtn(type, id) {
+    var k = curtidaKey(type, id);
+    var btn = document.createElement('button');
+    btn.type = 'button';
+    function render() {
+      var st = curtidasCache[k] || { count: 0, mine: false };
+      btn.className = 'like-btn' + (st.mine ? ' liked' : '');
+      btn.title = st.mine ? 'Descurtir' : 'Curtir';
+      btn.innerHTML = '<svg class="ic"><use href="#i-heart"/></svg><span>' + st.count + '</span>';
+    }
+    render();
+    btn.addEventListener('click', async function (e) {
+      e.stopPropagation();
+      if (!appState.session) return;
+      var myId = appState.session.user.id;
+      var st = curtidasCache[k] || { count: 0, mine: false };
+      btn.disabled = true;
+      if (st.mine) {
+        var del = await supabase.from('curtidas').delete().eq('content_type', type).eq('content_id', id).eq('user_id', myId);
+        if (!del.error) { st.mine = false; st.count = Math.max(0, st.count - 1); }
+      } else {
+        var ins = await supabase.from('curtidas').insert({ content_type: type, content_id: id, user_id: myId });
+        if (!ins.error) { st.mine = true; st.count++; }
+      }
+      curtidasCache[k] = st;
+      render();
+      btn.disabled = false;
+    });
+    return btn;
+  }
+
+  // ---------------- Avaliação por estrelas (1-5) das aulas da Trilha do Conhecimento ----------------
+  var avaliacoesCache = {}; // documento_id -> { avg, count, mine }
+
+  async function loadAvaliacoes(ids) {
+    ids = (ids || []).filter(Boolean);
+    ids.forEach(function (id) { avaliacoesCache[id] = { avg: 0, count: 0, mine: 0 }; });
+    if (!ids.length) return;
+    var res = await supabase.from('avaliacoes_aula').select('documento_id,nota,user_id').in('documento_id', ids);
+    if (res.error) { console.error('Falha ao carregar avaliações:', res.error); return; }
+    var myId = appState.session && appState.session.user && appState.session.user.id;
+    var sums = {}, counts = {};
+    (res.data || []).forEach(function (r) {
+      sums[r.documento_id] = (sums[r.documento_id] || 0) + r.nota;
+      counts[r.documento_id] = (counts[r.documento_id] || 0) + 1;
+      if (r.user_id === myId) avaliacoesCache[r.documento_id].mine = r.nota;
+    });
+    ids.forEach(function (id) {
+      var c = counts[id] || 0;
+      avaliacoesCache[id].count = c;
+      avaliacoesCache[id].avg = c ? (sums[id] / c) : 0;
+    });
+  }
+
+  function buildStarRating(documentoId) {
+    var wrap = document.createElement('div');
+    wrap.className = 'star-rate';
+    var avgSpan = document.createElement('span');
+    avgSpan.className = 'aula-card-rating-avg';
+
+    function render() {
+      wrap.querySelectorAll('button').forEach(function (b) { b.remove(); });
+      var st = avaliacoesCache[documentoId] || { avg: 0, count: 0, mine: 0 };
+      var highlight = st.mine || Math.round(st.avg);
+      for (var i = 1; i <= 5; i++) {
+        (function (i) {
+          var b = document.createElement('button');
+          b.type = 'button';
+          b.title = 'Dar nota ' + i + (i === 1 ? ' estrela' : ' estrelas');
+          b.innerHTML = '<svg class="ic' + (i <= highlight ? ' filled' : '') + '"><use href="#i-star"/></svg>';
+          b.addEventListener('click', async function (e) {
+            e.stopPropagation();
+            if (!appState.session) return;
+            b.closest('.star-rate').style.opacity = '.6';
+            var up = await supabase.from('avaliacoes_aula').upsert(
+              { documento_id: documentoId, user_id: appState.session.user.id, nota: i },
+              { onConflict: 'documento_id,user_id' }
+            );
+            if (!up.error) { await loadAvaliacoes([documentoId]); render(); }
+            wrap.style.opacity = '1';
+          });
+          wrap.insertBefore(b, avgSpan);
+        })(i);
+      }
+      var st2 = avaliacoesCache[documentoId] || { avg: 0, count: 0, mine: 0 };
+      avgSpan.textContent = st2.count ? (st2.avg.toFixed(1) + ' (' + st2.count + ')') : 'Seja o primeiro a avaliar';
+    }
+    wrap.appendChild(avgSpan);
+    render();
+    return wrap;
+  }
+
   function buildComunicadoCard(item) {
     var isAdmin = hasPermission('comunicados.gerenciar');
     var card = document.createElement('div');
@@ -4014,6 +4395,7 @@
         (expirado ? 'Saiu da tela de entrada em ' : 'Na tela de entrada até ') + formatDateBR(item.expira_em);
       footer.appendChild(expiraSpan);
     }
+    footer.appendChild(buildLikeBtn('comunicado', item.id));
     body.appendChild(footer);
 
     card.appendChild(body);
@@ -4050,6 +4432,7 @@
     listEl.innerHTML = '';
     if (!items.length) { emptyEl.style.display = 'block'; return; }
     emptyEl.style.display = 'none';
+    await loadCurtidas('comunicado', items.map(function (i) { return i.id; }));
     items.forEach(function (item) { listEl.appendChild(buildComunicadoCard(item)); });
   }
 
@@ -4592,6 +4975,7 @@
     var footer = document.createElement('div');
     footer.className = 'doc-footer';
     footer.innerHTML = '<span><svg class="ic" style="width:13px;height:13px"><use href="#i-clock"/></svg> ' + formatDateBR(item.created_at) + '</span>';
+    footer.appendChild(buildLikeBtn('informativo', item.id));
     body.appendChild(footer);
 
     card.appendChild(body);
@@ -4628,6 +5012,7 @@
     listEl.innerHTML = '';
     if (!items.length) { emptyEl.style.display = 'block'; return; }
     emptyEl.style.display = 'none';
+    await loadCurtidas('informativo', items.map(function (i) { return i.id; }));
     items.forEach(function (item) { listEl.appendChild(buildInformativoCard(item)); });
   }
 
@@ -4831,6 +5216,11 @@
       videoRow.appendChild(videoBtn);
       body.appendChild(videoRow);
     }
+    var likeRow = document.createElement('div');
+    likeRow.style.cssText = 'display:flex;margin-top:10px;';
+    likeRow.appendChild(buildLikeBtn('unidade', item.id));
+    likeRow.firstChild.style.marginLeft = '0';
+    body.appendChild(likeRow);
     if (isAdmin) {
       var actions = document.createElement('div');
       actions.style.display = 'flex';
@@ -4871,6 +5261,7 @@
     grid.innerHTML = '';
     if (!items.length) { emptyEl.style.display = 'block'; return; }
     emptyEl.style.display = 'none';
+    await loadCurtidas('unidade', items.map(function (i) { return i.id; }));
     items.forEach(function (item) { grid.appendChild(buildUnitCard(item)); });
   }
 
@@ -5064,6 +5455,13 @@
       card.appendChild(desligadoBadge);
     }
 
+    var likeWrap = document.createElement('div');
+    likeWrap.style.cssText = 'display:flex;justify-content:center;margin-top:6px;';
+    var likeBtn = buildLikeBtn('colaborador', item.id);
+    likeBtn.style.marginLeft = '0';
+    likeWrap.appendChild(likeBtn);
+    card.appendChild(likeWrap);
+
     var actions = document.createElement('div');
     actions.className = 'colaborador-actions';
     var perfilBtn = document.createElement('button');
@@ -5175,6 +5573,7 @@
     if (res.error) { if (colaboradoresMsgEl) showMsgEl(colaboradoresMsgEl, 'Não foi possível carregar os colaboradores.', 'error'); return; }
     var allItems = res.data || [];
     colaboradoresCache = allItems;
+    await loadCurtidas('colaborador', allItems.map(function (i) { return i.id; }));
     var ativos = allItems.filter(function (c) { return c.status !== 'desligado'; });
     var desligados = allItems.filter(function (c) { return c.status === 'desligado'; });
     var countEl = document.getElementById('unidadesSideCountColaboradores');
@@ -7310,6 +7709,264 @@
   var enqueteResultadosModal = document.getElementById('enqueteResultadosModal');
   var enqueteResultadosClose = document.getElementById('enqueteResultadosClose');
   if (enqueteResultadosClose) enqueteResultadosClose.addEventListener('click', function () { enqueteResultadosModal.classList.add('hidden'); });
+
+  // =====================================================================
+  // SUGESTÕES — "Fala aí!" (caixa de sugestão com opção de anonimato)
+  // =====================================================================
+  var SUGESTAO_STATUS_LABELS = {
+    novo: 'Novo', em_analise: 'Em análise', aceita: 'Aceita',
+    aplicada: 'Aplicada', nao_aplicada: 'Não aplicada no momento', improcedente: 'Improcedente'
+  };
+  var SUGESTAO_STATUS_COLORS = {
+    novo: '#2563EB', em_analise: '#B45309', aceita: '#0EA5E9',
+    aplicada: '#16A34A', nao_aplicada: '#6B7280', improcedente: '#B91C2B'
+  };
+
+  var sugestaoModal = document.getElementById('sugestaoModal');
+  var sugestaoForm = document.getElementById('sugestaoForm');
+  var sugestaoModalMsg = document.getElementById('sugestaoModalMsg');
+  var btnNovaSugestao = document.getElementById('btnNovaSugestao');
+  var sugestaoCancel = document.getElementById('sugestaoCancel');
+  var sugestaoDirecionamentoTipo = document.getElementById('sugestaoDirecionamentoTipo');
+  var sugestaoDeptWrap = document.getElementById('sugestaoDeptWrap');
+  var sugestaoPessoaWrap = document.getElementById('sugestaoPessoaWrap');
+  var sugestaoPessoaSelect = document.getElementById('sugestaoPessoa');
+  var sugestaoNomeWrap = document.getElementById('sugestaoNomeWrap');
+  var sugestaoSigiloMsg = document.getElementById('sugestaoSigiloMsg');
+  var sugestaoPessoasLoaded = false;
+
+  function updateSugestaoDirecionamentoUI() {
+    var tipo = sugestaoDirecionamentoTipo.value;
+    sugestaoDeptWrap.style.display = tipo === 'departamento' ? 'block' : 'none';
+    sugestaoPessoaWrap.style.display = tipo === 'pessoa' ? 'block' : 'none';
+    if (tipo === 'pessoa' && !sugestaoPessoasLoaded) {
+      sugestaoPessoasLoaded = true;
+      supabase.from('profiles').select('id,full_name,email').eq('active', true).order('full_name').then(function (res) {
+        (res.data || []).forEach(function (p) {
+          var opt = document.createElement('option');
+          opt.value = p.full_name || p.email;
+          opt.textContent = p.full_name || p.email;
+          sugestaoPessoaSelect.appendChild(opt);
+        });
+      });
+    }
+  }
+  if (sugestaoDirecionamentoTipo) {
+    sugestaoDirecionamentoTipo.addEventListener('change', updateSugestaoDirecionamentoUI);
+  }
+  function updateSugestaoIdentUI() {
+    var sim = document.getElementById('sugestaoIdentSim').checked;
+    sugestaoNomeWrap.style.display = sim ? 'block' : 'none';
+    sugestaoSigiloMsg.style.display = sim ? 'none' : 'block';
+  }
+  document.querySelectorAll('input[name="sugestaoIdent"]').forEach(function (r) {
+    r.addEventListener('change', updateSugestaoIdentUI);
+  });
+
+  function openSugestaoModal() {
+    hideMsgEl(sugestaoModalMsg);
+    sugestaoForm.reset();
+    sugestaoDeptWrap.style.display = 'none';
+    sugestaoPessoaWrap.style.display = 'none';
+    sugestaoNomeWrap.style.display = 'none';
+    sugestaoSigiloMsg.style.display = 'block';
+    document.getElementById('sugestaoNome').value = (appState.profile && appState.profile.full_name) || '';
+    sugestaoModal.classList.remove('hidden');
+  }
+  if (btnNovaSugestao) btnNovaSugestao.addEventListener('click', openSugestaoModal);
+  if (sugestaoCancel) sugestaoCancel.addEventListener('click', function () { sugestaoModal.classList.add('hidden'); });
+  if (sugestaoModal) sugestaoModal.addEventListener('click', function (e) { if (e.target === sugestaoModal) sugestaoModal.classList.add('hidden'); });
+
+  if (sugestaoForm) {
+    sugestaoForm.addEventListener('submit', async function (e) {
+      e.preventDefault();
+      hideMsgEl(sugestaoModalMsg);
+      var descricao = document.getElementById('sugestaoDescricao').value.trim();
+      if (!descricao) return;
+      var tipo = sugestaoDirecionamentoTipo.value;
+      var valor = tipo === 'departamento' ? document.getElementById('sugestaoDept').value
+        : tipo === 'pessoa' ? sugestaoPessoaSelect.value
+        : null;
+      var identificado = document.getElementById('sugestaoIdentSim').checked;
+      var nome = identificado ? document.getElementById('sugestaoNome').value.trim() : null;
+      var submitBtn = sugestaoForm.querySelector('button[type="submit"]');
+      if (submitBtn) submitBtn.disabled = true;
+
+      var anexoInput = document.getElementById('sugestaoAnexo');
+      var anexoPath = null, anexoNome = null;
+      try {
+        if (anexoInput.files && anexoInput.files[0]) {
+          var file = anexoInput.files[0];
+          var path = crypto.randomUUID() + '-' + safeStorageName(file.name);
+          var up = await supabase.storage.from('sugestoes').upload(path, file);
+          if (up.error) throw new Error('Falha ao enviar anexo: ' + up.error.message);
+          anexoPath = path;
+          anexoNome = file.name;
+        }
+        var payload = {
+          identificado: identificado,
+          nome_informado: nome || null,
+          direcionamento_tipo: tipo,
+          direcionamento_valor: valor,
+          descricao: descricao,
+          anexo_storage_path: anexoPath,
+          anexo_nome: anexoNome
+        };
+        if (identificado && appState.session) payload.user_id = appState.session.user.id;
+        var ins = await supabase.from('sugestoes').insert(payload);
+        if (ins.error) throw new Error(ins.error.message);
+        sugestaoModal.classList.add('hidden');
+        loadSugestoes();
+      } catch (err) {
+        showMsgEl(sugestaoModalMsg, (err && err.message) || 'Não foi possível enviar sua sugestão.', 'error');
+      } finally {
+        if (submitBtn) submitBtn.disabled = false;
+      }
+    });
+  }
+
+  function direcionamentoLabel(item) {
+    if (item.direcionamento_tipo === 'empresa') return 'Empresa em geral';
+    if (item.direcionamento_tipo === 'departamento') return 'Depto: ' + (item.direcionamento_valor || '—');
+    if (item.direcionamento_tipo === 'pessoa') return 'Pessoa: ' + (item.direcionamento_valor || '—');
+    return '—';
+  }
+
+  function buildSugestaoCard(item, isAdminView) {
+    var card = document.createElement('div');
+    card.className = 'sugestao-card';
+
+    var top = document.createElement('div');
+    top.style.cssText = 'display:flex;justify-content:space-between;align-items:flex-start;gap:10px;flex-wrap:wrap;';
+    var left = document.createElement('div');
+    var badge = document.createElement('span');
+    badge.className = 'badge';
+    badge.style.cssText = 'background:' + (SUGESTAO_STATUS_COLORS[item.status] || '#6B7280') + ';color:#fff;';
+    badge.textContent = SUGESTAO_STATUS_LABELS[item.status] || item.status;
+    left.appendChild(badge);
+    var dirSpan = document.createElement('span');
+    dirSpan.className = 'badge badge-blue';
+    dirSpan.style.marginLeft = '6px';
+    dirSpan.textContent = direcionamentoLabel(item);
+    left.appendChild(dirSpan);
+    top.appendChild(left);
+    var dateSpan = document.createElement('span');
+    dateSpan.style.cssText = 'font-size:11.5px;color:var(--muted);';
+    dateSpan.textContent = formatDateBR(item.created_at);
+    top.appendChild(dateSpan);
+    card.appendChild(top);
+
+    var desc = document.createElement('p');
+    desc.style.cssText = 'margin:10px 0 0;font-size:13.5px;';
+    desc.textContent = item.descricao;
+    card.appendChild(desc);
+
+    if (isAdminView) {
+      var quemEl = document.createElement('p');
+      quemEl.style.cssText = 'margin:6px 0 0;font-size:11.5px;color:var(--muted);';
+      quemEl.textContent = item.identificado ? ('Enviado por: ' + (item.nome_informado || '—')) : 'Enviado de forma anônima';
+      card.appendChild(quemEl);
+      if (item.anexo_storage_path) {
+        var anexoBtn = document.createElement('button');
+        anexoBtn.type = 'button';
+        anexoBtn.className = 'doc-action-btn';
+        anexoBtn.style.marginTop = '8px';
+        anexoBtn.innerHTML = '<svg class="ic" style="width:13px;height:13px"><use href="#i-download"/></svg> Baixar anexo';
+        anexoBtn.addEventListener('click', async function () {
+          var signed = await supabase.storage.from('sugestoes').createSignedUrl(item.anexo_storage_path, 60);
+          if (signed.data) window.open(signed.data.signedUrl, '_blank', 'noopener');
+        });
+        card.appendChild(anexoBtn);
+      }
+    }
+
+    if (item.resposta_admin) {
+      var respBox = document.createElement('div');
+      respBox.style.cssText = 'margin-top:10px;background:var(--bg);border-radius:8px;padding:10px 12px;font-size:12.5px;';
+      respBox.innerHTML = '<b>Resposta:</b> ';
+      respBox.appendChild(document.createTextNode(item.resposta_admin));
+      card.appendChild(respBox);
+    }
+
+    if (isAdminView) {
+      var editBtn = document.createElement('button');
+      editBtn.type = 'button';
+      editBtn.className = 'doc-action-btn';
+      editBtn.style.cssText = 'margin-top:10px;background:var(--ink-2);';
+      editBtn.innerHTML = '<svg class="ic" style="width:13px;height:13px"><use href="#i-edit"/></svg> Responder / atualizar status';
+      editBtn.addEventListener('click', function () { openSugestaoRespostaModal(item); });
+      card.appendChild(editBtn);
+    }
+
+    return card;
+  }
+
+  async function loadSugestoes() {
+    if (!appState.session) return;
+    hideMsgEl(document.getElementById('sugestoesMsg'));
+    var isAdmin = hasPermission('sugestoes.gerenciar');
+    var res = await supabase.from('sugestoes').select('*').order('created_at', { ascending: false });
+    if (res.error) { showMsgEl(document.getElementById('sugestoesMsg'), 'Não foi possível carregar as sugestões.', 'error'); return; }
+    var items = res.data || [];
+
+    var inboxSection = document.getElementById('sugestoesInboxSection');
+    var inboxList = document.getElementById('sugestoesInboxList');
+    var inboxEmpty = document.getElementById('sugestoesInboxEmpty');
+    if (isAdmin) {
+      inboxSection.style.display = 'block';
+      inboxList.innerHTML = '';
+      if (!items.length) { inboxEmpty.style.display = 'block'; }
+      else { inboxEmpty.style.display = 'none'; items.forEach(function (item) { inboxList.appendChild(buildSugestaoCard(item, true)); }); }
+      var navBadge = document.getElementById('navSugestoesBadge');
+      var novasCount = items.filter(function (i) { return i.status === 'novo'; }).length;
+      if (navBadge) { navBadge.style.display = novasCount ? 'inline-flex' : 'none'; navBadge.textContent = novasCount; }
+    } else {
+      inboxSection.style.display = 'none';
+    }
+
+    var divulgadas = items.filter(function (i) { return i.divulgada; });
+    var respList = document.getElementById('sugestoesRespondidasList');
+    var respEmpty = document.getElementById('sugestoesRespondidasEmpty');
+    respList.innerHTML = '';
+    if (!divulgadas.length) { respEmpty.style.display = 'block'; }
+    else { respEmpty.style.display = 'none'; divulgadas.forEach(function (item) { respList.appendChild(buildSugestaoCard(item, false)); }); }
+  }
+
+  var sugestaoRespostaModal = document.getElementById('sugestaoRespostaModal');
+  var sugestaoRespostaForm = document.getElementById('sugestaoRespostaForm');
+  var sugestaoRespostaModalMsg = document.getElementById('sugestaoRespostaModalMsg');
+  var sugestaoRespostaCancel = document.getElementById('sugestaoRespostaCancel');
+
+  function openSugestaoRespostaModal(item) {
+    hideMsgEl(sugestaoRespostaModalMsg);
+    document.getElementById('sugestaoRespostaId').value = item.id;
+    document.getElementById('sugestaoRespostaStatus').value = item.status || 'novo';
+    document.getElementById('sugestaoRespostaTexto').value = item.resposta_admin || '';
+    document.getElementById('sugestaoRespostaDivulgar').checked = !!item.divulgada;
+    sugestaoRespostaModal.classList.remove('hidden');
+  }
+  if (sugestaoRespostaCancel) sugestaoRespostaCancel.addEventListener('click', function () { sugestaoRespostaModal.classList.add('hidden'); });
+  if (sugestaoRespostaModal) sugestaoRespostaModal.addEventListener('click', function (e) { if (e.target === sugestaoRespostaModal) sugestaoRespostaModal.classList.add('hidden'); });
+
+  if (sugestaoRespostaForm) {
+    sugestaoRespostaForm.addEventListener('submit', async function (e) {
+      e.preventDefault();
+      hideMsgEl(sugestaoRespostaModalMsg);
+      var id = document.getElementById('sugestaoRespostaId').value;
+      var status = document.getElementById('sugestaoRespostaStatus').value;
+      var resposta = document.getElementById('sugestaoRespostaTexto').value.trim();
+      var divulgar = document.getElementById('sugestaoRespostaDivulgar').checked;
+      var upd = await supabase.from('sugestoes').update({
+        status: status,
+        resposta_admin: resposta || null,
+        divulgada: divulgar,
+        respondida_em: new Date().toISOString()
+      }).eq('id', id);
+      if (upd.error) { showMsgEl(sugestaoRespostaModalMsg, 'Não foi possível salvar.', 'error'); return; }
+      sugestaoRespostaModal.classList.add('hidden');
+      loadSugestoes();
+    });
+  }
 
   function buildResultadoBloco(pg) {
     var box = document.createElement('div');
