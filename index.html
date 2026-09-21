@@ -683,6 +683,11 @@
   .mini-cal-day.is-empty{visibility:hidden;}
   .mini-cal-dots{display:flex;gap:3px;position:absolute;bottom:3px;}
   .mini-cal-dots span{width:5px;height:5px;border-radius:50%;display:block;}
+  .mini-cal-head-left{display:flex;align-items:center;gap:8px;}
+  .mini-cal-nav-btn{background:var(--bg);border:1px solid var(--line);border-radius:7px;width:24px;height:24px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--ink-2);flex-shrink:0;}
+  .mini-cal-nav-btn:hover{border-color:var(--red);color:var(--red);}
+  .mini-cal-nav-btn .ic{width:13px;height:13px;}
+  .mini-cal-today-btn{font-size:11px;font-weight:700;color:var(--red);cursor:pointer;background:none;border:none;padding:0;font-family:inherit;}
 
   .cal-toolbar{display:flex;align-items:center;gap:12px;flex-wrap:wrap;}
   .cal-nav-btn{background:var(--bg);border:1px solid var(--line);border-radius:8px;width:32px;height:32px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--ink-2);}
@@ -1054,9 +1059,9 @@
             <h3>Calendário</h3>
             <button class="link-more" onclick="navigate('calendario')">ver tudo</button>
           </div>
-          <button type="button" class="mini-cal" id="miniCalBtn" title="Clique para ver o calendário completo">
+          <div class="mini-cal" id="miniCalBtn" role="button" tabindex="0" title="Clique para ver o calendário completo">
             <div id="miniCalWrap"></div>
-          </button>
+          </div>
         </div>
         </div>
 
@@ -1791,16 +1796,38 @@
                 <option value="outro">Outro</option>
               </select>
             </div>
-            <div class="login-field">
-              <label for="eventoData">Data</label>
-              <input type="date" id="eventoData" required>
+            <div style="display:flex;gap:10px;">
+              <div class="login-field" style="flex:1;">
+                <label for="eventoData">Data</label>
+                <input type="date" id="eventoData" required>
+              </div>
+              <div class="login-field" style="flex:1;">
+                <label for="eventoHorario">Horário (opcional)</label>
+                <input type="time" id="eventoHorario">
+              </div>
             </div>
             <label class="gate-check-row" style="margin-bottom:16px;">
               <input type="checkbox" id="eventoRecorrente"> Repete todo ano nessa data (ex: aniversários e feriados fixos)
             </label>
             <div class="login-field">
+              <label for="eventoLink">Link (opcional)</label>
+              <input type="url" id="eventoLink" placeholder="https://...">
+            </div>
+            <div class="login-field">
               <label for="eventoDescricao">Descrição (opcional)</label>
               <textarea id="eventoDescricao" rows="2" style="width:100%;font-family:inherit;padding:11px 13px;border-radius:9px;border:1px solid var(--line);background:var(--bg);font-size:13.5px;"></textarea>
+            </div>
+            <label class="gate-check-row" id="eventoLembreteRow">
+              <input type="checkbox" id="eventoLembreteAtivo"> Enviar lembrete por e-mail pra mim
+            </label>
+            <div class="login-field" id="eventoLembreteQuandoWrap" style="display:none;margin-bottom:16px;">
+              <label for="eventoLembreteDias">Quando enviar o lembrete</label>
+              <select id="eventoLembreteDias">
+                <option value="0">No dia do evento</option>
+                <option value="1">1 dia antes</option>
+                <option value="2">2 dias antes</option>
+                <option value="7">1 semana antes</option>
+              </select>
             </div>
             <div style="display:flex;gap:10px;margin-top:16px;">
               <button type="submit" class="login-btn" style="width:auto;padding:11px 20px;">Salvar</button>
@@ -7720,11 +7747,15 @@
     if (pageEl && pageEl.classList.contains('active')) { renderCalPage(); }
   }
 
+  var miniCalState = { year: null, month: null };
   function renderMiniCalendar() {
     var wrap = document.getElementById('miniCalWrap');
     if (!wrap) return;
     var today = new Date();
-    var year = today.getFullYear(), month = today.getMonth() + 1, todayDay = today.getDate();
+    var todayY = today.getFullYear(), todayM = today.getMonth() + 1, todayDay = today.getDate();
+    if (!miniCalState.year) { miniCalState.year = todayY; miniCalState.month = todayM; }
+    var year = miniCalState.year, month = miniCalState.month;
+    var isCurrentMonth = (year === todayY && month === todayM);
     var firstDow = new Date(year, month - 1, 1).getDay();
     var daysInMonth = new Date(year, month, 0).getDate();
     var eventsByDay = {};
@@ -7733,12 +7764,19 @@
       if (!eventsByDay[d]) eventsByDay[d] = [];
       eventsByDay[d].push(ev);
     });
-    var html = '<div class="mini-cal-head"><b>' + CAL_MESES[month - 1] + ' ' + year + '</b><span>ver calendário</span></div>';
+    var html = '<div class="mini-cal-head">' +
+      '<div class="mini-cal-head-left">' +
+      '<button type="button" class="mini-cal-nav-btn" data-mini-cal-nav="prev" title="Mês anterior"><svg class="ic"><use href="#i-chevron-left"/></svg></button>' +
+      '<b>' + CAL_MESES[month - 1] + ' ' + year + '</b>' +
+      '<button type="button" class="mini-cal-nav-btn" data-mini-cal-nav="next" title="Próximo mês"><svg class="ic"><use href="#i-chevron-right"/></svg></button>' +
+      (isCurrentMonth ? '' : '<button type="button" class="mini-cal-today-btn" data-mini-cal-nav="hoje">hoje</button>') +
+      '</div>' +
+      '<span>ver calendário</span></div>';
     html += '<div class="mini-cal-grid">';
     CAL_DOW.forEach(function (d) { html += '<div class="mini-cal-dow">' + d + '</div>'; });
     for (var i = 0; i < firstDow; i++) { html += '<div class="mini-cal-day is-empty"></div>'; }
     for (var day = 1; day <= daysInMonth; day++) {
-      var isToday = day === todayDay;
+      var isToday = isCurrentMonth && day === todayDay;
       var dots = '';
       if (eventsByDay[day]) {
         var tipos = [];
@@ -7751,6 +7789,22 @@
     }
     html += '</div>';
     wrap.innerHTML = html;
+    wrap.querySelectorAll('[data-mini-cal-nav]').forEach(function (btn) {
+      btn.addEventListener('click', function (e) {
+        e.stopPropagation();
+        var dir = btn.getAttribute('data-mini-cal-nav');
+        if (dir === 'prev') {
+          miniCalState.month--;
+          if (miniCalState.month < 1) { miniCalState.month = 12; miniCalState.year--; }
+        } else if (dir === 'next') {
+          miniCalState.month++;
+          if (miniCalState.month > 12) { miniCalState.month = 1; miniCalState.year++; }
+        } else if (dir === 'hoje') {
+          miniCalState.year = todayY; miniCalState.month = todayM;
+        }
+        renderMiniCalendar();
+      });
+    });
   }
 
   function calBuildGridHTML(year, month) {
@@ -7772,7 +7826,9 @@
       var chips = '';
       (eventsByDay[day] || []).forEach(function (ev) {
         var meta = CAL_TIPO_META[ev.tipo] || CAL_TIPO_META.outro;
-        chips += '<div class="cal-event-chip" data-evento-id="' + ev.id + '" style="background:' + meta.color + '22;color:' + meta.color + '" title="' + (ev.titulo || '').replace(/"/g, '&quot;') + '">' + (ev.titulo || '') + '</div>';
+        var chipTitle = (ev.titulo || '') + (ev.horario ? ' às ' + ev.horario.slice(0, 5) : '');
+        chips += '<div class="cal-event-chip" data-evento-id="' + ev.id + '" style="background:' + meta.color + '22;color:' + meta.color + '" title="' + chipTitle.replace(/"/g, '&quot;') + '">' +
+          (ev.horario ? '<b>' + ev.horario.slice(0, 5) + '</b> ' : '') + (ev.titulo || '') + '</div>';
       });
       html += '<div class="cal-day' + (isToday ? ' is-today' : '') + '"><div class="cal-day-num">' + day + '</div>' + chips + '</div>';
     }
@@ -7815,9 +7871,11 @@
         var p = calParseData(ev.data);
         var row = document.createElement('div');
         row.className = 'evento-row';
-        var dateStr = String(p.d).padStart(2, '0') + '/' + String(p.m).padStart(2, '0');
+        var dateStr = String(p.d).padStart(2, '0') + '/' + String(p.m).padStart(2, '0') + (ev.horario ? ' ' + ev.horario.slice(0, 5) : '');
+        var linkHtml = ev.link ? ' <a href="' + ev.link.replace(/"/g, '&quot;') + '" target="_blank" rel="noopener" style="font-size:11px;" onclick="event.stopPropagation();">🔗 link</a>' : '';
+        var lembreteHtml = ev.lembrete_ativo ? ' <span title="Lembrete por e-mail ativado" style="font-size:12px;">🔔</span>' : '';
         row.innerHTML = '<div class="evento-row-date">' + dateStr + '</div>' +
-          '<div class="evento-row-title">' + ev.titulo + '</div>' +
+          '<div class="evento-row-title">' + ev.titulo + lembreteHtml + linkHtml + '</div>' +
           '<span class="badge ' + meta.badge + '">' + meta.label + '</span>';
         if (isAdmin) {
           var actions = document.createElement('div');
@@ -7897,10 +7955,16 @@
   }
 
   var miniCalBtnEl = document.getElementById('miniCalBtn');
-  if (miniCalBtnEl) miniCalBtnEl.addEventListener('click', function () {
-    var t = new Date();
-    openCalendarGrande(t.getFullYear(), t.getMonth() + 1);
-  });
+  if (miniCalBtnEl) {
+    miniCalBtnEl.addEventListener('click', function () {
+      var y = miniCalState.year, m = miniCalState.month;
+      if (!y) { var t = new Date(); y = t.getFullYear(); m = t.getMonth() + 1; }
+      openCalendarGrande(y, m);
+    });
+    miniCalBtnEl.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); miniCalBtnEl.click(); }
+    });
+  }
   var calendarGrandeCloseEl = document.getElementById('calendarGrandeClose');
   if (calendarGrandeCloseEl) calendarGrandeCloseEl.addEventListener('click', function () {
     document.getElementById('calendarGrandeModal').classList.add('hidden');
@@ -7925,10 +7989,22 @@
     document.getElementById('eventoTitulo').value = ev ? ev.titulo : '';
     document.getElementById('eventoTipo').value = ev ? ev.tipo : 'aniversario';
     document.getElementById('eventoData').value = ev ? ev.data : '';
+    document.getElementById('eventoHorario').value = (ev && ev.horario) ? ev.horario.slice(0, 5) : '';
     document.getElementById('eventoRecorrente').checked = ev ? !!ev.recorrente_anual : true;
+    document.getElementById('eventoLink').value = (ev && ev.link) || '';
     document.getElementById('eventoDescricao').value = (ev && ev.descricao) || '';
+    var lembreteAtivoEl = document.getElementById('eventoLembreteAtivo');
+    var lembreteDiasEl = document.getElementById('eventoLembreteDias');
+    var lembreteWrapEl = document.getElementById('eventoLembreteQuandoWrap');
+    lembreteAtivoEl.checked = ev ? !!ev.lembrete_ativo : false;
+    lembreteDiasEl.value = ev && ev.lembrete_dias_antes != null ? String(ev.lembrete_dias_antes) : '0';
+    lembreteWrapEl.style.display = lembreteAtivoEl.checked ? '' : 'none';
     eventoModalEl.classList.remove('hidden');
   }
+  var eventoLembreteAtivoEl = document.getElementById('eventoLembreteAtivo');
+  if (eventoLembreteAtivoEl) eventoLembreteAtivoEl.addEventListener('change', function () {
+    document.getElementById('eventoLembreteQuandoWrap').style.display = eventoLembreteAtivoEl.checked ? '' : 'none';
+  });
   var eventoCancelEl = document.getElementById('eventoCancel');
   if (eventoCancelEl) eventoCancelEl.addEventListener('click', function () { eventoModalEl.classList.add('hidden'); });
   var eventoTipoSelEl = document.getElementById('eventoTipo');
@@ -7942,8 +8018,12 @@
       titulo: document.getElementById('eventoTitulo').value.trim(),
       tipo: document.getElementById('eventoTipo').value,
       data: document.getElementById('eventoData').value,
+      horario: document.getElementById('eventoHorario').value || null,
       recorrente_anual: document.getElementById('eventoRecorrente').checked,
-      descricao: document.getElementById('eventoDescricao').value.trim() || null
+      link: document.getElementById('eventoLink').value.trim() || null,
+      descricao: document.getElementById('eventoDescricao').value.trim() || null,
+      lembrete_ativo: document.getElementById('eventoLembreteAtivo').checked,
+      lembrete_dias_antes: parseInt(document.getElementById('eventoLembreteDias').value, 10) || 0
     };
     if (!payload.titulo || !payload.data) return;
     try {
