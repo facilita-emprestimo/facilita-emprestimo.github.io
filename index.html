@@ -1422,10 +1422,27 @@
                 <input type="checkbox" id="comunicadoShowGate"> Mostrar na tela de entrada (aviso obrigatório ao logar)
               </label>
             </div>
-            <div class="login-field">
-              <label for="comunicadoExpiraEm">Data de expiração (opcional)</label>
-              <input type="date" id="comunicadoExpiraEm">
-              <div style="font-size:11.5px;color:var(--muted,#6B7280);margin-top:5px;">Depois dessa data, o comunicado deixa de aparecer na tela de entrada — mas continua no histórico de Comunicados normalmente.</div>
+            <div style="display:flex;gap:12px;">
+              <div class="login-field" style="flex:1;">
+                <label for="comunicadoPublicaEm">Data de publicação (opcional)</label>
+                <input type="date" id="comunicadoPublicaEm">
+                <div style="font-size:11.5px;color:var(--muted,#6B7280);margin-top:5px;">Se preenchida com uma data futura, o comunicado só aparece a partir dela. Vazio = publica agora.</div>
+              </div>
+              <div class="login-field" style="flex:1;">
+                <label for="comunicadoExpiraEm">Data de expiração (opcional)</label>
+                <input type="date" id="comunicadoExpiraEm">
+                <div style="font-size:11.5px;color:var(--muted,#6B7280);margin-top:5px;">Depois dessa data, o comunicado deixa de aparecer na tela de entrada — mas continua no histórico de Comunicados normalmente.</div>
+              </div>
+            </div>
+            <label class="gate-check-row" style="margin-bottom:4px;">
+              <input type="checkbox" id="comunicadoAllowAll" checked>
+              Visível para todos os colaboradores
+            </label>
+            <div id="comunicadoRolesWrap" style="display:none;">
+              <div class="login-field" style="margin-top:10px;">
+                <label>Ou selecione os cargos que podem ver</label>
+                <div class="role-checks" id="comunicadoRoles"></div>
+              </div>
             </div>
             <div style="display:flex;gap:10px;margin-top:16px;">
               <button type="submit" class="login-btn" style="width:auto;padding:11px 20px;">Salvar</button>
@@ -1485,6 +1502,28 @@
               <label class="gate-check-row" id="informativoRemoveAnexoWrap" style="display:none;margin-top:6px;">
                 <input type="checkbox" id="informativoRemoveAnexo"> Remover anexo atual
               </label>
+            </div>
+            <div style="display:flex;gap:12px;">
+              <div class="login-field" style="flex:1;">
+                <label for="informativoPublicaEm">Data de publicação (opcional)</label>
+                <input type="date" id="informativoPublicaEm">
+                <div style="font-size:11.5px;color:var(--muted,#6B7280);margin-top:5px;">Se preenchida com uma data futura, o informativo só aparece a partir dela.</div>
+              </div>
+              <div class="login-field" style="flex:1;">
+                <label for="informativoExpiraEm">Data de expiração (opcional)</label>
+                <input type="date" id="informativoExpiraEm">
+                <div style="font-size:11.5px;color:var(--muted,#6B7280);margin-top:5px;">Depois dessa data, o informativo deixa de aparecer para os colaboradores.</div>
+              </div>
+            </div>
+            <label class="gate-check-row" style="margin-bottom:4px;">
+              <input type="checkbox" id="informativoAllowAll" checked>
+              Visível para todos os colaboradores
+            </label>
+            <div id="informativoRolesWrap" style="display:none;">
+              <div class="login-field" style="margin-top:10px;">
+                <label>Ou selecione os cargos que podem ver</label>
+                <div class="role-checks" id="informativoRoles"></div>
+              </div>
             </div>
             <div style="display:flex;gap:10px;margin-top:16px;">
               <button type="submit" class="login-btn" style="width:auto;padding:11px 20px;">Salvar</button>
@@ -2184,6 +2223,15 @@
               <label for="eventoDescricao">Descrição (opcional)</label>
               <textarea id="eventoDescricao" rows="2" style="width:100%;font-family:inherit;padding:11px 13px;border-radius:9px;border:1px solid var(--line);background:var(--bg);font-size:13.5px;"></textarea>
             </div>
+            <div class="login-field">
+              <label for="eventoAnexo">Anexo — PDF, imagem ou vídeo (opcional)</label>
+              <input type="file" id="eventoAnexo" accept=".pdf,image/*,video/*">
+              <div id="eventoAnexoAtual" style="font-size:12.5px;color:var(--muted,#6B7280);margin-top:6px;display:none;"></div>
+              <div id="eventoAnexoPreview" class="attach-preview" style="display:none;"></div>
+              <label class="gate-check-row" id="eventoRemoveAnexoWrap" style="display:none;margin-top:6px;">
+                <input type="checkbox" id="eventoRemoveAnexo"> Remover anexo atual
+              </label>
+            </div>
             <label class="gate-check-row" id="eventoLembreteRow">
               <input type="checkbox" id="eventoLembreteAtivo"> Enviar lembrete por e-mail pra mim
             </label>
@@ -2195,6 +2243,28 @@
                 <option value="2">2 dias antes</option>
                 <option value="7">1 semana antes</option>
               </select>
+            </div>
+            <div style="display:flex;gap:12px;">
+              <div class="login-field" style="flex:1;">
+                <label for="eventoPublicaEm">Data de publicação (opcional)</label>
+                <input type="date" id="eventoPublicaEm">
+                <div style="font-size:11.5px;color:var(--muted,#6B7280);margin-top:5px;">Se preenchida com uma data futura, o evento só aparece no calendário a partir dela.</div>
+              </div>
+              <div class="login-field" style="flex:1;">
+                <label for="eventoExpiraEm">Data de expiração (opcional)</label>
+                <input type="date" id="eventoExpiraEm">
+                <div style="font-size:11.5px;color:var(--muted,#6B7280);margin-top:5px;">Depois dessa data, o evento deixa de aparecer para os colaboradores.</div>
+              </div>
+            </div>
+            <label class="gate-check-row" style="margin-bottom:4px;">
+              <input type="checkbox" id="eventoAllowAll" checked>
+              Visível para todos os colaboradores
+            </label>
+            <div id="eventoRolesWrap" style="display:none;">
+              <div class="login-field" style="margin-top:10px;">
+                <label>Ou selecione os cargos que podem ver</label>
+                <div class="role-checks" id="eventoRoles"></div>
+              </div>
             </div>
             <div style="display:flex;gap:10px;margin-top:16px;">
               <button type="submit" class="login-btn" style="width:auto;padding:11px 20px;">Salvar</button>
@@ -2656,6 +2726,49 @@
     marketing: 'Marketing'
   };
   var ALL_ROLES = Object.keys(ROLE_LABELS);
+
+  // ---- "Quem pode ver" — helper reutilizável para os checkboxes de cargo (allow_all + allowed_roles) ----
+  function wireRoleChecks(rolesContainerId, allowAllId, rolesWrapId) {
+    var container = document.getElementById(rolesContainerId);
+    var allowAllEl = document.getElementById(allowAllId);
+    var wrapEl = document.getElementById(rolesWrapId);
+    if (container && !container.childElementCount) {
+      ALL_ROLES.forEach(function (r) {
+        var label = document.createElement('label');
+        var input = document.createElement('input');
+        input.type = 'checkbox';
+        input.value = r;
+        label.appendChild(input);
+        label.appendChild(document.createTextNode(' ' + ROLE_LABELS[r]));
+        container.appendChild(label);
+      });
+    }
+    if (allowAllEl && wrapEl) {
+      allowAllEl.addEventListener('change', function () {
+        wrapEl.style.display = allowAllEl.checked ? 'none' : '';
+      });
+    }
+  }
+  function setRoleChecksValue(rolesContainerId, allowAllId, rolesWrapId, allowAll, allowedRoles) {
+    var container = document.getElementById(rolesContainerId);
+    var allowAllEl = document.getElementById(allowAllId);
+    var wrapEl = document.getElementById(rolesWrapId);
+    if (allowAllEl) allowAllEl.checked = allowAll !== false;
+    if (wrapEl) wrapEl.style.display = (allowAll !== false) ? 'none' : '';
+    if (container) {
+      var roles = allowedRoles || [];
+      Array.prototype.slice.call(container.querySelectorAll('input[type="checkbox"]')).forEach(function (cb) {
+        cb.checked = roles.indexOf(cb.value) !== -1;
+      });
+    }
+  }
+  function getRoleChecksValue(rolesContainerId, allowAllId) {
+    var container = document.getElementById(rolesContainerId);
+    var allowAllEl = document.getElementById(allowAllId);
+    var allowAll = allowAllEl ? allowAllEl.checked : true;
+    var checked = container ? Array.prototype.slice.call(container.querySelectorAll('input:checked')).map(function (i) { return i.value; }) : [];
+    return { allow_all: allowAll, allowed_roles: allowAll ? [] : checked };
+  }
 
   var PERMISSION_DEFS = [
     { key: 'comunicados.gerenciar', label: 'Publicar comunicados/avisos' },
@@ -4847,6 +4960,7 @@
   var btnNewComunicado = document.getElementById('btnNewComunicado');
   var comunicadoCancel = document.getElementById('comunicadoCancel');
   var comunicadoEditingAttachmentPath = null;
+  wireRoleChecks('comunicadoRoles', 'comunicadoAllowAll', 'comunicadoRolesWrap');
 
   // ---------------- Curtidas (like em coração) — genérico ----------------
   // content_type: 'informativo' | 'comunicado' | 'unidade' | 'colaborador'
@@ -5268,6 +5382,8 @@
     document.getElementById('comunicadoShowGate').checked = item ? !!item.show_in_gate : false;
     document.getElementById('comunicadoImportante').checked = item ? !!item.importante : false;
     document.getElementById('comunicadoExpiraEm').value = item && item.expira_em ? item.expira_em : '';
+    document.getElementById('comunicadoPublicaEm').value = item && item.publica_em ? item.publica_em : '';
+    setRoleChecksValue('comunicadoRoles', 'comunicadoAllowAll', 'comunicadoRolesWrap', item ? item.allow_all : true, item ? item.allowed_roles : []);
     comunicadoEditingAttachmentPath = item ? (item.attachment_path || null) : null;
     var comunicadoAnexoAtualEl = document.getElementById('comunicadoAnexoAtual');
     var comunicadoRemoveAnexoWrapEl = document.getElementById('comunicadoRemoveAnexoWrap');
@@ -5311,6 +5427,11 @@
       payload.link_url = linkVal || null;
       var expiraEmVal = document.getElementById('comunicadoExpiraEm').value;
       payload.expira_em = expiraEmVal || null;
+      var publicaEmVal = document.getElementById('comunicadoPublicaEm').value;
+      payload.publica_em = publicaEmVal || null;
+      var roleVals = getRoleChecksValue('comunicadoRoles', 'comunicadoAllowAll');
+      payload.allow_all = roleVals.allow_all;
+      payload.allowed_roles = roleVals.allowed_roles;
       var fileInput = document.getElementById('comunicadoAnexo');
       var file = fileInput.files[0];
       var removeChecked = document.getElementById('comunicadoRemoveAnexo').checked;
@@ -5766,6 +5887,7 @@
   var btnNewInformativo = document.getElementById('btnNewInformativo');
   var informativoCancel = document.getElementById('informativoCancel');
   var informativoEditingAttachmentPath = null;
+  wireRoleChecks('informativoRoles', 'informativoAllowAll', 'informativoRolesWrap');
 
   function buildInformativoCard(item) {
     var isAdmin = hasPermission('informativos.gerenciar');
@@ -5907,6 +6029,9 @@
     document.getElementById('informativoDescricao').value = item ? item.description : '';
     document.getElementById('informativoStatus').value = item ? (item.status || 'ativo') : 'ativo';
     document.getElementById('informativoLink').value = item ? (item.link_url || '') : '';
+    document.getElementById('informativoPublicaEm').value = item && item.publica_em ? item.publica_em : '';
+    document.getElementById('informativoExpiraEm').value = item && item.expira_em ? item.expira_em : '';
+    setRoleChecksValue('informativoRoles', 'informativoAllowAll', 'informativoRolesWrap', item ? item.allow_all : true, item ? item.allowed_roles : []);
     informativoEditingAttachmentPath = item ? (item.attachment_path || null) : null;
     var informativoAnexoAtualEl = document.getElementById('informativoAnexoAtual');
     var informativoRemoveAnexoWrapEl = document.getElementById('informativoRemoveAnexoWrap');
@@ -5945,6 +6070,13 @@
       };
       var linkVal = document.getElementById('informativoLink').value.trim();
       payload.link_url = linkVal || null;
+      var publicaEmVal = document.getElementById('informativoPublicaEm').value;
+      payload.publica_em = publicaEmVal || null;
+      var expiraEmVal = document.getElementById('informativoExpiraEm').value;
+      payload.expira_em = expiraEmVal || null;
+      var roleVals = getRoleChecksValue('informativoRoles', 'informativoAllowAll');
+      payload.allow_all = roleVals.allow_all;
+      payload.allowed_roles = roleVals.allowed_roles;
       var fileInput = document.getElementById('informativoAnexo');
       var file = fileInput.files[0];
       var removeChecked = document.getElementById('informativoRemoveAnexo').checked;
@@ -9427,9 +9559,14 @@
         var dateStr = String(p.d).padStart(2, '0') + '/' + String(p.m).padStart(2, '0') + (ev.horario ? ' ' + ev.horario.slice(0, 5) : '');
         var linkHtml = ev.link ? ' <a href="' + ev.link.replace(/"/g, '&quot;') + '" target="_blank" rel="noopener" style="font-size:11px;" onclick="event.stopPropagation();">🔗 link</a>' : '';
         var lembreteHtml = ev.lembrete_ativo ? ' <span title="Lembrete por e-mail ativado" style="font-size:12px;">🔔</span>' : '';
+        var anexoHtml = ev.attachment_path ? ' <a href="#" class="evento-row-anexo-link" style="font-size:11px;" data-evento-anexo-id="' + ev.id + '" onclick="event.stopPropagation();event.preventDefault();">📎 ' + (ev.attachment_type === 'image' ? 'imagem' : ev.attachment_type === 'video' ? 'vídeo' : 'anexo') + '</a>' : '';
         row.innerHTML = '<div class="evento-row-date">' + dateStr + '</div>' +
-          '<div class="evento-row-title">' + ev.titulo + lembreteHtml + linkHtml + '</div>' +
+          '<div class="evento-row-title">' + ev.titulo + lembreteHtml + linkHtml + anexoHtml + '</div>' +
           '<span class="badge ' + meta.badge + '">' + meta.label + '</span>';
+        if (ev.attachment_path) {
+          var anexoLinkEl = row.querySelector('.evento-row-anexo-link');
+          if (anexoLinkEl) anexoLinkEl.addEventListener('click', function () { downloadEventoAttachment(ev); });
+        }
         if (isAdmin) {
           var actions = document.createElement('div');
           actions.className = 'evento-row-actions';
@@ -9534,6 +9671,8 @@
   var eventoModalEl = document.getElementById('eventoModal');
   var eventoFormEl = document.getElementById('eventoForm');
   var eventoModalMsgEl = document.getElementById('eventoModalMsg');
+  var eventoEditingAttachmentPath = null;
+  wireRoleChecks('eventoRoles', 'eventoAllowAll', 'eventoRolesWrap');
   function openEventoModal(ev) {
     if (!eventoModalEl) return;
     eventoModalMsgEl.style.display = 'none';
@@ -9546,6 +9685,26 @@
     document.getElementById('eventoRecorrente').checked = ev ? !!ev.recorrente_anual : true;
     document.getElementById('eventoLink').value = (ev && ev.link) || '';
     document.getElementById('eventoDescricao').value = (ev && ev.descricao) || '';
+    document.getElementById('eventoPublicaEm').value = (ev && ev.publica_em) || '';
+    document.getElementById('eventoExpiraEm').value = (ev && ev.expira_em) || '';
+    setRoleChecksValue('eventoRoles', 'eventoAllowAll', 'eventoRolesWrap', ev ? ev.allow_all : true, ev ? ev.allowed_roles : []);
+    eventoEditingAttachmentPath = ev ? (ev.attachment_path || null) : null;
+    var eventoAnexoAtualEl = document.getElementById('eventoAnexoAtual');
+    var eventoRemoveAnexoWrapEl = document.getElementById('eventoRemoveAnexoWrap');
+    document.getElementById('eventoRemoveAnexo').checked = false;
+    eventoAnexoAtualEl.style.display = 'none';
+    eventoRemoveAnexoWrapEl.style.display = 'none';
+    var eventoAnexoPreviewEl = document.getElementById('eventoAnexoPreview');
+    eventoAnexoPreviewEl.innerHTML = '';
+    eventoAnexoPreviewEl.style.display = 'none';
+    if (ev && ev.attachment_name) {
+      eventoAnexoAtualEl.textContent = 'Anexo atual: ' + ev.attachment_name;
+      eventoAnexoAtualEl.style.display = 'block';
+      eventoRemoveAnexoWrapEl.style.display = 'flex';
+      if (ev.attachment_path && (ev.attachment_type === 'image' || ev.attachment_type === 'video')) {
+        showAttachmentPreviewFromStorage(eventoAnexoPreviewEl, ev.attachment_path, ev.attachment_type);
+      }
+    }
     var lembreteAtivoEl = document.getElementById('eventoLembreteAtivo');
     var lembreteDiasEl = document.getElementById('eventoLembreteDias');
     var lembreteWrapEl = document.getElementById('eventoLembreteQuandoWrap');
@@ -9564,8 +9723,13 @@
   if (eventoTipoSelEl) eventoTipoSelEl.addEventListener('change', function () {
     document.getElementById('eventoRecorrente').checked = (eventoTipoSelEl.value === 'aniversario' || eventoTipoSelEl.value === 'feriado');
   });
+  var eventoAnexoInputEl = document.getElementById('eventoAnexo');
+  if (eventoAnexoInputEl) eventoAnexoInputEl.addEventListener('change', function () {
+    showAttachmentPreviewFromFile(document.getElementById('eventoAnexoPreview'), eventoAnexoInputEl.files[0]);
+  });
   if (eventoFormEl) eventoFormEl.addEventListener('submit', async function (e) {
     e.preventDefault();
+    eventoModalMsgEl.style.display = 'none';
     var id = document.getElementById('eventoId').value;
     var payload = {
       titulo: document.getElementById('eventoTitulo').value.trim(),
@@ -9576,10 +9740,38 @@
       link: document.getElementById('eventoLink').value.trim() || null,
       descricao: document.getElementById('eventoDescricao').value.trim() || null,
       lembrete_ativo: document.getElementById('eventoLembreteAtivo').checked,
-      lembrete_dias_antes: parseInt(document.getElementById('eventoLembreteDias').value, 10) || 0
+      lembrete_dias_antes: parseInt(document.getElementById('eventoLembreteDias').value, 10) || 0,
+      publica_em: document.getElementById('eventoPublicaEm').value || null,
+      expira_em: document.getElementById('eventoExpiraEm').value || null
     };
+    var eventoRoleVals = getRoleChecksValue('eventoRoles', 'eventoAllowAll');
+    payload.allow_all = eventoRoleVals.allow_all;
+    payload.allowed_roles = eventoRoleVals.allowed_roles;
     if (!payload.titulo || !payload.data) return;
+    var eventoFileInput = document.getElementById('eventoAnexo');
+    var eventoFile = eventoFileInput.files[0];
+    var eventoRemoveChecked = document.getElementById('eventoRemoveAnexo').checked;
+    var eventoSubmitBtn = eventoFormEl.querySelector('button[type="submit"]');
     try {
+      if (eventoFile) {
+        if (eventoSubmitBtn) eventoSubmitBtn.disabled = true;
+        var eventoPath = 'eventos/' + crypto.randomUUID() + '-' + safeStorageName(eventoFile.name);
+        var eventoUp = await supabase.storage.from('conteudo').upload(eventoPath, eventoFile);
+        if (eventoUp.error) throw new Error('Falha ao enviar o anexo.');
+        if (id && eventoEditingAttachmentPath) {
+          try { await supabase.storage.from('conteudo').remove([eventoEditingAttachmentPath]); } catch (ignoreErr) {}
+        }
+        payload.attachment_path = eventoPath;
+        payload.attachment_type = attachmentTypeFromFilename(eventoFile.name);
+        payload.attachment_name = eventoFile.name;
+      } else if (eventoRemoveChecked) {
+        if (eventoEditingAttachmentPath) {
+          try { await supabase.storage.from('conteudo').remove([eventoEditingAttachmentPath]); } catch (ignoreErr) {}
+        }
+        payload.attachment_path = null;
+        payload.attachment_type = null;
+        payload.attachment_name = null;
+      }
       var res;
       if (id) {
         res = await supabase.from('eventos_calendario').update(payload).eq('id', id);
@@ -9594,6 +9786,8 @@
     } catch (err) {
       eventoModalMsgEl.textContent = (err && err.message) || 'Não foi possível salvar o evento.';
       eventoModalMsgEl.style.display = '';
+    } finally {
+      if (eventoSubmitBtn) eventoSubmitBtn.disabled = false;
     }
   });
   async function deleteEvento(ev) {
@@ -9605,6 +9799,20 @@
       renderCalPage();
     } catch (err) {
       console.error('Erro ao excluir evento:', err);
+    }
+  }
+
+  async function downloadEventoAttachment(ev) {
+    try {
+      var signedRes = await supabase.storage.from('conteudo').createSignedUrl(ev.attachment_path, 60);
+      if (signedRes.error || !signedRes.data) throw new Error('Não foi possível gerar o link de download.');
+      var fileResp = await fetch(signedRes.data.signedUrl);
+      if (!fileResp.ok) throw new Error('Falha ao baixar o arquivo.');
+      var blob = await fileResp.blob();
+      var filename = ev.attachment_name || ('anexo-' + ev.id);
+      triggerBlobDownload(blob, filename);
+    } catch (err) {
+      alert((err && err.message) || 'Não foi possível baixar o arquivo.');
     }
   }
 </script>
