@@ -216,6 +216,58 @@
   .feed-post-foot{display:flex;align-items:center;padding:10px 16px 14px;border-top:1px solid #F1F2F5;margin-top:12px;}
   .feed-post-foot .like-btn{margin-left:0;}
 
+  /* ---------- Trilha do Conhecimento: progresso e certificado ---------- */
+  .concluido-btn{display:inline-flex;align-items:center;gap:6px;background:#fff;border:1.5px solid var(--line);color:var(--muted);font-family:inherit;font-weight:700;font-size:12.5px;padding:8px 14px;border-radius:20px;cursor:pointer;transition:all .15s;}
+  .concluido-btn:hover{border-color:var(--green);color:var(--green);}
+  .concluido-btn.done{background:#EAFBF1;border-color:var(--green);color:var(--green);}
+  .concluido-btn .ic{width:15px;height:15px;}
+  .concluido-btn:disabled{opacity:.6;cursor:default;}
+
+  .trilha-progress-card{background:#fff;border:1px solid var(--line);border-radius:14px;padding:18px 20px;margin-bottom:18px;}
+  .trilha-progress-head{display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:12px;}
+  .trilha-progress-head b{font-size:15px;display:block;}
+  .trilha-progress-head span{font-size:12.5px;color:var(--muted);}
+  .trilha-progress-bar-outer{height:8px;border-radius:6px;background:var(--bg);overflow:hidden;}
+  .trilha-progress-bar-inner{height:100%;background:linear-gradient(90deg,var(--teal),var(--green));border-radius:6px;transition:width .3s ease;}
+  .btn-primary-sm{display:inline-flex;align-items:center;gap:6px;background:var(--red);color:#fff;border:none;font-family:inherit;font-weight:700;font-size:12.5px;padding:9px 16px;border-radius:20px;cursor:pointer;white-space:nowrap;}
+  .btn-primary-sm:hover{background:var(--red-dark);}
+  .btn-primary-sm:disabled{opacity:.45;cursor:not-allowed;background:var(--muted);}
+
+  .modal-close-x{position:absolute;top:14px;right:14px;background:none;border:none;color:var(--muted);cursor:pointer;padding:5px;border-radius:8px;}
+  .modal-close-x:hover{background:var(--bg);color:var(--text);}
+  .modal-close-x .ic{width:18px;height:18px;}
+
+  .certificado-border{border:3px solid var(--red);border-radius:14px;padding:40px 36px;text-align:center;background:linear-gradient(180deg,#fff,#F7FBFD);}
+  .certificado-brand{font-weight:800;font-size:15px;letter-spacing:3px;color:var(--red-dark);margin-bottom:18px;}
+  .certificado-brand span{font-weight:500;color:var(--muted);letter-spacing:1px;}
+  .certificado-ribbon{display:inline-block;background:var(--red);color:#fff;font-weight:700;font-size:13px;letter-spacing:1px;text-transform:uppercase;padding:8px 20px;border-radius:20px;margin-bottom:22px;}
+  .certificado-lead{font-size:13px;color:var(--muted);margin:0;}
+  .certificado-nome{font-size:26px;font-weight:800;margin:6px 0 18px;color:var(--text);}
+  .certificado-curso{font-size:18px;font-weight:700;color:var(--red-dark);margin:0 0 14px;}
+  .certificado-detalhes{font-size:12.5px;color:var(--muted);max-width:480px;margin:0 auto;line-height:1.6;}
+  .certificado-footer{margin-top:30px;}
+  .certificado-line{width:160px;height:1px;background:var(--line);margin:0 auto 8px;}
+  .certificado-footer span{font-size:11px;color:var(--muted);letter-spacing:.5px;}
+
+  body.printing-certificado > *:not(#app){display:none !important;}
+  body.printing-certificado #app > *:not(.main-wrap){display:none !important;}
+  body.printing-certificado #app > .main-wrap > *:not(.content){display:none !important;}
+  body.printing-certificado #app > .main-wrap > .content > *:not(#certificadoModal){display:none !important;}
+  body.printing-certificado{background:#fff !important;}
+  body.printing-certificado #app{display:block !important;min-height:0 !important;}
+  body.printing-certificado #app > .main-wrap{display:block !important;}
+  body.printing-certificado #app > .main-wrap > .content{padding:0 !important;max-width:none !important;margin:0 !important;}
+  body.printing-certificado #certificadoModal{
+    position:static !important;inset:auto !important;background:none !important;
+    padding:0 !important;display:block !important;z-index:auto !important;
+  }
+  body.printing-certificado #certificadoModal .modal-card{
+    max-width:none !important;width:100% !important;max-height:none !important;
+    overflow:visible !important;box-shadow:none !important;border-radius:0 !important;padding:0 !important;
+  }
+  body.printing-certificado #certificadoModal .modal-card > *:not(#certificadoPrint){display:none !important;}
+  body.printing-certificado #certificadoPrint{display:block !important;}
+
   .badge{font-size:10.5px;font-weight:700;padding:2px 9px;border-radius:20px;white-space:nowrap;}
   .badge-red{background:#FEE2E2;color:#B91C2B;}
   .badge-green{background:#DCFCE7;color:#15803D;}
@@ -876,6 +928,8 @@
     <symbol id="i-send" viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></symbol>
     <symbol id="i-calendar" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></symbol>
     <symbol id="i-printer" viewBox="0 0 24 24"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></symbol>
+    <symbol id="i-circle" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/></symbol>
+    <symbol id="i-award" viewBox="0 0 24 24"><circle cx="12" cy="8" r="6"/><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"/></symbol>
     <symbol id="i-chevron-left" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></symbol>
     <symbol id="i-chevron-right" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></symbol>
     <symbol id="i-chevron-down" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></symbol>
@@ -1682,6 +1736,33 @@
               <button type="button" class="login-btn" id="newFolderCancel" style="width:auto;padding:11px 20px;background:#9CA3AF;">Cancelar</button>
             </div>
           </form>
+        </div>
+      </div>
+
+      <!-- ================= CERTIFICADO DE CONCLUSÃO (Trilha do Conhecimento) ================= -->
+      <div class="modal-overlay hidden" id="certificadoModal">
+        <div class="modal-card" style="max-width:720px;position:relative;">
+          <button type="button" class="modal-close-x" id="certificadoClose" aria-label="Fechar"><svg class="ic"><use href="#i-x"/></svg></button>
+          <div class="certificado-print" id="certificadoPrint">
+            <div class="certificado-border">
+              <div class="certificado-brand">FACILITA <span>Empréstimo</span></div>
+              <div class="certificado-ribbon">Certificado de Conclusão</div>
+              <p class="certificado-lead">Certificamos que</p>
+              <h2 class="certificado-nome" id="certificadoNome">—</h2>
+              <p class="certificado-lead">concluiu com êxito o curso</p>
+              <h3 class="certificado-curso" id="certificadoCurso">—</h3>
+              <p class="certificado-detalhes" id="certificadoDetalhes"></p>
+              <div class="certificado-footer">
+                <div class="certificado-line"></div>
+                <span>Portal Interno Facilita · Trilha do Conhecimento</span>
+              </div>
+            </div>
+          </div>
+          <div class="no-print" style="display:flex;gap:10px;justify-content:center;margin-top:18px;">
+            <button type="button" class="login-btn" id="certificadoImprimir" style="width:auto;padding:11px 20px;">
+              <svg class="ic" style="width:15px;height:15px;vertical-align:-2px;"><use href="#i-printer"/></svg> Imprimir / Baixar PDF
+            </button>
+          </div>
         </div>
       </div>
 
@@ -3575,7 +3656,13 @@
     if (videoDocs.length) {
       await loadCurtidas('documento', videoDocs.map(function (d) { return d.id; }));
       await loadAvaliacoes(videoDocs.map(function (d) { return d.id; }));
-      videoDocs.forEach(function (d) { listEl.appendChild(buildAulaCard(d, profilesMap[d.uploaded_by])); });
+      await loadProgresso(videoDocs.map(function (d) { return d.id; }));
+      var currentFolder = docsState.path[docsState.path.length - 1];
+      var progressBar = currentFolder ? buildTrilhaProgressBar(currentFolder, videoDocs) : null;
+      if (progressBar) listEl.appendChild(progressBar);
+      videoDocs.forEach(function (d) {
+        listEl.appendChild(buildAulaCard(d, profilesMap[d.uploaded_by], function () { if (progressBar) progressBar.refresh(); }));
+      });
     }
     outrosDocs.forEach(function (d) {
       listEl.appendChild(buildFileRow(d, profilesMap[d.uploaded_by]));
@@ -3585,7 +3672,7 @@
   // Card de "aula em vídeo" — usado só dentro da Trilha do Conhecimento.
   // Toca o vídeo direto no card (sem precisar clicar em "Visualizar"), com link externo opcional,
   // curtida e avaliação por estrelas.
-  function buildAulaCard(doc, uploaderProfile) {
+  function buildAulaCard(doc, uploaderProfile, onProgressChange) {
     var isAdmin = hasPermission('documentos.gerenciar');
     var card = document.createElement('div');
     card.className = 'aula-card';
@@ -3633,6 +3720,11 @@
     var uploaderName = uploaderProfile ? (uploaderProfile.full_name || uploaderProfile.email) : '—';
     sub.textContent = 'Enviado por ' + uploaderName + ' · ' + formatDateBR(doc.created_at);
     body.appendChild(sub);
+
+    var progressRow = document.createElement('div');
+    progressRow.style.cssText = 'margin-top:10px;';
+    progressRow.appendChild(buildConcluidoBtn(doc, onProgressChange));
+    body.appendChild(progressRow);
 
     var row = document.createElement('div');
     row.className = 'aula-card-row';
@@ -4341,6 +4433,160 @@
     render();
     return wrap;
   }
+
+  // ---------------- Progresso de aulas + certificado (Trilha do Conhecimento) ----------------
+  var progressoCache = {}; // documento_id -> concluido_at (ISO string) | null
+
+  async function loadProgresso(ids) {
+    ids = (ids || []).filter(Boolean);
+    ids.forEach(function (id) { progressoCache[id] = null; });
+    if (!ids.length || !appState.session) return;
+    var myId = appState.session.user.id;
+    var res = await supabase.from('aula_progresso').select('documento_id,concluido_at').eq('user_id', myId).in('documento_id', ids);
+    if (res.error) { console.error('Falha ao carregar progresso:', res.error); return; }
+    (res.data || []).forEach(function (r) { progressoCache[r.documento_id] = r.concluido_at; });
+  }
+
+  function buildConcluidoBtn(doc, onChange) {
+    var btn = document.createElement('button');
+    btn.type = 'button';
+    function render() {
+      var done = !!progressoCache[doc.id];
+      btn.className = 'concluido-btn' + (done ? ' done' : '');
+      btn.innerHTML = '<svg class="ic"><use href="#' + (done ? 'i-check' : 'i-circle') + '"/></svg> ' + (done ? 'Concluído' : 'Marcar como concluído');
+    }
+    render();
+    btn.addEventListener('click', async function (e) {
+      e.stopPropagation();
+      if (!appState.session) return;
+      var myId = appState.session.user.id;
+      var done = !!progressoCache[doc.id];
+      btn.disabled = true;
+      if (done) {
+        var del = await supabase.from('aula_progresso').delete().eq('documento_id', doc.id).eq('user_id', myId);
+        if (!del.error) progressoCache[doc.id] = null;
+      } else {
+        var ins = await supabase.from('aula_progresso').insert({ documento_id: doc.id, user_id: myId }).select().single();
+        if (!ins.error) progressoCache[doc.id] = (ins.data && ins.data.concluido_at) || new Date().toISOString();
+      }
+      btn.disabled = false;
+      render();
+      if (typeof onChange === 'function') onChange();
+    });
+    return btn;
+  }
+
+  function formatCargaHoraria(min) {
+    min = parseInt(min, 10) || 0;
+    var h = Math.floor(min / 60), m = min % 60;
+    if (h && m) return h + 'h' + (m < 10 ? '0' : '') + m + 'min';
+    if (h) return h + 'h';
+    return min + 'min';
+  }
+
+  function buildTrilhaProgressBar(folder, videoDocs) {
+    var wrap = document.createElement('div');
+    wrap.className = 'trilha-progress-card';
+
+    function rerender() {
+      wrap.innerHTML = '';
+      var done = videoDocs.filter(function (d) { return !!progressoCache[d.id]; }).length;
+      var total = videoDocs.length;
+      var pct = total ? Math.round((done / total) * 100) : 0;
+
+      var head = document.createElement('div');
+      head.className = 'trilha-progress-head';
+      var title = document.createElement('div');
+      title.innerHTML = '<b>' + (pct === 100 ? 'Curso concluído! 🎉' : 'Seu progresso') + '</b>' +
+        '<span>' + done + ' de ' + total + ' aula' + (total === 1 ? '' : 's') + ' concluída' + (total === 1 ? '' : 's') + ' · ' + pct + '%</span>';
+      head.appendChild(title);
+
+      var actions = document.createElement('div');
+      actions.style.cssText = 'display:flex;gap:8px;align-items:center;flex-wrap:wrap;';
+
+      if (hasPermission('documentos.gerenciar')) {
+        var chBtn = document.createElement('button');
+        chBtn.type = 'button';
+        chBtn.className = 'doc-action-btn';
+        chBtn.textContent = folder.carga_horaria_min ? 'Carga: ' + formatCargaHoraria(folder.carga_horaria_min) : 'Definir carga horária';
+        chBtn.addEventListener('click', async function () {
+          var v = prompt('Carga horária estimada deste curso, em minutos (ex: 78):', folder.carga_horaria_min || '');
+          if (v === null) return;
+          var mins = parseInt(v, 10);
+          if (isNaN(mins) || mins < 0) { alert('Informe um número válido de minutos.'); return; }
+          var upd = await supabase.from('folders').update({ carga_horaria_min: mins }).eq('id', folder.id);
+          if (upd.error) { alert('Não foi possível salvar a carga horária.'); return; }
+          folder.carga_horaria_min = mins;
+          rerender();
+        });
+        actions.appendChild(chBtn);
+      }
+
+      var certBtn = document.createElement('button');
+      certBtn.type = 'button';
+      certBtn.className = 'btn-primary-sm';
+      certBtn.innerHTML = '<svg class="ic" style="width:14px;height:14px"><use href="#i-award"/></svg> Ver certificado';
+      certBtn.disabled = pct < 100;
+      certBtn.title = pct < 100 ? 'Conclua todas as aulas para liberar o certificado' : 'Emitir certificado de conclusão';
+      certBtn.addEventListener('click', function () { openCertificado(folder, videoDocs); });
+      actions.appendChild(certBtn);
+
+      head.appendChild(actions);
+      wrap.appendChild(head);
+
+      var barOuter = document.createElement('div');
+      barOuter.className = 'trilha-progress-bar-outer';
+      var barInner = document.createElement('div');
+      barInner.className = 'trilha-progress-bar-inner';
+      barInner.style.width = pct + '%';
+      barOuter.appendChild(barInner);
+      wrap.appendChild(barOuter);
+    }
+
+    wrap.refresh = rerender;
+    rerender();
+    return wrap;
+  }
+
+  function openCertificado(folder, videoDocs) {
+    var modal = document.getElementById('certificadoModal');
+    if (!modal) return;
+    var datas = videoDocs
+      .map(function (d) { return progressoCache[d.id]; })
+      .filter(Boolean)
+      .map(function (s) { return new Date(s); });
+    var inicio = datas.length ? new Date(Math.min.apply(null, datas)) : null;
+    var fim = datas.length ? new Date(Math.max.apply(null, datas)) : null;
+    var nome = (appState.profile && appState.profile.full_name) ||
+      (appState.session && appState.session.user && appState.session.user.email) || 'Colaborador(a)';
+    document.getElementById('certificadoNome').textContent = nome;
+    document.getElementById('certificadoCurso').textContent = folder.name;
+    var detalhes = [];
+    if (folder.carga_horaria_min) detalhes.push('Carga horária estimada em ' + formatCargaHoraria(folder.carga_horaria_min));
+    if (inicio) detalhes.push('com início em ' + formatDateBR(inicio.toISOString()));
+    if (fim) detalhes.push((inicio ? 'e ' : 'com ') + 'conclusão em ' + formatDateBR(fim.toISOString()));
+    document.getElementById('certificadoDetalhes').textContent = detalhes.join(', ') + '.';
+    modal.classList.remove('hidden');
+  }
+
+  function printCertificado() {
+    document.body.classList.add('printing-certificado');
+    var cleanup = function () {
+      document.body.classList.remove('printing-certificado');
+      window.removeEventListener('afterprint', cleanup);
+    };
+    window.addEventListener('afterprint', cleanup);
+    setTimeout(function () {
+      window.print();
+      setTimeout(cleanup, 20000);
+    }, 50);
+  }
+
+  var certificadoModalEl = document.getElementById('certificadoModal');
+  var certificadoCloseBtn = document.getElementById('certificadoClose');
+  var certificadoImprimirBtn = document.getElementById('certificadoImprimir');
+  if (certificadoCloseBtn) certificadoCloseBtn.addEventListener('click', function () { certificadoModalEl.classList.add('hidden'); });
+  if (certificadoImprimirBtn) certificadoImprimirBtn.addEventListener('click', printCertificado);
 
   function buildComunicadoCard(item) {
     var isAdmin = hasPermission('comunicados.gerenciar');
