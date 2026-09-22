@@ -772,6 +772,25 @@
   .doc-del-btn{background:none;border:none;color:var(--muted);cursor:pointer;padding:6px;border-radius:6px;flex-shrink:0;}
   .doc-del-btn:hover{color:#B91C2B;background:#FEE2E2;}
 
+  /* ---------- Grade de arquivos (ícones médios com pré-visualização) ---------- */
+  .doc-file-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(168px,1fr));gap:16px;}
+  .doc-file-card{background:#fff;border:1px solid var(--line);border-radius:12px;overflow:hidden;display:flex;flex-direction:column;}
+  .doc-file-card-thumb{position:relative;width:100%;aspect-ratio:4/3;background:var(--bg);display:flex;align-items:center;justify-content:center;overflow:hidden;flex-shrink:0;border:none;padding:0;font:inherit;cursor:default;}
+  .doc-file-card-thumb.is-clickable{cursor:pointer;}
+  .doc-file-card-thumb .thumb-mini-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;}
+  .doc-file-card-thumb .thumb-mini-play{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.28);z-index:1;}
+  .doc-file-card-thumb .thumb-mini-play svg{width:30px;height:30px;}
+  .doc-file-card-thumb .ic{width:34px;height:34px;color:#fff;position:relative;z-index:0;}
+  .doc-file-card-dl{position:absolute;left:8px;bottom:8px;display:flex;align-items:center;gap:5px;background:rgba(2,48,71,.82);color:#fff;font-size:11px;font-weight:700;padding:6px 10px;border-radius:20px;border:none;cursor:pointer;font-family:inherit;z-index:2;}
+  .doc-file-card-dl:hover{background:var(--red);}
+  .doc-file-card-dl:disabled{opacity:.6;cursor:not-allowed;}
+  .doc-file-card-del{position:absolute;right:8px;top:8px;background:rgba(2,48,71,.72);color:#fff;border:none;border-radius:8px;padding:6px;cursor:pointer;z-index:2;display:flex;}
+  .doc-file-card-del:hover{background:#B91C2B;}
+  .doc-file-card-del .ic{width:13px;height:13px;color:#fff;}
+  .doc-file-card-body{padding:10px 12px 12px;}
+  .doc-file-card-name{font-size:12.5px;font-weight:700;margin:0 0 3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .doc-file-card-sub{font-size:11px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+
   /* ---------- MODAL (Nova pasta) ---------- */
   .modal-overlay{position:fixed;inset:0;background:rgba(12,14,18,.6);display:flex;align-items:center;justify-content:center;z-index:1050;padding:20px;transition:opacity .2s ease, visibility .2s ease;}
   .modal-overlay.hidden{opacity:0;visibility:hidden;pointer-events:none;}
@@ -3728,9 +3747,14 @@
         listEl.appendChild(buildAulaCard(d, profilesMap[d.uploaded_by], function () { if (progressBar) progressBar.refresh(); }));
       });
     }
-    outrosDocs.forEach(function (d) {
-      listEl.appendChild(buildFileRow(d, profilesMap[d.uploaded_by]));
-    });
+    if (outrosDocs.length) {
+      var fileGrid = document.createElement('div');
+      fileGrid.className = 'doc-file-grid';
+      outrosDocs.forEach(function (d) {
+        fileGrid.appendChild(buildFileCard(d, profilesMap[d.uploaded_by]));
+      });
+      listEl.appendChild(fileGrid);
+    }
   }
 
   // Card de "aula em vídeo" — usado só dentro da Trilha do Conhecimento.
@@ -3871,60 +3895,76 @@
     return card;
   }
 
-  function buildFileRow(doc, uploaderProfile) {
-    var row = document.createElement('div');
-    row.className = 'doc-file-row';
+  // Rótulo curto do tipo de arquivo para exibir sob a miniatura (ex: "Imagem (PNG)", "Vídeo (MP4)", "Arquivo (PDF)").
+  function fileTypeLabel(fileType, name) {
+    var ext = ((fileType || '') || (name || '').split('.').pop() || '').toUpperCase();
+    var kind = previewKindOf(name, fileType);
+    if (kind === 'image') return 'Imagem (' + ext + ')';
+    if (kind === 'video') return 'Vídeo (' + ext + ')';
+    if (kind === 'pdf') return 'PDF';
+    if (kind === 'office') return ext || 'Arquivo';
+    return ext ? 'Arquivo (' + ext + ')' : 'Arquivo';
+  }
+
+  // Card de arquivo em grade — miniatura média (imagem/quadro de vídeo real quando disponível),
+  // com pré-visualização ao clicar e botão de download sobreposto, no estilo do painel de referência.
+  function buildFileCard(doc, uploaderProfile) {
+    var card = document.createElement('div');
+    card.className = 'doc-file-card';
     var info = fileIconInfo(doc.file_type, doc.name);
     var uploaderName = uploaderProfile ? (uploaderProfile.full_name || uploaderProfile.email) : '—';
+    var previewable = isPreviewable(doc.name, doc.file_type);
+    var previewOpts = {
+      bucket: 'documentos',
+      path: doc.storage_path,
+      name: doc.name,
+      fileType: doc.file_type,
+      onDownload: function () { downloadDocument(doc); }
+    };
 
-    var iconEl = document.createElement('div');
-    iconEl.className = 'doc-file-icon';
-    iconEl.style.background = info.bg;
-    iconEl.innerHTML = '<svg class="ic" style="color:#fff"><use href="#' + info.symbol + '"/></svg>';
-    row.appendChild(iconEl);
-    attachRealThumb(iconEl, doc);
-
-    var metaEl = document.createElement('div');
-    metaEl.className = 'doc-file-meta';
-    var nameEl = document.createElement('p');
-    nameEl.className = 'doc-file-name';
-    nameEl.textContent = doc.name;
-    var subEl = document.createElement('div');
-    subEl.className = 'doc-file-sub';
-    subEl.textContent = 'Enviado por ' + uploaderName + ' · ' + formatDateBR(doc.created_at) + ' · ' + humanFileSize(doc.size_bytes);
-    metaEl.appendChild(nameEl);
-    metaEl.appendChild(subEl);
-    row.appendChild(metaEl);
-
-    var actionsEl = document.createElement('div');
-    actionsEl.className = 'doc-file-actions';
-    if (isPreviewable(doc.name, doc.file_type)) {
-      actionsEl.appendChild(buildPreviewBtn({
-        bucket: 'documentos',
-        path: doc.storage_path,
-        name: doc.name,
-        fileType: doc.file_type,
-        onDownload: function () { downloadDocument(doc); }
-      }));
+    var thumb = document.createElement(previewable ? 'button' : 'div');
+    thumb.className = 'doc-file-card-thumb' + (previewable ? ' is-clickable' : '');
+    if (previewable) {
+      thumb.type = 'button';
+      thumb.title = 'Pré-visualizar';
+      thumb.addEventListener('click', function () { openFilePreview(previewOpts); });
     }
-    var dlBtn = document.createElement('button');
-    dlBtn.type = 'button';
-    dlBtn.className = 'doc-dl-btn';
-    dlBtn.innerHTML = '<svg class="ic" style="width:14px;height:14px"><use href="#i-download"/></svg> Download';
-    dlBtn.addEventListener('click', function () { downloadDocument(doc, dlBtn); });
-    actionsEl.appendChild(dlBtn);
+    thumb.style.background = info.bg;
+    thumb.innerHTML = '<svg class="ic"><use href="#' + info.symbol + '"/></svg>';
+    attachRealThumb(thumb, doc);
+
+    var dlPill = document.createElement('button');
+    dlPill.type = 'button';
+    dlPill.className = 'doc-file-card-dl';
+    dlPill.innerHTML = '<svg class="ic" style="width:12px;height:12px"><use href="#i-download"/></svg> Download';
+    dlPill.addEventListener('click', function (e) { e.stopPropagation(); downloadDocument(doc, dlPill); });
+    thumb.appendChild(dlPill);
 
     if (hasPermission('documentos.gerenciar')) {
       var delBtn = document.createElement('button');
       delBtn.type = 'button';
-      delBtn.className = 'doc-del-btn';
+      delBtn.className = 'doc-file-card-del';
       delBtn.title = 'Excluir arquivo';
-      delBtn.innerHTML = '<svg class="ic" style="width:15px;height:15px"><use href="#i-trash"/></svg>';
-      delBtn.addEventListener('click', function () { deleteDocument(doc); });
-      actionsEl.appendChild(delBtn);
+      delBtn.innerHTML = '<svg class="ic"><use href="#i-trash"/></svg>';
+      delBtn.addEventListener('click', function (e) { e.stopPropagation(); deleteDocument(doc); });
+      thumb.appendChild(delBtn);
     }
-    row.appendChild(actionsEl);
-    return row;
+    card.appendChild(thumb);
+
+    var body = document.createElement('div');
+    body.className = 'doc-file-card-body';
+    var nameEl = document.createElement('p');
+    nameEl.className = 'doc-file-card-name';
+    nameEl.textContent = doc.name;
+    nameEl.title = doc.name;
+    var subEl = document.createElement('div');
+    subEl.className = 'doc-file-card-sub';
+    subEl.textContent = fileTypeLabel(doc.file_type, doc.name) + (doc.size_bytes ? ' · ' + humanFileSize(doc.size_bytes) : '');
+    subEl.title = 'Enviado por ' + uploaderName + ' · ' + formatDateBR(doc.created_at);
+    body.appendChild(nameEl);
+    body.appendChild(subEl);
+    card.appendChild(body);
+    return card;
   }
 
   function triggerBlobDownload(blob, filename) {
