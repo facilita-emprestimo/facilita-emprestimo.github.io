@@ -3295,57 +3295,107 @@
 
   var PLAY_TRIANGLE_SVG = '<svg viewBox="0 0 24 24" fill="#fff"><polygon points="6,4 20,12 6,20"/></svg>';
 
+  // Cache em memória (doc.id -> {kind, src}): evita rebuscar a URL assinada e (para vídeo) redecodificar
+  // um quadro toda vez que a pasta é re-renderizada — o que antes acontecia a cada novo upload, já que
+  // renderInsideFolder recarrega a lista inteira e regeraria a miniatura de TODOS os arquivos de novo.
+  var thumbCache = {};
+
+  // Limita quantas miniaturas são buscadas/decodificadas ao mesmo tempo. Sem isso, uma pasta com muitos
+  // arquivos dispara dezenas de requisições simultâneas, disputando banda com um upload em andamento.
+  var THUMB_CONCURRENCY = 3;
+  var thumbQueue = [];
+  var thumbActive = 0;
+  function scheduleThumbWork(fn) {
+    thumbQueue.push(fn);
+    runThumbQueue();
+  }
+  function runThumbQueue() {
+    while (thumbActive < THUMB_CONCURRENCY && thumbQueue.length) {
+      var job = thumbQueue.shift();
+      thumbActive++;
+      job(function () { thumbActive--; runThumbQueue(); });
+    }
+  }
+
+  function insertThumbImg(containerEl, kind, src) {
+    var img = document.createElement('img');
+    img.className = 'thumb-mini-img';
+    img.alt = '';
+    img.src = src;
+    containerEl.insertBefore(img, containerEl.firstChild);
+    if (kind === 'video') {
+      var play = document.createElement('div');
+      play.className = 'thumb-mini-play';
+      play.innerHTML = PLAY_TRIANGLE_SVG;
+      containerEl.appendChild(play);
+    }
+  }
+
   // Insere uma prévia real (imagem ou quadro de vídeo) dentro de containerEl, por cima do ícone genérico
   // que já estiver lá. Se não for imagem/vídeo, ou se falhar ao carregar, o ícone genérico permanece.
   function attachRealThumb(containerEl, doc) {
     var kind = mediaKindOf(doc);
     if (kind !== 'image' && kind !== 'video') return;
     if (!doc.storage_path) return;
-    supabase.storage.from('documentos').createSignedUrl(doc.storage_path, 3600).then(function (res) {
-      if (!res.data || !res.data.signedUrl) return;
-      var url = res.data.signedUrl;
-      if (kind === 'image') {
-        var img = document.createElement('img');
-        img.className = 'thumb-mini-img';
-        img.alt = '';
-        img.onload = function () { containerEl.insertBefore(img, containerEl.firstChild); };
-        img.onerror = function () {};
-        img.src = url;
-      } else {
-        var video = document.createElement('video');
-        video.crossOrigin = 'anonymous';
-        video.muted = true;
-        video.preload = 'auto';
-        video.style.position = 'fixed';
-        video.style.left = '-9999px';
-        video.style.width = '1px';
-        video.style.height = '1px';
-        var cleanup = function () { if (video.parentNode) video.parentNode.removeChild(video); };
-        video.addEventListener('loadeddata', function () {
-          try {
-            var canvas = document.createElement('canvas');
-            canvas.width = video.videoWidth || 160;
-            canvas.height = video.videoHeight || 90;
-            var ctx = canvas.getContext('2d');
-            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-            var dataUrl = canvas.toDataURL('image/jpeg', 0.7);
-            var img2 = document.createElement('img');
-            img2.className = 'thumb-mini-img';
-            img2.alt = '';
-            img2.src = dataUrl;
-            containerEl.insertBefore(img2, containerEl.firstChild);
-            var play = document.createElement('div');
-            play.className = 'thumb-mini-play';
-            play.innerHTML = PLAY_TRIANGLE_SVG;
-            containerEl.appendChild(play);
-          } catch (e) {}
-          cleanup();
-        });
-        video.addEventListener('error', cleanup);
-        document.body.appendChild(video);
-        video.src = url;
-      }
-    }).catch(function () {});
+
+    var cached = thumbCache[doc.id];
+    if (cached) { insertThumbImg(containerEl, cached.kind, cached.src); return; }
+
+    scheduleThumbWork(function (done) {
+      supabase.storage.from('documentos').createSignedUrl(doc.storage_path, 3600).then(function (res) {
+        if (!res.data || !res.data.signedUrl) { done(); return; }
+        var url = res.data.signedUrl;
+        if (kind === 'image') {
+          var img = document.createElement('img');
+          img.className = 'thumb-mini-img';
+          img.alt = '';
+          img.onload = function () {
+            thumbCache[doc.id] = { kind: 'image', src: url };
+            containerEl.insertBefore(img, containerEl.firstChild);
+            done();
+          };
+          img.onerror = function () { done(); };
+          img.src = url;
+        } else {
+          // preload:'metadata' + seek para um instante específico baixa só o essencial p/ decodificar
+          // 1 quadro (poucos KB), em vez de 'auto', que baixava boa parte do vídeo só p/ gerar a miniatura.
+          var video = document.createElement('video');
+          video.crossOrigin = 'anonymous';
+          video.muted = true;
+          video.preload = 'metadata';
+          video.style.position = 'fixed';
+          video.style.left = '-9999px';
+          video.style.width = '1px';
+          video.style.height = '1px';
+          var settled = false;
+          var cleanup = function () {
+            if (settled) return;
+            settled = true;
+            if (video.parentNode) video.parentNode.removeChild(video);
+            done();
+          };
+          video.addEventListener('loadedmetadata', function () {
+            try { video.currentTime = Math.min(0.5, (video.duration || 1) / 4); } catch (e) { cleanup(); }
+          });
+          video.addEventListener('seeked', function () {
+            try {
+              var canvas = document.createElement('canvas');
+              canvas.width = video.videoWidth || 160;
+              canvas.height = video.videoHeight || 90;
+              var ctx = canvas.getContext('2d');
+              ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+              var dataUrl = canvas.toDataURL('image/jpeg', 0.7);
+              thumbCache[doc.id] = { kind: 'video', src: dataUrl };
+              insertThumbImg(containerEl, 'video', dataUrl);
+            } catch (e) {}
+            cleanup();
+          });
+          video.addEventListener('error', cleanup);
+          document.body.appendChild(video);
+          video.src = url;
+        }
+      }).catch(function () { done(); });
+    });
   }
 
   function humanFileSize(bytes) {
@@ -3724,22 +3774,32 @@
     docs.forEach(function (d) {
       if (d.uploaded_by && ids.indexOf(d.uploaded_by) === -1) ids.push(d.uploaded_by);
     });
-    var profilesMap = {};
-    if (ids.length) {
-      var pr = await supabase.from('profiles').select('id,full_name,email').in('id', ids);
-      (pr.data || []).forEach(function (p) { profilesMap[p.id] = p; });
-    }
 
     var isTrilha = docsState.area === 'trilha-conhecimento';
     var isAulaDoc = function (d) { return d.is_aula || previewKindOf(d.name, d.file_type) === 'video'; };
     var videoDocs = isTrilha ? docs.filter(isAulaDoc) : [];
     var outrosDocs = isTrilha ? docs.filter(function (d) { return !isAulaDoc(d); }) : docs;
+    var videoIds = videoDocs.map(function (d) { return d.id; });
+
+    // Todas as consultas auxiliares (perfis, curtidas, avaliações, progresso, materiais) são
+    // independentes entre si — disparar em paralelo evita empilhar vários round-trips sequenciais
+    // toda vez que a pasta é (re)carregada, o que antes deixava o carregamento visivelmente lento.
+    var profilesMap = {};
+    var loaders = [];
+    if (ids.length) {
+      loaders.push(supabase.from('profiles').select('id,full_name,email').in('id', ids).then(function (pr) {
+        (pr.data || []).forEach(function (p) { profilesMap[p.id] = p; });
+      }));
+    }
+    if (videoDocs.length) {
+      loaders.push(loadCurtidas('documento', videoIds));
+      loaders.push(loadAvaliacoes(videoIds));
+      loaders.push(loadProgresso(videoIds));
+      loaders.push(loadMateriais(videoIds));
+    }
+    await Promise.all(loaders);
 
     if (videoDocs.length) {
-      await loadCurtidas('documento', videoDocs.map(function (d) { return d.id; }));
-      await loadAvaliacoes(videoDocs.map(function (d) { return d.id; }));
-      await loadProgresso(videoDocs.map(function (d) { return d.id; }));
-      await loadMateriais(videoDocs.map(function (d) { return d.id; }));
       var currentFolder = docsState.path[docsState.path.length - 1];
       var progressBar = currentFolder ? buildTrilhaProgressBar(currentFolder, videoDocs) : null;
       if (progressBar) listEl.appendChild(progressBar);
@@ -4158,6 +4218,32 @@
     if (parentId) renderInsideFolder(parentId); else loadRootFolders();
   }
 
+  // Executa até `limit` chamadas de worker(item) em paralelo, em vez de uma de cada vez.
+  // Usado para enviar vários arquivos ao mesmo tempo (uploads múltiplos ficavam lentos
+  // porque cada arquivo esperava o anterior terminar completamente antes de começar).
+  function runWithConcurrency(items, limit, worker) {
+    return new Promise(function (resolve) {
+      if (!items.length) { resolve([]); return; }
+      var idx = 0, active = 0, done = 0;
+      var results = new Array(items.length);
+      function next() {
+        if (done >= items.length) { resolve(results); return; }
+        while (active < limit && idx < items.length) {
+          (function (i) {
+            active++;
+            Promise.resolve(worker(items[i], i)).then(function (r) {
+              results[i] = r;
+              active--; done++;
+              next();
+            });
+          })(idx);
+          idx++;
+        }
+      }
+      next();
+    });
+  }
+
   var docsUploadInputEl = document.getElementById('docsUploadInput');
   if (docsUploadInputEl) {
     docsUploadInputEl.addEventListener('change', async function (e) {
@@ -4165,9 +4251,7 @@
       if (!files.length) return;
       var folderId = currentFolderId();
       if (!folderId) { alert('Abra uma pasta antes de enviar arquivos.'); return; }
-      for (var i = 0; i < files.length; i++) {
-        await uploadOneFile(files[i], folderId);
-      }
+      await runWithConcurrency(files, 3, function (file) { return uploadOneFile(file, folderId); });
       e.target.value = '';
       renderInsideFolder(folderId);
     });
@@ -4253,9 +4337,7 @@
         if (ins.error) throw new Error('Falha ao salvar a aula: ' + ins.error.message);
         var documentoId = ins.data && ins.data.id;
         if (documentoId) {
-          for (var i = 0; i < materiaisFiles.length; i++) {
-            await uploadAulaMaterial(materiaisFiles[i], documentoId);
-          }
+          await runWithConcurrency(materiaisFiles, 3, function (file) { return uploadAulaMaterial(file, documentoId); });
         }
         newAulaModal.classList.add('hidden');
         renderInsideFolder(folderId);
