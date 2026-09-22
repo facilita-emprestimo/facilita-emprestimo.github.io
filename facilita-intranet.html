@@ -314,6 +314,15 @@
   /* ---------- TRILHA: AULA EM VÍDEO ---------- */
   .aula-card{background:#fff;border:1px solid var(--line);border-radius:14px;overflow:hidden;margin-bottom:16px;}
   .aula-card video{display:block;width:100%;max-height:360px;background:#000;}
+  .aula-cover{position:relative;width:100%;aspect-ratio:16/9;max-height:360px;background:linear-gradient(135deg,#0B2942,#034C67);display:flex;align-items:center;justify-content:center;overflow:hidden;}
+  .aula-cover-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;}
+  .aula-cover-play{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;gap:8px;background:none;border:none;cursor:pointer;font-family:inherit;color:#fff;padding:0;}
+  .aula-cover-play-ic{width:60px;height:60px;border-radius:50%;background:rgba(255,255,255,.94);display:flex;align-items:center;justify-content:center;box-shadow:0 6px 18px rgba(0,0,0,.35);transition:transform .15s ease;}
+  .aula-cover-play-ic .ic{width:24px;height:24px;color:var(--red);margin-left:3px;}
+  .aula-cover-play:hover .aula-cover-play-ic{transform:scale(1.07);}
+  .aula-cover-play span:last-child{font-size:12.5px;font-weight:700;letter-spacing:.3px;text-shadow:0 1px 4px rgba(0,0,0,.5);}
+  .aula-cover-shade{position:absolute;inset:0;background:linear-gradient(180deg,rgba(2,20,34,.12),rgba(2,20,34,.45));}
+  .aula-cover-media{display:block;width:100%;height:100%;max-height:360px;background:#000;border:none;aspect-ratio:16/9;}
   .aula-card-body{padding:14px 18px;}
   .aula-card-title{font-size:14.5px;font-weight:700;margin-bottom:8px;}
   .aula-card-row{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-top:10px;}
@@ -959,6 +968,7 @@
     <symbol id="i-printer" viewBox="0 0 24 24"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></symbol>
     <symbol id="i-circle" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/></symbol>
     <symbol id="i-award" viewBox="0 0 24 24"><circle cx="12" cy="8" r="6"/><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"/></symbol>
+    <symbol id="i-play" viewBox="0 0 24 24" fill="currentColor" stroke="none"><polygon points="7,4 20,12 7,20"/></symbol>
     <symbol id="i-chevron-left" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></symbol>
     <symbol id="i-chevron-right" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></symbol>
     <symbol id="i-chevron-down" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></symbol>
@@ -3817,22 +3827,142 @@
     }
   }
 
+  function extractYouTubeId(url) {
+    if (!url) return null;
+    var m = url.match(/(?:youtube\.com\/(?:watch\?v=|embed\/|shorts\/)|youtu\.be\/)([A-Za-z0-9_-]{6,})/);
+    return m ? m[1] : null;
+  }
+
+  function extractDriveFileId(url) {
+    if (!url) return null;
+    var m = url.match(/drive\.google\.com\/file\/d\/([A-Za-z0-9_-]+)/) || url.match(/[?&]id=([A-Za-z0-9_-]+)/);
+    return m ? m[1] : null;
+  }
+
+  // Captura um quadro real de um vídeo (dado seu URL assinado) para usar como capa/preview.
+  // preload:'metadata' + seek evita baixar o vídeo inteiro só para gerar a imagem.
+  function captureVideoFrame(url, onReady) {
+    var video = document.createElement('video');
+    video.crossOrigin = 'anonymous';
+    video.muted = true;
+    video.preload = 'metadata';
+    video.style.cssText = 'position:fixed;left:-9999px;top:0;width:1px;height:1px;';
+    var settled = false;
+    var finish = function (result) {
+      if (settled) return;
+      settled = true;
+      if (video.parentNode) video.parentNode.removeChild(video);
+      onReady(result);
+    };
+    video.addEventListener('loadedmetadata', function () {
+      try { video.currentTime = Math.min(0.5, (video.duration || 1) / 4); } catch (e) { finish(null); }
+    });
+    video.addEventListener('seeked', function () {
+      try {
+        var canvas = document.createElement('canvas');
+        canvas.width = video.videoWidth || 480;
+        canvas.height = video.videoHeight || 270;
+        canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
+        finish(canvas.toDataURL('image/jpeg', 0.78));
+      } catch (e) { finish(null); }
+    });
+    video.addEventListener('error', function () { finish(null); });
+    document.body.appendChild(video);
+    video.src = url;
+  }
+
+  var aulaCoverCache = {}; // documento_id -> data URL do quadro capturado (arquivos enviados)
+
+  // Capa da aula + botão "Iniciar": mostra uma prévia (quadro real do vídeo enviado, thumb do
+  // YouTube, ou um fundo genérico) e só carrega/incorpora o player de fato quando o usuário clica,
+  // em vez de tocar o vídeo (ou seus controles nativos) assim que a pasta é aberta.
+  function buildAulaCover(doc) {
+    var wrap = document.createElement('div');
+    wrap.className = 'aula-cover';
+
+    var youtubeId = extractYouTubeId(doc.link_externo);
+    var driveId = !youtubeId ? extractDriveFileId(doc.link_externo) : null;
+
+    var img = document.createElement('img');
+    img.className = 'aula-cover-img';
+    img.alt = '';
+    img.style.display = 'none';
+    wrap.appendChild(img);
+
+    var shade = document.createElement('div');
+    shade.className = 'aula-cover-shade';
+    wrap.appendChild(shade);
+
+    var playBtn = document.createElement('button');
+    playBtn.type = 'button';
+    playBtn.className = 'aula-cover-play';
+    playBtn.title = 'Iniciar aula';
+    playBtn.innerHTML = '<span class="aula-cover-play-ic"><svg class="ic"><use href="#i-play"/></svg></span><span>Iniciar</span>';
+    wrap.appendChild(playBtn);
+
+    function showImg(src) { img.src = src; img.style.display = 'block'; }
+
+    if (doc.storage_path) {
+      if (aulaCoverCache[doc.id]) {
+        showImg(aulaCoverCache[doc.id]);
+      } else {
+        supabase.storage.from('documentos').createSignedUrl(doc.storage_path, 3600).then(function (res) {
+          if (!res.data) return;
+          captureVideoFrame(res.data.signedUrl, function (dataUrl) {
+            if (dataUrl) { aulaCoverCache[doc.id] = dataUrl; showImg(dataUrl); }
+          });
+        });
+      }
+    } else if (youtubeId) {
+      showImg('https://img.youtube.com/vi/' + youtubeId + '/hqdefault.jpg');
+    }
+    // Link do Drive ou outro link externo sem arquivo enviado: sem capa real disponível
+    // (não é possível extrair um quadro de um link de terceiros sem baixá-lo) — fica o fundo genérico.
+
+    playBtn.addEventListener('click', function () {
+      if (doc.storage_path) {
+        wrap.innerHTML = '';
+        var video = document.createElement('video');
+        video.className = 'aula-cover-media';
+        video.controls = true;
+        video.autoplay = true;
+        wrap.appendChild(video);
+        supabase.storage.from('documentos').createSignedUrl(doc.storage_path, 3600).then(function (res) {
+          if (res.data) video.src = res.data.signedUrl;
+        });
+      } else if (youtubeId) {
+        wrap.innerHTML = '';
+        var iframe = document.createElement('iframe');
+        iframe.className = 'aula-cover-media';
+        iframe.src = 'https://www.youtube.com/embed/' + youtubeId + '?autoplay=1';
+        iframe.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture';
+        iframe.allowFullscreen = true;
+        wrap.appendChild(iframe);
+      } else if (driveId) {
+        wrap.innerHTML = '';
+        var iframe2 = document.createElement('iframe');
+        iframe2.className = 'aula-cover-media';
+        iframe2.src = 'https://drive.google.com/file/d/' + driveId + '/preview';
+        iframe2.allow = 'autoplay';
+        wrap.appendChild(iframe2);
+      } else if (doc.link_externo) {
+        window.open(doc.link_externo, '_blank', 'noopener');
+      }
+    });
+
+    return wrap;
+  }
+
   // Card de "aula em vídeo" — usado só dentro da Trilha do Conhecimento.
-  // Toca o vídeo direto no card (sem precisar clicar em "Visualizar"), com link externo opcional,
-  // curtida e avaliação por estrelas.
+  // Mostra uma capa com botão "Iniciar" (quadro real do vídeo, thumb do YouTube, ou fundo genérico),
+  // link externo opcional, curtida e avaliação por estrelas.
   function buildAulaCard(doc, uploaderProfile, onProgressChange) {
     var isAdmin = hasPermission('documentos.gerenciar');
     var card = document.createElement('div');
     card.className = 'aula-card';
 
-    if (doc.storage_path) {
-      var video = document.createElement('video');
-      video.controls = true;
-      video.preload = 'metadata';
-      card.appendChild(video);
-      supabase.storage.from('documentos').createSignedUrl(doc.storage_path, 3600).then(function (res) {
-        if (res.data) video.src = res.data.signedUrl;
-      });
+    if (doc.storage_path || doc.link_externo) {
+      card.appendChild(buildAulaCover(doc));
     }
 
     var body = document.createElement('div');
