@@ -318,6 +318,16 @@
   .aula-card-title{font-size:14.5px;font-weight:700;margin-bottom:8px;}
   .aula-card-row{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-top:10px;}
   .aula-card-rating-avg{font-size:11.5px;color:var(--muted);display:flex;align-items:center;gap:4px;}
+  .aula-card-subtitulo{font-size:12.5px;color:var(--muted);margin-top:2px;}
+  .aula-card-descricao{font-size:13px;color:var(--text);margin-top:10px;line-height:1.55;white-space:pre-wrap;}
+  .aula-card-duvida{margin-top:10px;background:#FFF7E6;border:1px solid #F5D98B;border-radius:10px;padding:10px 12px;font-size:12.5px;color:#7A5B00;line-height:1.5;white-space:pre-wrap;}
+  .aula-card-duvida b{display:block;margin-bottom:2px;font-size:11.5px;text-transform:uppercase;letter-spacing:.4px;}
+  .aula-materiais{margin-top:12px;}
+  .aula-materiais-title{font-size:11px;font-weight:700;color:var(--muted);margin-bottom:6px;text-transform:uppercase;letter-spacing:.4px;}
+  .aula-material-row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:7px 10px;background:var(--bg);border-radius:8px;margin-bottom:6px;font-size:12.5px;}
+  .aula-material-row .aula-material-name{display:flex;align-items:center;gap:7px;min-width:0;}
+  .aula-material-row .aula-material-name span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .aula-material-row .aula-material-actions{display:flex;align-items:center;gap:6px;flex-shrink:0;}
 
   /* ---------- CAIXA DE SUGESTÃO ---------- */
   .sugestao-widget{background:linear-gradient(135deg,#023047,#046a9e);border-radius:16px;padding:20px 22px;display:flex;align-items:center;gap:16px;color:#fff;cursor:pointer;transition:transform .15s ease,box-shadow .15s ease;}
@@ -1699,10 +1709,15 @@
               <div id="docsSubfolderGrid" class="folder-grid" style="display:none;"></div>
               <div class="panel-title">
                 <h3>Arquivos</h3>
-                <label class="doc-action-btn upload-label" id="docsUploadWrap" style="display:none;">
-                  <svg class="ic" style="width:15px;height:15px"><use href="#i-upload"/></svg> Upload
-                  <input type="file" id="docsUploadInput" multiple>
-                </label>
+                <div id="docsUploadWrap" style="display:none;gap:10px;">
+                  <label class="doc-action-btn upload-label" id="docsUploadLabelWrap">
+                    <svg class="ic" style="width:15px;height:15px"><use href="#i-upload"/></svg> Upload
+                    <input type="file" id="docsUploadInput" multiple>
+                  </label>
+                  <button type="button" class="doc-action-btn" id="btnNovaAula" style="display:none;">
+                    <svg class="ic" style="width:15px;height:15px"><use href="#i-plus"/></svg> Nova aula
+                  </button>
+                </div>
               </div>
               <div id="docsFileList" class="doc-file-list"></div>
               <div id="docsFileEmpty" class="docs-empty" style="display:none;">Nenhum arquivo nesta pasta ainda.</div>
@@ -1734,6 +1749,49 @@
             <div style="display:flex;gap:10px;margin-top:16px;">
               <button type="submit" class="login-btn" style="width:auto;padding:11px 20px;">Criar pasta</button>
               <button type="button" class="login-btn" id="newFolderCancel" style="width:auto;padding:11px 20px;background:#9CA3AF;">Cancelar</button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- ============ MODAL: NOVA AULA (Trilha do Conhecimento) ============ -->
+      <div class="modal-overlay hidden" id="newAulaModal">
+        <div class="modal-card" style="max-width:560px;">
+          <h3>Nova aula</h3>
+          <div class="login-msg error" id="newAulaMsg"></div>
+          <form id="newAulaForm">
+            <div class="login-field">
+              <label for="newAulaTitulo">Título</label>
+              <input type="text" id="newAulaTitulo" required>
+            </div>
+            <div class="login-field">
+              <label for="newAulaSubtitulo">Subtítulo (opcional)</label>
+              <input type="text" id="newAulaSubtitulo">
+            </div>
+            <div class="login-field">
+              <label for="newAulaDescricao">Descrição (opcional)</label>
+              <textarea id="newAulaDescricao" rows="3" style="width:100%;box-sizing:border-box;padding:11px 13px;border:1px solid var(--line);border-radius:9px;font-family:inherit;font-size:13.5px;background:var(--bg);resize:vertical;"></textarea>
+            </div>
+            <div class="login-field">
+              <label for="newAulaLink">Link externo (opcional — ex: YouTube ou Drive)</label>
+              <input type="url" id="newAulaLink" placeholder="https://...">
+            </div>
+            <div class="login-field">
+              <label for="newAulaVideo">Vídeo da aula (opcional se preencher o link acima)</label>
+              <input type="file" id="newAulaVideo" accept="video/*">
+            </div>
+            <div class="login-field">
+              <label for="newAulaDuvida">Deixe aqui sua dúvida (opcional)</label>
+              <textarea id="newAulaDuvida" rows="2" placeholder="Anote aqui alguma dúvida ou observação sobre este conteúdo" style="width:100%;box-sizing:border-box;padding:11px 13px;border:1px solid var(--line);border-radius:9px;font-family:inherit;font-size:13.5px;background:var(--bg);resize:vertical;"></textarea>
+            </div>
+            <div class="login-field" style="margin-bottom:6px;">
+              <label for="newAulaMateriais">Material de apoio para download (opcional)</label>
+              <input type="file" id="newAulaMateriais" multiple>
+              <div style="font-size:11.5px;color:var(--muted);margin-top:6px;">Arquivos que quem estiver fazendo o curso poderá baixar (PDF, apostila, planilha etc).</div>
+            </div>
+            <div style="display:flex;gap:10px;margin-top:16px;">
+              <button type="submit" class="login-btn" id="newAulaSubmitBtn" style="width:auto;padding:11px 20px;">Salvar aula</button>
+              <button type="button" class="login-btn" id="newAulaCancel" style="width:auto;padding:11px 20px;background:#9CA3AF;">Cancelar</button>
             </div>
           </form>
         </div>
@@ -3609,7 +3667,11 @@
     var toolbar = document.getElementById('docsAdminActions');
     var isAdmin = !!(appState.profile && appState.profile.is_admin);
     if (toolbar) toolbar.style.display = isAdmin ? 'flex' : 'none';
-    document.getElementById('docsUploadWrap').style.display = hasPermission('documentos.gerenciar') ? 'inline-flex' : 'none';
+    var canManageDocs = hasPermission('documentos.gerenciar');
+    var isTrilhaArea = docsState.area === 'trilha-conhecimento';
+    document.getElementById('docsUploadWrap').style.display = canManageDocs ? 'flex' : 'none';
+    document.getElementById('docsUploadLabelWrap').style.display = (canManageDocs && !isTrilhaArea) ? 'inline-flex' : 'none';
+    document.getElementById('btnNovaAula').style.display = (canManageDocs && isTrilhaArea) ? 'inline-flex' : 'none';
     renderBreadcrumb();
 
     var subRes = await supabase.from('folders').select('*').eq('parent_id', folderId).order('name');
@@ -3650,13 +3712,15 @@
     }
 
     var isTrilha = docsState.area === 'trilha-conhecimento';
-    var videoDocs = isTrilha ? docs.filter(function (d) { return previewKindOf(d.name, d.file_type) === 'video'; }) : [];
-    var outrosDocs = isTrilha ? docs.filter(function (d) { return previewKindOf(d.name, d.file_type) !== 'video'; }) : docs;
+    var isAulaDoc = function (d) { return d.is_aula || previewKindOf(d.name, d.file_type) === 'video'; };
+    var videoDocs = isTrilha ? docs.filter(isAulaDoc) : [];
+    var outrosDocs = isTrilha ? docs.filter(function (d) { return !isAulaDoc(d); }) : docs;
 
     if (videoDocs.length) {
       await loadCurtidas('documento', videoDocs.map(function (d) { return d.id; }));
       await loadAvaliacoes(videoDocs.map(function (d) { return d.id; }));
       await loadProgresso(videoDocs.map(function (d) { return d.id; }));
+      await loadMateriais(videoDocs.map(function (d) { return d.id; }));
       var currentFolder = docsState.path[docsState.path.length - 1];
       var progressBar = currentFolder ? buildTrilhaProgressBar(currentFolder, videoDocs) : null;
       if (progressBar) listEl.appendChild(progressBar);
@@ -3677,13 +3741,15 @@
     var card = document.createElement('div');
     card.className = 'aula-card';
 
-    var video = document.createElement('video');
-    video.controls = true;
-    video.preload = 'metadata';
-    card.appendChild(video);
-    supabase.storage.from('documentos').createSignedUrl(doc.storage_path, 3600).then(function (res) {
-      if (res.data) video.src = res.data.signedUrl;
-    });
+    if (doc.storage_path) {
+      var video = document.createElement('video');
+      video.controls = true;
+      video.preload = 'metadata';
+      card.appendChild(video);
+      supabase.storage.from('documentos').createSignedUrl(doc.storage_path, 3600).then(function (res) {
+        if (res.data) video.src = res.data.signedUrl;
+      });
+    }
 
     var body = document.createElement('div');
     body.className = 'aula-card-body';
@@ -3714,6 +3780,13 @@
     }
     body.appendChild(titleRow);
 
+    if (doc.subtitulo) {
+      var subtituloEl = document.createElement('div');
+      subtituloEl.className = 'aula-card-subtitulo';
+      subtituloEl.textContent = doc.subtitulo;
+      body.appendChild(subtituloEl);
+    }
+
     var sub = document.createElement('div');
     sub.className = 'doc-file-sub';
     sub.style.marginTop = '2px';
@@ -3721,10 +3794,39 @@
     sub.textContent = 'Enviado por ' + uploaderName + ' · ' + formatDateBR(doc.created_at);
     body.appendChild(sub);
 
+    if (doc.descricao) {
+      var descricaoEl = document.createElement('div');
+      descricaoEl.className = 'aula-card-descricao';
+      descricaoEl.textContent = doc.descricao;
+      body.appendChild(descricaoEl);
+    }
+
+    if (doc.duvida) {
+      var duvidaEl = document.createElement('div');
+      duvidaEl.className = 'aula-card-duvida';
+      duvidaEl.innerHTML = '<b>Dúvida</b>';
+      duvidaEl.appendChild(document.createTextNode(doc.duvida));
+      body.appendChild(duvidaEl);
+    }
+
     var progressRow = document.createElement('div');
     progressRow.style.cssText = 'margin-top:10px;';
     progressRow.appendChild(buildConcluidoBtn(doc, onProgressChange));
     body.appendChild(progressRow);
+
+    var materiais = materiaisCache[doc.id] || [];
+    if (materiais.length) {
+      var materiaisWrap = document.createElement('div');
+      materiaisWrap.className = 'aula-materiais';
+      var materiaisTitle = document.createElement('div');
+      materiaisTitle.className = 'aula-materiais-title';
+      materiaisTitle.textContent = 'Material de apoio';
+      materiaisWrap.appendChild(materiaisTitle);
+      materiais.forEach(function (m) {
+        materiaisWrap.appendChild(buildAulaMaterialRow(m, isAdmin, doc.id));
+      });
+      body.appendChild(materiaisWrap);
+    }
 
     var row = document.createElement('div');
     row.className = 'aula-card-row';
@@ -3738,12 +3840,14 @@
       row.appendChild(linkBtn);
     }
 
-    var dlBtn = document.createElement('button');
-    dlBtn.type = 'button';
-    dlBtn.className = 'doc-dl-btn';
-    dlBtn.innerHTML = '<svg class="ic" style="width:14px;height:14px"><use href="#i-download"/></svg> Download';
-    dlBtn.addEventListener('click', function () { downloadDocument(doc, dlBtn); });
-    row.appendChild(dlBtn);
+    if (doc.storage_path) {
+      var dlBtn = document.createElement('button');
+      dlBtn.type = 'button';
+      dlBtn.className = 'doc-dl-btn';
+      dlBtn.innerHTML = '<svg class="ic" style="width:14px;height:14px"><use href="#i-download"/></svg> Download';
+      dlBtn.addEventListener('click', function () { downloadDocument(doc, dlBtn); });
+      row.appendChild(dlBtn);
+    }
 
     if (isAdmin) {
       var delBtn = document.createElement('button');
@@ -4043,6 +4147,177 @@
       uploaded_by: appState.session.user.id
     });
     if (ins.error) { alert('Falha ao registrar ' + file.name + ': ' + ins.error.message); }
+  }
+
+  // ---- Modal: nova aula (Trilha do Conhecimento) ----
+  var newAulaModal = document.getElementById('newAulaModal');
+  var newAulaForm = document.getElementById('newAulaForm');
+  var newAulaMsg = document.getElementById('newAulaMsg');
+  var btnNovaAula = document.getElementById('btnNovaAula');
+  var newAulaCancel = document.getElementById('newAulaCancel');
+  var newAulaSubmitBtn = document.getElementById('newAulaSubmitBtn');
+
+  if (btnNovaAula) {
+    btnNovaAula.addEventListener('click', function () {
+      newAulaForm.reset();
+      hideMsgEl(newAulaMsg);
+      newAulaModal.classList.remove('hidden');
+    });
+  }
+  if (newAulaCancel) {
+    newAulaCancel.addEventListener('click', function () { newAulaModal.classList.add('hidden'); });
+  }
+  if (newAulaForm) {
+    newAulaForm.addEventListener('submit', async function (e) {
+      e.preventDefault();
+      hideMsgEl(newAulaMsg);
+      var folderId = currentFolderId();
+      if (!folderId) { showMsgEl(newAulaMsg, 'Abra uma pasta antes de adicionar uma aula.', 'error'); return; }
+
+      var titulo = document.getElementById('newAulaTitulo').value.trim();
+      var subtitulo = document.getElementById('newAulaSubtitulo').value.trim();
+      var descricao = document.getElementById('newAulaDescricao').value.trim();
+      var link = document.getElementById('newAulaLink').value.trim();
+      var duvida = document.getElementById('newAulaDuvida').value.trim();
+      var videoFile = document.getElementById('newAulaVideo').files[0] || null;
+      var materiaisFiles = Array.prototype.slice.call(document.getElementById('newAulaMateriais').files || []);
+
+      if (!titulo) { showMsgEl(newAulaMsg, 'Informe o título da aula.', 'error'); return; }
+      if (!videoFile && !link) { showMsgEl(newAulaMsg, 'Envie um vídeo ou informe um link externo.', 'error'); return; }
+
+      newAulaSubmitBtn.disabled = true;
+      newAulaSubmitBtn.textContent = 'Salvando...';
+      try {
+        var storagePath = null, fileType = null, sizeBytes = null;
+        if (videoFile) {
+          var path = folderId + '/' + crypto.randomUUID() + '-' + safeStorageName(videoFile.name);
+          var up = await supabase.storage.from('documentos').upload(path, videoFile);
+          if (up.error) throw new Error('Falha ao enviar o vídeo: ' + up.error.message);
+          storagePath = path;
+          fileType = (videoFile.name.split('.').pop() || '').toLowerCase();
+          sizeBytes = videoFile.size;
+        }
+        var ins = await supabase.from('documents').insert({
+          folder_id: folderId,
+          name: titulo,
+          subtitulo: subtitulo || null,
+          descricao: descricao || null,
+          duvida: duvida || null,
+          link_externo: link || null,
+          storage_path: storagePath,
+          file_type: fileType,
+          size_bytes: sizeBytes,
+          uploaded_by: appState.session.user.id,
+          is_aula: true
+        }).select().single();
+        if (ins.error) throw new Error('Falha ao salvar a aula: ' + ins.error.message);
+        var documentoId = ins.data && ins.data.id;
+        if (documentoId) {
+          for (var i = 0; i < materiaisFiles.length; i++) {
+            await uploadAulaMaterial(materiaisFiles[i], documentoId);
+          }
+        }
+        newAulaModal.classList.add('hidden');
+        renderInsideFolder(folderId);
+      } catch (err) {
+        showMsgEl(newAulaMsg, (err && err.message) || 'Não foi possível salvar a aula.', 'error');
+      } finally {
+        newAulaSubmitBtn.disabled = false;
+        newAulaSubmitBtn.textContent = 'Salvar aula';
+      }
+    });
+  }
+
+  // ---- Material de apoio (download) das aulas da Trilha do Conhecimento ----
+  var materiaisCache = {}; // documento_id -> array de anexos { id, name, storage_path, ... }
+
+  async function loadMateriais(ids) {
+    ids = (ids || []).filter(Boolean);
+    ids.forEach(function (id) { materiaisCache[id] = []; });
+    if (!ids.length) return;
+    var res = await supabase.from('aula_materiais').select('*').in('documento_id', ids).order('created_at');
+    if (res.error) { console.error('Falha ao carregar materiais de apoio:', res.error); return; }
+    (res.data || []).forEach(function (m) {
+      if (!materiaisCache[m.documento_id]) materiaisCache[m.documento_id] = [];
+      materiaisCache[m.documento_id].push(m);
+    });
+  }
+
+  async function uploadAulaMaterial(file, documentoId) {
+    var path = 'materiais/' + documentoId + '/' + crypto.randomUUID() + '-' + safeStorageName(file.name);
+    var up = await supabase.storage.from('documentos').upload(path, file);
+    if (up.error) { alert('Falha ao enviar material "' + file.name + '": ' + up.error.message); return; }
+    var ext = (file.name.split('.').pop() || '').toLowerCase();
+    var ins = await supabase.from('aula_materiais').insert({
+      documento_id: documentoId,
+      name: file.name,
+      storage_path: path,
+      file_type: ext,
+      size_bytes: file.size,
+      uploaded_by: appState.session.user.id
+    });
+    if (ins.error) { alert('Falha ao registrar material "' + file.name + '": ' + ins.error.message); }
+  }
+
+  async function downloadAulaMaterial(anexo, btnEl) {
+    if (btnEl) btnEl.disabled = true;
+    try {
+      var signedRes = await supabase.storage.from('documentos').createSignedUrl(anexo.storage_path, 60);
+      if (signedRes.error || !signedRes.data) throw new Error('Não foi possível gerar o link de download.');
+      var fileResp = await fetch(signedRes.data.signedUrl);
+      if (!fileResp.ok) throw new Error('Falha ao baixar o arquivo.');
+      var blob = await fileResp.blob();
+      triggerBlobDownload(blob, anexo.name);
+    } catch (err) {
+      alert((err && err.message) || 'Não foi possível baixar o arquivo.');
+    } finally {
+      if (btnEl) btnEl.disabled = false;
+    }
+  }
+
+  async function deleteAulaMaterial(anexo, documentoId) {
+    if (!confirm('Excluir o material "' + anexo.name + '"? Esta ação não pode ser desfeita.')) return;
+    await supabase.storage.from('documentos').remove([anexo.storage_path]);
+    var del = await supabase.from('aula_materiais').delete().eq('id', anexo.id);
+    if (del.error) { alert('Não foi possível excluir o material.'); return; }
+    var folderId = currentFolderId();
+    if (folderId) renderInsideFolder(folderId);
+  }
+
+  function buildAulaMaterialRow(anexo, isAdmin, documentoId) {
+    var row = document.createElement('div');
+    row.className = 'aula-material-row';
+
+    var nameWrap = document.createElement('div');
+    nameWrap.className = 'aula-material-name';
+    nameWrap.innerHTML = '<svg class="ic" style="width:14px;height:14px;flex-shrink:0;color:var(--muted)"><use href="#i-file"/></svg>';
+    var nameSpan = document.createElement('span');
+    nameSpan.textContent = anexo.name;
+    nameWrap.appendChild(nameSpan);
+    row.appendChild(nameWrap);
+
+    var actions = document.createElement('div');
+    actions.className = 'aula-material-actions';
+
+    var dlBtn = document.createElement('button');
+    dlBtn.type = 'button';
+    dlBtn.className = 'doc-dl-btn';
+    dlBtn.innerHTML = '<svg class="ic" style="width:13px;height:13px"><use href="#i-download"/></svg> Baixar';
+    dlBtn.addEventListener('click', function () { downloadAulaMaterial(anexo, dlBtn); });
+    actions.appendChild(dlBtn);
+
+    if (isAdmin) {
+      var delBtn = document.createElement('button');
+      delBtn.type = 'button';
+      delBtn.className = 'doc-del-btn';
+      delBtn.title = 'Excluir material';
+      delBtn.innerHTML = '<svg class="ic" style="width:13px;height:13px"><use href="#i-trash"/></svg>';
+      delBtn.addEventListener('click', function () { deleteAulaMaterial(anexo, documentoId); });
+      actions.appendChild(delBtn);
+    }
+
+    row.appendChild(actions);
+    return row;
   }
 
   // ---- Modal: nova pasta ----
