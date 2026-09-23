@@ -808,6 +808,9 @@
   .prio-actions button{background:var(--bg);border:none;border-radius:7px;padding:5px;cursor:pointer;color:var(--ink-2);display:flex;}
   .prio-actions button:hover{background:#E5E7EB;}
   .prio-actions .ic{width:14px;height:14px;}
+  .prio-updated{display:inline-flex;align-items:center;gap:7px;margin:0 0 16px;background:#ECFDF5;color:#047857;border:1px solid #A7F3D0;font-size:12.5px;font-weight:700;padding:7px 12px;border-radius:9px;}
+  .prio-updated .ic{width:14px;height:14px;}
+  .prio-home-upd{font-size:11.5px;opacity:.8;font-weight:600;margin-left:8px;}
   .prio-home{background:linear-gradient(135deg,#023047,#034C67);color:#fff;border-radius:14px;padding:18px 20px;margin-bottom:18px;}
   .prio-home-head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:12px;}
   .prio-home-head h3{margin:0;font-size:16px;font-weight:800;display:flex;align-items:center;gap:8px;}
@@ -1224,7 +1227,7 @@
 
         <div class="prio-home" id="homePrioWidget" style="display:none;">
           <div class="prio-home-head">
-            <h3><svg class="ic"><use href="#i-star"/></svg> Prioridades de hoje — 1º banco a oferecer</h3>
+            <h3><svg class="ic"><use href="#i-star"/></svg> Prioridades de hoje — 1º banco a oferecer <span class="prio-home-upd" id="homePrioUpd"></span></h3>
             <button type="button" onclick="navigate('prioridades')">Ver ordem completa</button>
           </div>
           <div class="prio-home-grid" id="homePrioGrid"></div>
@@ -1438,6 +1441,7 @@
             </button>
           </div>
         </div>
+        <div class="prio-updated" id="prioUpdated" style="display:none;"><svg class="ic"><use href="#i-clock"/></svg><span></span></div>
         <div class="prio-filters">
           <div class="prio-search"><svg class="ic"><use href="#i-search"/></svg><input type="text" id="prioSearch" placeholder="Buscar banco, tabela ou regra..."></div>
           <div id="prioChips" style="display:flex;gap:8px;flex-wrap:wrap;"></div>
@@ -10159,7 +10163,7 @@
   // =====================================================================
   var prioState = { items: [], filtro: 'todos', busca: '' };
   var PRIO_PUBLICO_ORDEM = ['Governo do MA', 'Prefeitura de São Luís', 'INSS', 'SIAPE (Federal)'];
-  var PRIO_PRODUTO_ORDEM = ['Novo', 'Refin', 'Novo e Refin', 'Portabilidade', 'Cartão Consignado (RMC)', 'Cartão Benefício (RCC)', 'CLT', 'FGTS'];
+  var PRIO_PRODUTO_ORDEM = ['Novo', 'Refin', 'Novo e Refin', 'Portabilidade', 'Cartão Consignado (RMC)', 'Cartão Benefício (RCC)', 'Cartão Consignado / Saque', 'Compra de cartão (RMC/RCC)', 'CLT', 'FGTS'];
 
   function prioEsc(t) {
     return String(t == null ? '' : t).replace(/[&<>"']/g, function (c) {
@@ -10179,6 +10183,14 @@
     if (!iso) return '';
     var s = String(iso).slice(0, 10).split('-');
     return s[2] + '/' + s[1] + '/' + s[0];
+  }
+  function prioUltimaAtualizacao(items) {
+    var max = 0;
+    items.forEach(function (it) { var t = new Date(it.updated_at || it.created_at).getTime(); if (t > max) max = t; });
+    return max ? new Date(max) : null;
+  }
+  function prioDataHoraBR(d) {
+    return d.toLocaleDateString('pt-BR') + ' às ' + d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
   }
   function prioRank(list, v) { var i = list.indexOf(v); return i === -1 ? 999 : i; }
   function prioAgrupar(items) {
@@ -10221,6 +10233,10 @@
       showMsgEl(msg, 'Não foi possível carregar as prioridades.', 'error');
       return;
     }
+    var upd = prioUltimaAtualizacao(prioState.items);
+    var updEl = document.getElementById('prioUpdated');
+    if (upd) { updEl.querySelector('span').textContent = 'Tabela atualizada em ' + prioDataHoraBR(upd); updEl.style.display = ''; }
+    else updEl.style.display = 'none';
     renderPrioChips();
     renderPrioridades();
   }
@@ -10270,7 +10286,7 @@
       grupo.produtos.forEach(function (g) {
         var box = document.createElement('div');
         box.className = 'prio-produto';
-        box.innerHTML = '<div class="prio-produto-head"><h4>' + prioEsc(g.produto) + '</h4><span>' + g.itens.length + (g.itens.length === 1 ? ' banco' : ' bancos') + '</span></div>';
+        box.innerHTML = '<div class="prio-produto-head"><h4>' + prioEsc(g.produto) + '</h4><span>' + g.itens.length + (g.itens.length === 1 ? ' banco' : ' bancos') + ' · atualizado em ' + prioUltimaAtualizacao(g.itens).toLocaleDateString('pt-BR') + '</span></div>';
         var primeiroValido = g.itens.find(function (x) { return !prioVencida(x); });
         g.itens.forEach(function (it) { box.appendChild(buildPrioRow(it, it === primeiroValido, canEdit, g.itens)); });
         grid.appendChild(box);
@@ -10422,6 +10438,8 @@
     try { items = (await fetchPrioridades()).filter(function (x) { return !prioVencida(x); }); } catch (e) { return; }
     if (!items.length) { widget.style.display = 'none'; return; }
     grid.innerHTML = '';
+    var updH = prioUltimaAtualizacao(items);
+    document.getElementById('homePrioUpd').textContent = updH ? '· atualizado em ' + prioDataHoraBR(updH) : '';
     prioAgrupar(items).forEach(function (g) {
       g.produtos.forEach(function (p) {
         var top = p.itens[0];
