@@ -744,7 +744,7 @@
   .folder-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:16px;margin-bottom:24px;}
   .folder-card{background:#fff;border:1px solid var(--line);border-radius:12px;padding:0;overflow:hidden;cursor:pointer;display:flex;flex-direction:column;position:relative;transition:box-shadow .15s ease, transform .15s ease;}
   .folder-card:hover{box-shadow:0 10px 20px rgba(16,24,40,.09);transform:translateY(-2px);}
-  .folder-card-cover{height:74px;flex-shrink:0;position:relative;display:flex;align-items:center;justify-content:center;overflow:hidden;}
+  .folder-card-cover{height:110px;flex-shrink:0;position:relative;display:flex;align-items:center;justify-content:center;overflow:hidden;}
   .folder-card-cover-icon{width:30px;height:30px;color:rgba(255,255,255,.92);position:relative;z-index:1;}
   .folder-card-cover-icon .ic{width:30px;height:30px;stroke-width:1.6;}
   .folder-card-cover-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;}
@@ -765,6 +765,12 @@
   .folder-card-del{position:absolute;top:10px;right:10px;z-index:2;background:rgba(2,48,71,.38);border:none;color:#fff;cursor:pointer;padding:5px;border-radius:7px;display:flex;}
   .folder-card-new-badge{position:absolute;top:8px;left:8px;background:#16A34A;color:#fff;font-size:10px;font-weight:800;letter-spacing:.3px;text-transform:uppercase;padding:3px 8px;border-radius:20px;z-index:2;box-shadow:0 2px 5px rgba(0,0,0,.25);}
   .folder-card-del:hover{color:#fff;background:#B91C2B;}
+  .folder-card-cover-actions{position:absolute;top:10px;right:44px;z-index:2;display:flex;gap:6px;}
+  .folder-card-cover-btn{background:rgba(2,48,71,.38);border:none;color:#fff;cursor:pointer;padding:5px 8px;border-radius:7px;display:flex;align-items:center;gap:5px;font-family:inherit;font-size:11px;font-weight:700;}
+  .folder-card-cover-btn:hover{background:rgba(2,48,71,.75);}
+  .folder-card-cover-btn .ic{width:14px;height:14px;}
+  .folder-card-cover-pdf{position:absolute;bottom:6px;right:8px;z-index:2;background:rgba(0,0,0,.5);color:#fff;font-size:9.5px;font-weight:800;letter-spacing:.4px;padding:2px 6px;border-radius:4px;}
+  .attach-hint{font-size:11.5px;color:var(--muted,#6B7280);background:var(--bg,#F3F5F8);border-radius:8px;padding:7px 10px;margin-top:6px;line-height:1.45;}
   .doc-file-list{display:flex;flex-direction:column;gap:10px;}
   .doc-file-row{background:#fff;border:1px solid var(--line);border-radius:12px;padding:14px 16px;display:flex;align-items:center;gap:14px;}
   .doc-file-icon{width:36px;height:36px;border-radius:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0;position:relative;overflow:hidden;box-sizing:border-box;border:1px solid rgba(2,48,71,.08);}
@@ -1406,6 +1412,7 @@
             <div class="login-field">
               <label for="comunicadoAnexo">Anexo — PDF, imagem ou vídeo (opcional)</label>
               <input type="file" id="comunicadoAnexo" accept=".pdf,image/*,video/*">
+              <div class="attach-hint">📐 <b>Imagem ideal:</b> JPG ou PNG · <b>1200 × 675 px</b> (horizontal 16:9) · até <b>1 MB</b>. Texto grande e centralizado — evite informação nas bordas.</div>
               <div id="comunicadoAnexoAtual" style="font-size:12.5px;color:var(--muted,#6B7280);margin-top:6px;display:none;"></div>
               <div id="comunicadoAnexoPreview" class="attach-preview" style="display:none;"></div>
               <label class="gate-check-row" id="comunicadoRemoveAnexoWrap" style="display:none;margin-top:6px;">
@@ -1497,6 +1504,7 @@
             <div class="login-field">
               <label for="informativoAnexo">Anexo — PDF, imagem ou vídeo (opcional)</label>
               <input type="file" id="informativoAnexo" accept=".pdf,image/*,video/*">
+              <div class="attach-hint">📐 <b>Imagem ideal:</b> JPG ou PNG · <b>1200 × 675 px</b> (horizontal 16:9) · até <b>1 MB</b>. Texto grande e centralizado — evite informação nas bordas.</div>
               <div id="informativoAnexoAtual" style="font-size:12.5px;color:var(--muted,#6B7280);margin-top:6px;display:none;"></div>
               <div id="informativoAnexoPreview" class="attach-preview" style="display:none;"></div>
               <label class="gate-check-row" id="informativoRemoveAnexoWrap" style="display:none;margin-top:6px;">
@@ -1808,6 +1816,11 @@
               <input type="checkbox" id="newFolderAllowAll">
               Visível para todos os colaboradores
             </label>
+            <div class="login-field" style="margin-top:10px;">
+              <label for="newFolderCapa">Capa da pasta (opcional)</label>
+              <input type="file" id="newFolderCapa" accept="image/*">
+              <div class="attach-hint">Sem capa, a pasta usa automaticamente a prévia do arquivo mais recente (imagem, vídeo ou 1ª página do PDF). Ideal: <b>1200 × 675 px</b>, JPG/PNG, até <b>1 MB</b>.</div>
+            </div>
             <div id="newFolderRolesWrap">
               <div class="login-field" style="margin-top:10px;">
                 <label>Ou selecione os cargos com acesso</label>
@@ -2226,6 +2239,7 @@
             <div class="login-field">
               <label for="eventoAnexo">Anexo — PDF, imagem ou vídeo (opcional)</label>
               <input type="file" id="eventoAnexo" accept=".pdf,image/*,video/*">
+              <div class="attach-hint">📐 <b>Imagem ideal:</b> JPG ou PNG · <b>1200 × 675 px</b> (horizontal 16:9) · até <b>1 MB</b>. Texto grande e centralizado — evite informação nas bordas.</div>
               <div id="eventoAnexoAtual" style="font-size:12.5px;color:var(--muted,#6B7280);margin-top:6px;display:none;"></div>
               <div id="eventoAnexoPreview" class="attach-preview" style="display:none;"></div>
               <label class="gate-check-row" id="eventoRemoveAnexoWrap" style="display:none;margin-top:6px;">
@@ -3403,7 +3417,7 @@
     if (ext === 'pdf') return { symbol: 'i-file-pdf', bg: '#FB8500' };
     if (ext === 'doc' || ext === 'docx') return { symbol: 'i-file-doc', bg: '#2C7DA0' };
     if (ext === 'xls' || ext === 'xlsx' || ext === 'csv') return { symbol: 'i-file-xls', bg: '#16A34A' };
-    if (['png', 'jpg', 'jpeg', 'gif', 'webp', 'svg'].indexOf(ext) !== -1) return { symbol: 'i-image', bg: '#4A5C7A' };
+    if (['png', 'jpg', 'jpeg', 'jfif', 'pjpeg', 'pjp', 'gif', 'webp', 'avif', 'bmp', 'svg'].indexOf(ext) !== -1) return { symbol: 'i-image', bg: '#4A5C7A' };
     if (['mp4', 'webm', 'mov', 'avi', 'mkv', 'm4v'].indexOf(ext) !== -1) return { symbol: 'i-video', bg: '#6A4C93' };
     return { symbol: 'i-file', bg: '#034C67' };
   }
@@ -3411,7 +3425,7 @@
   // Detecta se um documento é imagem ou vídeo, para exibir prévia real em vez de ícone genérico.
   function mediaKindOf(doc) {
     var ext = ((doc.file_type || '') || (doc.name || '').split('.').pop() || '').toLowerCase();
-    if (['png', 'jpg', 'jpeg', 'gif', 'webp', 'svg'].indexOf(ext) !== -1) return 'image';
+    if (['png', 'jpg', 'jpeg', 'jfif', 'pjpeg', 'pjp', 'gif', 'webp', 'avif', 'bmp', 'svg'].indexOf(ext) !== -1) return 'image';
     if (['mp4', 'webm', 'mov', 'avi', 'mkv', 'm4v'].indexOf(ext) !== -1) return 'video';
     return 'other';
   }
@@ -3647,6 +3661,146 @@
     return FOLDER_COVER_PALETTE[idx];
   }
 
+  // ---- Capas de pasta ----
+  var COVER_IMAGE_EXTS = ['png', 'jpg', 'jpeg', 'jfif', 'pjpeg', 'pjp', 'gif', 'webp', 'avif', 'bmp', 'svg'];
+  var COVER_VIDEO_EXTS = ['mp4', 'webm', 'mov', 'avi', 'mkv', 'm4v'];
+  function docExt(d) {
+    return String((d.file_type || '') || (d.name || '').split('.').pop() || '').toLowerCase();
+  }
+  // Escolhe o arquivo que vira capa: imagem/vídeo mais recente; senão, o PDF mais recente.
+  // Olha primeiro os arquivos já carregados; se não achar, busca na pasta inteira.
+  async function pickAutoCoverDoc(folder, previewDocs) {
+    var list = previewDocs || [];
+    var media = list.find(function (d) { var k = mediaKindOf(d); return k === 'image' || k === 'video'; });
+    if (media) return media;
+    try {
+      var res = await supabase.from('documents').select('*').eq('folder_id', folder.id)
+        .in('file_type', COVER_IMAGE_EXTS.concat(COVER_VIDEO_EXTS))
+        .order('created_at', { ascending: false }).limit(1);
+      if (res.data && res.data[0]) return res.data[0];
+    } catch (e) {}
+    var pdf = list.find(function (d) { return docExt(d) === 'pdf'; });
+    if (pdf) return pdf;
+    try {
+      var res2 = await supabase.from('documents').select('*').eq('folder_id', folder.id)
+        .eq('file_type', 'pdf').order('created_at', { ascending: false }).limit(1);
+      if (res2.data && res2.data[0]) return res2.data[0];
+    } catch (e) {}
+    return null;
+  }
+
+  var folderCoverCache = {};
+  // Gera a imagem de capa de um documento (imagem, quadro do vídeo ou 1ª página do PDF).
+  function renderDocCover(doc, cb) {
+    if (!doc || !doc.storage_path) return;
+    var cached = folderCoverCache[doc.id];
+    if (cached) { cb(cached.src, cached.kind); return; }
+    var ext = docExt(doc);
+    var kind = ext === 'pdf' ? 'pdf' : mediaKindOf(doc);
+    scheduleThumbWork(function (done) {
+      supabase.storage.from('documentos').createSignedUrl(doc.storage_path, 3600).then(function (res) {
+        if (!res.data || !res.data.signedUrl) { done(); return; }
+        var url = res.data.signedUrl;
+        var ok = function (src) { folderCoverCache[doc.id] = { src: src, kind: kind }; cb(src, kind); done(); };
+        if (kind === 'image') {
+          var probe = new Image();
+          probe.onload = function () { ok(url); };
+          probe.onerror = function () { done(); };
+          probe.src = url;
+        } else if (kind === 'video') {
+          var video = document.createElement('video');
+          video.crossOrigin = 'anonymous';
+          video.muted = true;
+          video.preload = 'metadata';
+          video.style.cssText = 'position:fixed;left:-9999px;width:1px;height:1px;';
+          var settled = false;
+          var cleanup = function () { if (settled) return; settled = true; if (video.parentNode) video.parentNode.removeChild(video); done(); };
+          video.addEventListener('loadedmetadata', function () {
+            try { video.currentTime = Math.min(0.5, (video.duration || 1) / 4); } catch (e) { cleanup(); }
+          });
+          video.addEventListener('seeked', function () {
+            try {
+              var c = document.createElement('canvas');
+              c.width = video.videoWidth || 320; c.height = video.videoHeight || 180;
+              c.getContext('2d').drawImage(video, 0, 0, c.width, c.height);
+              var src = c.toDataURL('image/jpeg', 0.75);
+              folderCoverCache[doc.id] = { src: src, kind: 'video' };
+              cb(src, 'video');
+            } catch (e) {}
+            cleanup();
+          });
+          video.addEventListener('error', cleanup);
+          document.body.appendChild(video);
+          video.src = url;
+        } else if (kind === 'pdf') {
+          renderPdfFirstPage(url, 520).then(function (src) { if (src) ok(src); else done(); }).catch(function () { done(); });
+        } else {
+          done();
+        }
+      }).catch(function () { done(); });
+    });
+  }
+
+  // Carrega o pdf.js só quando alguma pasta precisa de capa de PDF.
+  var pdfJsPromise = null;
+  function loadPdfJs() {
+    if (window.pdfjsLib) return Promise.resolve(window.pdfjsLib);
+    if (pdfJsPromise) return pdfJsPromise;
+    pdfJsPromise = new Promise(function (resolve, reject) {
+      var sc = document.createElement('script');
+      sc.src = 'https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.min.js';
+      sc.onload = function () {
+        if (!window.pdfjsLib) { reject(new Error('pdfjs')); return; }
+        window.pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.worker.min.js';
+        resolve(window.pdfjsLib);
+      };
+      sc.onerror = function () { pdfJsPromise = null; reject(new Error('pdfjs')); };
+      document.head.appendChild(sc);
+    });
+    return pdfJsPromise;
+  }
+  async function renderPdfFirstPage(url, targetWidth) {
+    var pdfjsLib = await loadPdfJs();
+    var pdf = await pdfjsLib.getDocument({ url: url, disableAutoFetch: true, disableStream: false }).promise;
+    try {
+      var page = await pdf.getPage(1);
+      var base = page.getViewport({ scale: 1 });
+      var viewport = page.getViewport({ scale: (targetWidth || 520) / base.width });
+      var canvas = document.createElement('canvas');
+      canvas.width = Math.round(viewport.width);
+      canvas.height = Math.round(viewport.height);
+      var ctx = canvas.getContext('2d');
+      ctx.fillStyle = '#fff';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      await page.render({ canvasContext: ctx, viewport: viewport }).promise;
+      return canvas.toDataURL('image/jpeg', 0.8);
+    } finally {
+      try { pdf.destroy(); } catch (e) {}
+    }
+  }
+
+  // Envia a capa personalizada da pasta e grava em folders.cover_path. Retorna o caminho ou null.
+  async function uploadFolderCover(folder, file) {
+    var isImage = String(file.type || '').indexOf('image/') === 0 ||
+      COVER_IMAGE_EXTS.indexOf((file.name.split('.').pop() || '').toLowerCase()) !== -1;
+    if (!isImage) { setDocsMsg('A capa precisa ser uma imagem (JPG ou PNG).'); return null; }
+    if (file.size > 5 * 1024 * 1024) { setDocsMsg('Imagem muito pesada para capa (máx. 5 MB; ideal até 1 MB).'); return null; }
+    var ext = (file.name.split('.').pop() || 'jpg').toLowerCase();
+    if (ext === 'jfif' || ext === 'pjpeg' || ext === 'pjp') ext = 'jpg';
+    var path = 'capas-pastas/' + folder.id + '-' + Date.now() + '.' + ext;
+    var up = await supabase.storage.from('conteudo').upload(path, file, { contentType: file.type || 'image/jpeg', upsert: false });
+    if (up.error) { setDocsMsg('Não foi possível enviar a capa.'); return null; }
+    var old = folder.cover_path;
+    var upd = await supabase.from('folders').update({ cover_path: path }).eq('id', folder.id);
+    if (upd.error) {
+      supabase.storage.from('conteudo').remove([path]).catch(function () {});
+      setDocsMsg('Não foi possível salvar a capa.');
+      return null;
+    }
+    if (old) supabase.storage.from('conteudo').remove([old]).catch(function () {});
+    return path;
+  }
+
   function buildFolderCard(folder, previewDocs, docCount) {
     var card = document.createElement('div');
     card.className = 'folder-card';
@@ -3671,62 +3825,111 @@
       }
     }
 
-    // Se algum arquivo recente da pasta for imagem ou vídeo, usa uma prévia real como capa
-    // (para vídeo, captura um quadro automaticamente e mostra um ícone de "play").
-    var coverDoc = (previewDocs || []).find(function (d) {
-      var k = mediaKindOf(d);
-      return k === 'image' || k === 'video';
-    });
-    if (coverDoc) {
-      var coverKind = mediaKindOf(coverDoc);
-      supabase.storage.from('documentos').createSignedUrl(coverDoc.storage_path, 3600).then(function (res) {
-        if (!res.data || !res.data.signedUrl) return;
-        var signedUrl = res.data.signedUrl;
-        var finishCover = function (imgSrc) {
-          coverIcon.style.display = 'none';
-          var img = document.createElement('img');
-          img.className = 'folder-card-cover-img';
-          img.alt = '';
-          img.src = imgSrc;
-          cover.insertBefore(img, coverIcon);
-          var fade = document.createElement('div');
-          fade.className = 'folder-card-cover-fade';
-          cover.appendChild(fade);
-          if (coverKind === 'video') {
-            var playBadge = document.createElement('div');
-            playBadge.className = 'folder-card-cover-play';
-            playBadge.innerHTML = '<svg viewBox="0 0 24 24" width="11" height="11" fill="#fff"><polygon points="6,4 20,12 6,20"/></svg>';
-            cover.appendChild(playBadge);
-          }
-        };
-        if (coverKind === 'image') {
-          finishCover(signedUrl);
-        } else {
-          var video = document.createElement('video');
-          video.crossOrigin = 'anonymous';
-          video.muted = true;
-          video.preload = 'auto';
-          video.style.position = 'fixed';
-          video.style.left = '-9999px';
-          video.style.width = '1px';
-          video.style.height = '1px';
-          var cleanup = function () { if (video.parentNode) video.parentNode.removeChild(video); };
-          video.addEventListener('loadeddata', function () {
-            try {
-              var canvas = document.createElement('canvas');
-              canvas.width = video.videoWidth || 320;
-              canvas.height = video.videoHeight || 180;
-              var ctx = canvas.getContext('2d');
-              ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-              finishCover(canvas.toDataURL('image/jpeg', 0.75));
-            } catch (e) {}
-            cleanup();
-          });
-          video.addEventListener('error', cleanup);
-          document.body.appendChild(video);
-          video.src = signedUrl;
-        }
-      }).catch(function () {});
+    // Capa da pasta, em ordem de prioridade:
+    //   1) capa personalizada enviada pelo admin (folders.cover_path, bucket "conteudo");
+    //   2) prévia do arquivo mais recente que seja imagem ou vídeo;
+    //   3) primeira página do PDF mais recente;
+    //   4) cor/ícone padrão.
+    var coverLayer = [];
+    var clearCover = function () {
+      coverLayer.forEach(function (el) { if (el.parentNode) el.parentNode.removeChild(el); });
+      coverLayer = [];
+      coverIcon.style.display = '';
+    };
+    var finishCover = function (imgSrc, kind) {
+      clearCover();
+      coverIcon.style.display = 'none';
+      var img = document.createElement('img');
+      img.className = 'folder-card-cover-img';
+      img.alt = '';
+      img.src = imgSrc;
+      cover.insertBefore(img, cover.firstChild);
+      coverLayer.push(img);
+      var fade = document.createElement('div');
+      fade.className = 'folder-card-cover-fade';
+      cover.insertBefore(fade, img.nextSibling);
+      coverLayer.push(fade);
+      if (kind === 'video') {
+        var playBadge = document.createElement('div');
+        playBadge.className = 'folder-card-cover-play';
+        playBadge.innerHTML = '<svg viewBox="0 0 24 24" width="11" height="11" fill="#fff"><polygon points="6,4 20,12 6,20"/></svg>';
+        cover.appendChild(playBadge);
+        coverLayer.push(playBadge);
+      } else if (kind === 'pdf') {
+        var pdfBadge = document.createElement('div');
+        pdfBadge.className = 'folder-card-cover-pdf';
+        pdfBadge.textContent = 'PDF';
+        cover.appendChild(pdfBadge);
+        coverLayer.push(pdfBadge);
+      }
+    };
+    var applyAutoCover = function () {
+      pickAutoCoverDoc(folder, previewDocs).then(function (coverDoc) {
+        if (!coverDoc || folder.cover_path) return;
+        renderDocCover(coverDoc, function (src, kind) { if (!folder.cover_path) finishCover(src, kind); });
+      });
+    };
+    var applyCover = function () {
+      clearCover();
+      if (folder.cover_path) {
+        supabase.storage.from('conteudo').createSignedUrl(folder.cover_path, 3600).then(function (res) {
+          if (res.data && res.data.signedUrl) finishCover(res.data.signedUrl, 'image');
+          else applyAutoCover();
+        }).catch(applyAutoCover);
+      } else {
+        applyAutoCover();
+      }
+    };
+    applyCover();
+
+    // Admin: trocar / remover capa diretamente no card
+    if (appState.profile && appState.profile.is_admin) {
+      var actions = document.createElement('div');
+      actions.className = 'folder-card-cover-actions';
+      var coverInput = document.createElement('input');
+      coverInput.type = 'file';
+      coverInput.accept = 'image/*';
+      coverInput.style.display = 'none';
+      var setBtn = document.createElement('button');
+      setBtn.type = 'button';
+      setBtn.className = 'folder-card-cover-btn';
+      setBtn.title = 'Adicionar ou trocar a capa da pasta (ideal: 1200 × 675 px, JPG/PNG, até 1 MB)';
+      setBtn.innerHTML = '<svg class="ic"><use href="#i-image"/></svg> Capa';
+      var rmBtn = document.createElement('button');
+      rmBtn.type = 'button';
+      rmBtn.className = 'folder-card-cover-btn';
+      rmBtn.title = 'Remover capa personalizada (volta a usar a prévia dos arquivos)';
+      rmBtn.innerHTML = '<svg class="ic"><use href="#i-x"/></svg>';
+      rmBtn.style.display = folder.cover_path ? '' : 'none';
+      [setBtn, rmBtn, coverInput].forEach(function (el) {
+        el.addEventListener('click', function (ev) { ev.stopPropagation(); });
+        actions.appendChild(el);
+      });
+      setBtn.addEventListener('click', function () { coverInput.click(); });
+      coverInput.addEventListener('change', async function () {
+        var f = coverInput.files && coverInput.files[0];
+        coverInput.value = '';
+        if (!f) return;
+        setBtn.disabled = true;
+        setBtn.lastChild.textContent = ' Enviando…';
+        var newPath = await uploadFolderCover(folder, f);
+        setBtn.disabled = false;
+        setBtn.lastChild.textContent = ' Capa';
+        if (!newPath) return;
+        folder.cover_path = newPath;
+        rmBtn.style.display = '';
+        applyCover();
+      });
+      rmBtn.addEventListener('click', async function () {
+        var old = folder.cover_path;
+        var up = await supabase.from('folders').update({ cover_path: null }).eq('id', folder.id);
+        if (up.error) { setDocsMsg('Não foi possível remover a capa.'); return; }
+        if (old) supabase.storage.from('conteudo').remove([old]).catch(function () {});
+        folder.cover_path = null;
+        rmBtn.style.display = 'none';
+        applyCover();
+      });
+      cover.appendChild(actions);
     }
 
     var body = document.createElement('div');
@@ -4300,7 +4503,7 @@
 
   function previewKindOf(name, fileType) {
     var ext = ((fileType || '') || (name || '').split('.').pop() || '').toLowerCase();
-    if (['png', 'jpg', 'jpeg', 'gif', 'webp', 'svg'].indexOf(ext) !== -1) return 'image';
+    if (['png', 'jpg', 'jpeg', 'jfif', 'pjpeg', 'pjp', 'gif', 'webp', 'avif', 'bmp', 'svg'].indexOf(ext) !== -1) return 'image';
     if (['mp4', 'webm', 'mov', 'avi', 'mkv', 'm4v'].indexOf(ext) !== -1) return 'video';
     if (ext === 'pdf') return 'pdf';
     if (['doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx'].indexOf(ext) !== -1) return 'office';
@@ -4742,11 +4945,14 @@
         allow_all: allowAll,
         allowed_roles: allowAll ? [] : checked,
         created_by: appState.session.user.id
-      });
+      }).select().single();
       if (ins.error) {
         showMsgEl(newFolderMsg, 'Não foi possível criar a pasta.', 'error');
         return;
       }
+      var capaInput = document.getElementById('newFolderCapa');
+      var capaFile = capaInput && capaInput.files && capaInput.files[0];
+      if (capaFile && ins.data) await uploadFolderCover(ins.data, capaFile);
       newFolderModal.classList.add('hidden');
       if (parentId) renderInsideFolder(parentId); else loadRootFolders();
     });
@@ -4869,10 +5075,15 @@
   // =====================================================================
   var COLOR_VAR_MAP = { red: '--red', blue: '--blue', purple: '--purple', pink: '--pink', orange: '--orange', teal: '--teal', green: '--green', ink2: '--ink-2' };
   function colorVarName(key) { return COLOR_VAR_MAP[key] || COLOR_VAR_MAP.blue; }
-  function attachmentTypeFromFilename(name) {
+  function attachmentTypeFromFilename(name, mime) {
+    // O tipo real do arquivo (MIME) tem prioridade sobre a extensão — ex.: .jfif do Gemini é JPEG.
+    mime = String(mime || '').toLowerCase();
+    if (mime === 'application/pdf') return 'pdf';
+    if (mime.indexOf('image/') === 0 && mime !== 'image/heic' && mime !== 'image/heif') return 'image';
+    if (mime.indexOf('video/') === 0) return 'video';
     var ext = (name.split('.').pop() || '').toLowerCase();
     if (ext === 'pdf') return 'pdf';
-    if (['jpg','jpeg','png','gif','webp','svg'].indexOf(ext) !== -1) return 'image';
+    if (['jpg','jpeg','jfif','pjpeg','pjp','png','gif','webp','avif','bmp','svg'].indexOf(ext) !== -1) return 'image';
     if (['mp4','webm','mov','avi','mkv','m4v'].indexOf(ext) !== -1) return 'video';
     return 'other';
   }
@@ -4888,7 +5099,7 @@
   function showAttachmentPreviewFromFile(previewEl, file) {
     previewEl.innerHTML = '';
     if (!file) { previewEl.style.display = 'none'; return; }
-    var type = attachmentTypeFromFilename(file.name);
+    var type = attachmentTypeFromFilename(file.name, file.type);
     if (type !== 'image' && type !== 'video') { previewEl.style.display = 'none'; return; }
     var url = URL.createObjectURL(file);
     if (type === 'image') {
@@ -5446,7 +5657,7 @@
             try { await supabase.storage.from('conteudo').remove([comunicadoEditingAttachmentPath]); } catch (ignoreErr) {}
           }
           payload.attachment_path = path;
-          payload.attachment_type = attachmentTypeFromFilename(file.name);
+          payload.attachment_type = attachmentTypeFromFilename(file.name, file.type);
           payload.attachment_name = file.name;
         } catch (err) {
           showMsgEl(comunicadoModalMsg, (err && err.message) || 'Não foi possível enviar o anexo.', 'error');
@@ -6091,7 +6302,7 @@
             try { await supabase.storage.from('conteudo').remove([informativoEditingAttachmentPath]); } catch (ignoreErr) {}
           }
           payload.attachment_path = path;
-          payload.attachment_type = attachmentTypeFromFilename(file.name);
+          payload.attachment_type = attachmentTypeFromFilename(file.name, file.type);
           payload.attachment_name = file.name;
         } catch (err) {
           showMsgEl(informativoModalMsg, (err && err.message) || 'Não foi possível enviar o anexo.', 'error');
@@ -9762,7 +9973,7 @@
           try { await supabase.storage.from('conteudo').remove([eventoEditingAttachmentPath]); } catch (ignoreErr) {}
         }
         payload.attachment_path = eventoPath;
-        payload.attachment_type = attachmentTypeFromFilename(eventoFile.name);
+        payload.attachment_type = attachmentTypeFromFilename(eventoFile.name, eventoFile.type);
         payload.attachment_name = eventoFile.name;
       } else if (eventoRemoveChecked) {
         if (eventoEditingAttachmentPath) {
