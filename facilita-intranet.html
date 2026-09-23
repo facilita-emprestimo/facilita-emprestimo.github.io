@@ -770,6 +770,57 @@
   .folder-card-cover-btn:hover{background:rgba(2,48,71,.75);}
   .folder-card-cover-btn .ic{width:14px;height:14px;}
   .folder-card-cover-pdf{position:absolute;bottom:6px;right:8px;z-index:2;background:rgba(0,0,0,.5);color:#fff;font-size:9.5px;font-weight:800;letter-spacing:.4px;padding:2px 6px;border-radius:4px;}
+
+  /* ---------- PRIORIDADES DO DIA (comercial) ---------- */
+  .prio-filters{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:18px;}
+  .prio-search{flex:1;min-width:200px;max-width:340px;display:flex;align-items:center;gap:8px;background:#fff;border:1px solid var(--line);border-radius:10px;padding:8px 12px;}
+  .prio-search input{border:none;outline:none;font-family:inherit;font-size:13px;width:100%;background:transparent;}
+  .prio-search .ic{width:15px;height:15px;color:var(--muted);}
+  .prio-chip{border:1px solid var(--line);background:#fff;color:var(--ink-2);font-family:inherit;font-size:12.5px;font-weight:700;padding:7px 13px;border-radius:20px;cursor:pointer;}
+  .prio-chip.active{background:var(--ink);border-color:var(--ink);color:#fff;}
+  .prio-publico{margin-bottom:26px;}
+  .prio-publico-title{display:flex;align-items:center;gap:10px;margin:0 0 12px;font-size:17px;font-weight:800;color:var(--ink);}
+  .prio-publico-title .ic{width:18px;height:18px;color:var(--orange);}
+  .prio-produtos{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:14px;align-items:start;}
+  .prio-produto{background:#fff;border:1px solid var(--line);border-radius:14px;overflow:hidden;}
+  .prio-produto-head{display:flex;justify-content:space-between;align-items:center;padding:12px 16px;background:linear-gradient(135deg,#023047,#034C67);color:#fff;}
+  .prio-produto-head h4{margin:0;font-size:14px;font-weight:800;letter-spacing:.2px;}
+  .prio-produto-head span{font-size:11px;opacity:.8;}
+  .prio-row{display:flex;gap:12px;padding:12px 16px;border-top:1px solid var(--line);}
+  .prio-row:first-of-type{border-top:none;}
+  .prio-row.prio-first{background:#FFF7ED;}
+  .prio-row.prio-vencida{opacity:.5;}
+  .prio-pos{flex-shrink:0;width:30px;height:30px;border-radius:50%;background:var(--bg);color:var(--ink-2);display:flex;align-items:center;justify-content:center;font-size:12.5px;font-weight:800;}
+  .prio-first .prio-pos{background:var(--orange);color:#fff;}
+  .prio-body{flex:1;min-width:0;}
+  .prio-banco{display:flex;align-items:center;flex-wrap:wrap;gap:6px;font-size:14px;font-weight:800;color:var(--ink);}
+  .prio-tag{font-size:10px;font-weight:800;letter-spacing:.3px;text-transform:uppercase;padding:2px 7px;border-radius:20px;}
+  .prio-tag-top{background:var(--orange);color:#fff;}
+  .prio-tag-new{background:#DCFCE7;color:#15803D;}
+  .prio-tag-exp{background:#FEE2E2;color:#B91C1C;}
+  .prio-tabela{font-size:12.5px;color:var(--ink-2);margin-top:4px;line-height:1.45;word-break:break-word;}
+  .prio-prazo{display:inline-flex;align-items:center;gap:5px;margin-top:6px;font-size:11.5px;font-weight:700;color:var(--ink-2);background:var(--bg);padding:3px 9px;border-radius:7px;}
+  .prio-prazo .ic{width:12px;height:12px;}
+  .prio-regras{margin-top:7px;font-size:12px;color:#92400E;background:#FFFBEB;border-left:3px solid #F59E0B;padding:6px 9px;border-radius:0 7px 7px 0;line-height:1.45;}
+  .prio-meta{margin-top:6px;font-size:11px;color:var(--muted);display:flex;flex-wrap:wrap;gap:10px;align-items:center;}
+  .prio-meta a{color:var(--blue);font-weight:700;}
+  .prio-actions{display:flex;flex-direction:column;gap:4px;flex-shrink:0;}
+  .prio-actions button{background:var(--bg);border:none;border-radius:7px;padding:5px;cursor:pointer;color:var(--ink-2);display:flex;}
+  .prio-actions button:hover{background:#E5E7EB;}
+  .prio-actions .ic{width:14px;height:14px;}
+  .prio-home{background:linear-gradient(135deg,#023047,#034C67);color:#fff;border-radius:14px;padding:18px 20px;margin-bottom:18px;}
+  .prio-home-head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:12px;}
+  .prio-home-head h3{margin:0;font-size:16px;font-weight:800;display:flex;align-items:center;gap:8px;}
+  .prio-home-head h3 .ic{width:18px;height:18px;color:#FFB703;}
+  .prio-home-head button{background:rgba(255,255,255,.15);border:none;color:#fff;font-family:inherit;font-weight:700;font-size:12px;padding:7px 12px;border-radius:8px;cursor:pointer;}
+  .prio-home-head button:hover{background:rgba(255,255,255,.25);}
+  .prio-home-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:10px;}
+  .prio-home-item{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);border-radius:10px;padding:10px 12px;cursor:pointer;}
+  .prio-home-item:hover{background:rgba(255,255,255,.14);}
+  .prio-home-item small{display:block;font-size:11px;opacity:.75;margin-bottom:3px;}
+  .prio-home-item b{font-size:14px;color:#FFB703;}
+  .prio-home-item span{display:block;font-size:11px;opacity:.7;margin-top:2px;}
+  @media (max-width:640px){.prio-produtos{grid-template-columns:1fr;}}
   .attach-hint{font-size:11.5px;color:var(--muted,#6B7280);background:var(--bg,#F3F5F8);border-radius:8px;padding:7px 10px;margin-top:6px;line-height:1.45;}
   .doc-file-list{display:flex;flex-direction:column;gap:10px;}
   .doc-file-row{background:#fff;border:1px solid var(--line);border-radius:12px;padding:14px 16px;display:flex;align-items:center;gap:14px;}
@@ -1074,6 +1125,10 @@
       <button class="nav-link active" data-page="home" onclick="navigate('home')">
         <svg class="ic"><use href="#i-home"/></svg> Home
       </button>
+      <div class="nav-caption">Comercial</div>
+      <button class="nav-link" data-page="prioridades" onclick="navigate('prioridades')">
+        <svg class="ic"><use href="#i-star"/></svg> Prioridades do Dia
+      </button>
       <div class="nav-caption">Comunicação</div>
       <button class="nav-link" data-page="comunicados" onclick="navigate('comunicados')">
         <svg class="ic"><use href="#i-bell"/></svg> Comunicados
@@ -1167,6 +1222,14 @@
           </div>
         </div>
 
+        <div class="prio-home" id="homePrioWidget" style="display:none;">
+          <div class="prio-home-head">
+            <h3><svg class="ic"><use href="#i-star"/></svg> Prioridades de hoje — 1º banco a oferecer</h3>
+            <button type="button" onclick="navigate('prioridades')">Ver ordem completa</button>
+          </div>
+          <div class="prio-home-grid" id="homePrioGrid"></div>
+        </div>
+
         <div class="home-grid-2col" style="align-items:start;">
         <div class="card home-tiles-card">
           <div class="module-search-wrap">
@@ -1174,6 +1237,10 @@
             <input type="text" id="homeModuleSearch" placeholder="Buscar módulo..." oninput="filterHomeModules(this.value)">
           </div>
           <div class="tile-grid" id="homeTileGrid">
+            <button class="tile" data-tile-label="Prioridades do Dia" onclick="navigate('prioridades')">
+              <div class="tile-icon" style="background:var(--orange)"><svg class="ic" style="color:#fff"><use href="#i-star"/></svg></div>
+              <div class="tile-label">Prioridades do Dia</div>
+            </button>
             <button class="tile" data-tile-label="Comunicados" onclick="navigate('comunicados')">
               <div class="tile-icon" style="background:var(--blue)"><svg class="ic" style="color:#fff"><use href="#i-bell"/></svg></div>
               <div class="tile-label">Comunicados</div>
@@ -1358,6 +1425,58 @@
       </section>
 
       <!-- ================= COMUNICADOS ================= -->
+      <section class="page" id="page-prioridades">
+        <div class="breadcrumb">Portal Interno / <b>Prioridades do Dia</b></div>
+        <div class="page-header">
+          <div><h1>Prioridades do Dia</h1><p>Ordem de bancos por convênio e produto. Ofereça sempre na ordem — o 1º é o que mais interessa para a Facilita.</p></div>
+          <div class="docs-toolbar" style="display:flex;gap:8px;flex-wrap:wrap;">
+            <a class="doc-action-btn" style="background:var(--ink-2);text-decoration:none;" href="https://docs.google.com/spreadsheets/d/1fnkc0qXe_2D4aMlU8bm21dgwCf8F3zBC/edit?gid=1518627485#gid=1518627485" target="_blank" rel="noopener">
+              <svg class="ic" style="width:15px;height:15px"><use href="#i-file-xls"/></svg> Tabela completa
+            </a>
+            <button type="button" class="doc-action-btn" id="btnNewPrio" style="display:none;">
+              <svg class="ic" style="width:15px;height:15px"><use href="#i-plus"/></svg> Nova prioridade
+            </button>
+          </div>
+        </div>
+        <div class="prio-filters">
+          <div class="prio-search"><svg class="ic"><use href="#i-search"/></svg><input type="text" id="prioSearch" placeholder="Buscar banco, tabela ou regra..."></div>
+          <div id="prioChips" style="display:flex;gap:8px;flex-wrap:wrap;"></div>
+        </div>
+        <div class="login-msg error" id="prioMsg" style="margin-bottom:16px;"></div>
+        <div id="prioList"></div>
+        <div class="docs-empty" id="prioEmpty" style="display:none;">Nenhuma prioridade cadastrada ainda.</div>
+      </section>
+
+      <div class="modal-overlay hidden" id="prioModal">
+        <div class="modal-card" style="max-width:560px;">
+          <h3 id="prioModalTitle">Nova prioridade</h3>
+          <div class="login-msg error" id="prioModalMsg"></div>
+          <form id="prioForm">
+            <input type="hidden" id="prioId">
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+              <div class="login-field"><label for="prioPublico">Convênio / público</label><input type="text" id="prioPublico" list="prioPublicoList" required placeholder="Ex: Governo do MA"><datalist id="prioPublicoList"></datalist></div>
+              <div class="login-field"><label for="prioProduto">Produto</label><input type="text" id="prioProduto" list="prioProdutoList" required placeholder="Ex: Novo, Refin, Portabilidade"><datalist id="prioProdutoList"></datalist></div>
+            </div>
+            <div style="display:grid;grid-template-columns:90px 1fr;gap:10px;">
+              <div class="login-field"><label for="prioOrdem">Posição</label><input type="number" id="prioOrdem" min="1" required></div>
+              <div class="login-field"><label for="prioBanco">Banco</label><input type="text" id="prioBanco" required placeholder="Ex: HOPE CONSIG"></div>
+            </div>
+            <div class="login-field"><label for="prioTabela">Tabela(s) / taxa</label><textarea id="prioTabela" rows="2" placeholder="Ex: GOV MARANHAO 1 DIG – tx 2,50%"></textarea></div>
+            <div class="login-field"><label for="prioPrazo">Prazo</label><input type="text" id="prioPrazo" placeholder="Ex: 120 × 96"></div>
+            <div class="login-field"><label for="prioRegras">Exceções / regras (aparece em destaque)</label><textarea id="prioRegras" rows="3" placeholder="Ex: 84x só com autorização. Não consulta Não Perturbe."></textarea></div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+              <div class="login-field"><label for="prioLink">Link de roteiro (opcional)</label><input type="url" id="prioLink" placeholder="https://..."></div>
+              <div class="login-field"><label for="prioValidoAte">Válida até (opcional)</label><input type="date" id="prioValidoAte"></div>
+            </div>
+            <div class="attach-hint">A posição define a ordem de oferta. Se você colocar um banco numa posição já ocupada, os bancos seguintes descem uma posição automaticamente. Com "Válida até", a prioridade some sozinha para a equipe depois dessa data.</div>
+            <div style="display:flex;gap:10px;margin-top:16px;">
+              <button type="submit" class="login-btn" style="width:auto;padding:11px 20px;">Salvar</button>
+              <button type="button" class="login-btn" id="prioCancel" style="width:auto;padding:11px 20px;background:#9CA3AF;">Cancelar</button>
+            </div>
+          </form>
+        </div>
+      </div>
+
       <section class="page" id="page-comunicados">
         <div class="breadcrumb">Portal Interno / <b>Comunicados</b></div>
         <div class="page-header">
@@ -2785,6 +2904,7 @@
   }
 
   var PERMISSION_DEFS = [
+    { key: 'prioridades.gerenciar', label: 'Atualizar Prioridades do Dia (bancos por convênio)' },
     { key: 'comunicados.gerenciar', label: 'Publicar comunicados/avisos' },
     { key: 'informativos.gerenciar', label: 'Publicar informativos/notícias' },
     { key: 'documentos.gerenciar', label: 'Upload de documentos' },
@@ -2931,6 +3051,7 @@
       if (typeof loadGateComunicados === 'function') { loadGateComunicados(); } else { gateOverlay2.classList.remove('hidden'); }
       if (typeof loadRootFolders === 'function') loadRootFolders();
       if (typeof loadHomeComunicados === 'function') loadHomeComunicados();
+      if (typeof loadHomePrioridades === 'function') loadHomePrioridades();
       if (typeof loadHomeNoticias === 'function') loadHomeNoticias();
       if (typeof loadCalendarioEventos === 'function') loadCalendarioEventos();
       if (typeof updateTarefasBadges === 'function') updateTarefasBadges();
@@ -5045,6 +5166,8 @@
       applyAreaHeader(page);
       loadRootFolders();
     }
+    if (page === 'prioridades' && typeof loadPrioridades === 'function') { loadPrioridades(); }
+    if (page === 'home' && typeof loadHomePrioridades === 'function') { loadHomePrioridades(); }
     if (page === 'comunicados' && typeof loadComunicados === 'function') { loadComunicados(); }
     if (page === 'enquetes' && typeof loadEnquetes === 'function') { loadEnquetes(); }
     if (page === 'informativos' && typeof loadInformativos === 'function') { loadInformativos(); }
@@ -10025,6 +10148,292 @@
     } catch (err) {
       alert((err && err.message) || 'Não foi possível baixar o arquivo.');
     }
+  }
+</script>
+
+
+<script>
+  // =====================================================================
+  // PRIORIDADES DO DIA — ordem de bancos por convênio (público) e produto
+  // Tabela: prioridades_comerciais · Permissão de edição: prioridades.gerenciar
+  // =====================================================================
+  var prioState = { items: [], filtro: 'todos', busca: '' };
+  var PRIO_PUBLICO_ORDEM = ['Governo do MA', 'Prefeitura de São Luís', 'INSS', 'SIAPE (Federal)'];
+  var PRIO_PRODUTO_ORDEM = ['Novo', 'Refin', 'Novo e Refin', 'Portabilidade', 'Cartão Consignado (RMC)', 'Cartão Benefício (RCC)', 'CLT', 'FGTS'];
+
+  function prioEsc(t) {
+    return String(t == null ? '' : t).replace(/[&<>"']/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+    });
+  }
+  function prioHoje() {
+    var d = new Date();
+    return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+  }
+  function prioVencida(it) { return !!(it.valido_ate && it.valido_ate < prioHoje()); }
+  function prioRecente(it) {
+    var t = new Date(it.updated_at || it.created_at).getTime();
+    return (Date.now() - t) < 3 * 24 * 60 * 60 * 1000;
+  }
+  function prioDataBR(iso) {
+    if (!iso) return '';
+    var s = String(iso).slice(0, 10).split('-');
+    return s[2] + '/' + s[1] + '/' + s[0];
+  }
+  function prioRank(list, v) { var i = list.indexOf(v); return i === -1 ? 999 : i; }
+  function prioAgrupar(items) {
+    var porPublico = {};
+    items.forEach(function (it) {
+      (porPublico[it.publico] = porPublico[it.publico] || {});
+      (porPublico[it.publico][it.produto] = porPublico[it.publico][it.produto] || []).push(it);
+    });
+    var publicos = Object.keys(porPublico).sort(function (a, b) {
+      return (prioRank(PRIO_PUBLICO_ORDEM, a) - prioRank(PRIO_PUBLICO_ORDEM, b)) || a.localeCompare(b);
+    });
+    return publicos.map(function (pub) {
+      var produtos = Object.keys(porPublico[pub]).sort(function (a, b) {
+        return (prioRank(PRIO_PRODUTO_ORDEM, a) - prioRank(PRIO_PRODUTO_ORDEM, b)) || a.localeCompare(b);
+      });
+      return {
+        publico: pub,
+        produtos: produtos.map(function (pr) {
+          return { produto: pr, itens: porPublico[pub][pr].sort(function (a, b) { return a.ordem - b.ordem; }) };
+        })
+      };
+    });
+  }
+
+  async function fetchPrioridades() {
+    var res = await supabase.from('prioridades_comerciais').select('*').eq('ativo', true)
+      .order('publico').order('produto').order('ordem');
+    if (res.error) throw res.error;
+    return res.data || [];
+  }
+
+  async function loadPrioridades() {
+    var msg = document.getElementById('prioMsg');
+    hideMsgEl(msg);
+    var canEdit = hasPermission('prioridades.gerenciar');
+    document.getElementById('btnNewPrio').style.display = canEdit ? '' : 'none';
+    try {
+      prioState.items = await fetchPrioridades();
+    } catch (e) {
+      showMsgEl(msg, 'Não foi possível carregar as prioridades.', 'error');
+      return;
+    }
+    renderPrioChips();
+    renderPrioridades();
+  }
+
+  function renderPrioChips() {
+    var wrap = document.getElementById('prioChips');
+    var publicos = prioAgrupar(prioState.items).map(function (g) { return g.publico; });
+    wrap.innerHTML = '';
+    ['todos'].concat(publicos).forEach(function (p) {
+      var b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'prio-chip' + (prioState.filtro === p ? ' active' : '');
+      b.textContent = p === 'todos' ? 'Todos' : p;
+      b.addEventListener('click', function () { prioState.filtro = p; renderPrioChips(); renderPrioridades(); });
+      wrap.appendChild(b);
+    });
+    var pl = document.getElementById('prioPublicoList'), pr = document.getElementById('prioProdutoList');
+    var uniq = function (arr) { return arr.filter(function (v, i) { return arr.indexOf(v) === i; }); };
+    pl.innerHTML = uniq(PRIO_PUBLICO_ORDEM.concat(publicos)).map(function (v) { return '<option value="' + prioEsc(v) + '">'; }).join('');
+    pr.innerHTML = uniq(PRIO_PRODUTO_ORDEM.concat(prioState.items.map(function (i) { return i.produto; }))).map(function (v) { return '<option value="' + prioEsc(v) + '">'; }).join('');
+  }
+
+  function renderPrioridades() {
+    var canEdit = hasPermission('prioridades.gerenciar');
+    var busca = normalizeSearchText(prioState.busca);
+    var items = prioState.items.filter(function (it) {
+      if (!canEdit && prioVencida(it)) return false;
+      if (prioState.filtro !== 'todos' && it.publico !== prioState.filtro) return false;
+      if (busca) {
+        var hay = normalizeSearchText([it.publico, it.produto, it.banco, it.tabela, it.prazo, it.regras].join(' '));
+        if (hay.indexOf(busca) === -1) return false;
+      }
+      return true;
+    });
+    var list = document.getElementById('prioList');
+    var empty = document.getElementById('prioEmpty');
+    list.innerHTML = '';
+    empty.style.display = items.length ? 'none' : 'block';
+    empty.textContent = prioState.items.length ? 'Nenhuma prioridade encontrada com esse filtro.' : 'Nenhuma prioridade cadastrada ainda.';
+
+    prioAgrupar(items).forEach(function (grupo) {
+      var sec = document.createElement('div');
+      sec.className = 'prio-publico';
+      sec.innerHTML = '<h2 class="prio-publico-title"><svg class="ic"><use href="#i-star"/></svg>' + prioEsc(grupo.publico) + '</h2>';
+      var grid = document.createElement('div');
+      grid.className = 'prio-produtos';
+      grupo.produtos.forEach(function (g) {
+        var box = document.createElement('div');
+        box.className = 'prio-produto';
+        box.innerHTML = '<div class="prio-produto-head"><h4>' + prioEsc(g.produto) + '</h4><span>' + g.itens.length + (g.itens.length === 1 ? ' banco' : ' bancos') + '</span></div>';
+        var primeiroValido = g.itens.find(function (x) { return !prioVencida(x); });
+        g.itens.forEach(function (it) { box.appendChild(buildPrioRow(it, it === primeiroValido, canEdit, g.itens)); });
+        grid.appendChild(box);
+      });
+      sec.appendChild(grid);
+      list.appendChild(sec);
+    });
+  }
+
+  function buildPrioRow(it, isFirst, canEdit, irmaos) {
+    var row = document.createElement('div');
+    var vencida = prioVencida(it);
+    row.className = 'prio-row' + (isFirst ? ' prio-first' : '') + (vencida ? ' prio-vencida' : '');
+    var tags = '';
+    if (isFirst) tags += '<span class="prio-tag prio-tag-top">Ofereça primeiro</span>';
+    if (prioRecente(it)) tags += '<span class="prio-tag prio-tag-new">Atualizado</span>';
+    if (vencida) tags += '<span class="prio-tag prio-tag-exp">Vencida</span>';
+    var meta = [];
+    meta.push('Atualizado em ' + prioDataBR(it.updated_at || it.created_at));
+    if (it.valido_ate) meta.push('Válida até ' + prioDataBR(it.valido_ate));
+    var metaHtml = meta.map(prioEsc).join(' · ');
+    if (it.link_url) metaHtml += ' · <a href="' + prioEsc(it.link_url) + '" target="_blank" rel="noopener">Roteiro</a>';
+    row.innerHTML =
+      '<div class="prio-pos">' + it.ordem + 'º</div>' +
+      '<div class="prio-body">' +
+        '<div class="prio-banco">' + prioEsc(it.banco) + ' ' + tags + '</div>' +
+        (it.tabela ? '<div class="prio-tabela">' + prioEsc(it.tabela) + '</div>' : '') +
+        (it.prazo ? '<div class="prio-prazo"><svg class="ic"><use href="#i-clock"/></svg>Prazo: ' + prioEsc(it.prazo) + '</div>' : '') +
+        (it.regras ? '<div class="prio-regras">⚠ ' + prioEsc(it.regras) + '</div>' : '') +
+        '<div class="prio-meta">' + metaHtml + '</div>' +
+      '</div>';
+    if (canEdit) {
+      var act = document.createElement('div');
+      act.className = 'prio-actions';
+      var mk = function (icon, title, fn) {
+        var b = document.createElement('button');
+        b.type = 'button'; b.title = title;
+        var up = icon === 'i-chevron-up';
+        b.innerHTML = '<svg class="ic"' + (up ? ' style="transform:rotate(180deg)"' : '') + '><use href="#' + (up ? 'i-chevron-down' : icon) + '"/></svg>';
+        b.addEventListener('click', fn);
+        act.appendChild(b);
+      };
+      var idx = irmaos.indexOf(it);
+      if (idx > 0) mk('i-chevron-up', 'Subir uma posição', function () { trocarPrioOrdem(it, irmaos[idx - 1]); });
+      if (idx < irmaos.length - 1) mk('i-chevron-down', 'Descer uma posição', function () { trocarPrioOrdem(it, irmaos[idx + 1]); });
+      mk('i-edit', 'Editar', function () { openPrioModal(it); });
+      mk('i-trash', 'Remover', function () { removerPrio(it); });
+      row.appendChild(act);
+    }
+    return row;
+  }
+
+  async function trocarPrioOrdem(a, b) {
+    var oa = a.ordem, ob = b.ordem;
+    var r1 = await supabase.from('prioridades_comerciais').update({ ordem: ob }).eq('id', a.id);
+    var r2 = await supabase.from('prioridades_comerciais').update({ ordem: oa }).eq('id', b.id);
+    if (r1.error || r2.error) showMsgEl(document.getElementById('prioMsg'), 'Não foi possível alterar a ordem.', 'error');
+    loadPrioridades();
+  }
+
+  async function removerPrio(it) {
+    if (!confirm('Remover "' + it.banco + '" da prioridade de ' + it.publico + ' – ' + it.produto + '?')) return;
+    var r = await supabase.from('prioridades_comerciais').delete().eq('id', it.id);
+    if (r.error) { showMsgEl(document.getElementById('prioMsg'), 'Não foi possível remover.', 'error'); return; }
+    // fecha o buraco na numeração
+    var rest = prioState.items.filter(function (x) { return x.publico === it.publico && x.produto === it.produto && x.ordem > it.ordem; });
+    for (var i = 0; i < rest.length; i++) {
+      await supabase.from('prioridades_comerciais').update({ ordem: rest[i].ordem - 1 }).eq('id', rest[i].id);
+    }
+    loadPrioridades();
+  }
+
+  function openPrioModal(it) {
+    var f = function (id) { return document.getElementById(id); };
+    hideMsgEl(f('prioModalMsg'));
+    f('prioModalTitle').textContent = it ? 'Editar prioridade' : 'Nova prioridade';
+    f('prioId').value = it ? it.id : '';
+    f('prioPublico').value = it ? it.publico : (prioState.filtro !== 'todos' ? prioState.filtro : '');
+    f('prioProduto').value = it ? it.produto : '';
+    f('prioOrdem').value = it ? it.ordem : 1;
+    f('prioBanco').value = it ? it.banco : '';
+    f('prioTabela').value = it ? (it.tabela || '') : '';
+    f('prioPrazo').value = it ? (it.prazo || '') : '';
+    f('prioRegras').value = it ? (it.regras || '') : '';
+    f('prioLink').value = it ? (it.link_url || '') : '';
+    f('prioValidoAte').value = it ? (it.valido_ate || '') : '';
+    f('prioModal').classList.remove('hidden');
+  }
+
+  (function initPrioridadesUI() {
+    var btnNew = document.getElementById('btnNewPrio');
+    if (btnNew) btnNew.addEventListener('click', function () { openPrioModal(null); });
+    var cancel = document.getElementById('prioCancel');
+    if (cancel) cancel.addEventListener('click', function () { document.getElementById('prioModal').classList.add('hidden'); });
+    var search = document.getElementById('prioSearch');
+    if (search) search.addEventListener('input', function () { prioState.busca = search.value; renderPrioridades(); });
+    var form = document.getElementById('prioForm');
+    if (!form) return;
+    form.addEventListener('submit', async function (e) {
+      e.preventDefault();
+      var f = function (id) { return document.getElementById(id); };
+      var msg = f('prioModalMsg');
+      hideMsgEl(msg);
+      var id = f('prioId').value;
+      var payload = {
+        publico: f('prioPublico').value.trim(),
+        produto: f('prioProduto').value.trim(),
+        ordem: Math.max(1, parseInt(f('prioOrdem').value, 10) || 1),
+        banco: f('prioBanco').value.trim(),
+        tabela: f('prioTabela').value.trim() || null,
+        prazo: f('prioPrazo').value.trim() || null,
+        regras: f('prioRegras').value.trim() || null,
+        link_url: f('prioLink').value.trim() || null,
+        valido_ate: f('prioValidoAte').value || null
+      };
+      if (!payload.publico || !payload.produto || !payload.banco) { showMsgEl(msg, 'Preencha convênio, produto e banco.', 'error'); return; }
+      var anterior = id ? prioState.items.find(function (x) { return x.id === id; }) : null;
+      var mudouPosicao = !anterior || anterior.ordem !== payload.ordem || anterior.publico !== payload.publico || anterior.produto !== payload.produto;
+      if (mudouPosicao) {
+        // abre espaço: quem está na posição escolhida (ou abaixo) desce uma posição
+        var ocupados = prioState.items.filter(function (x) {
+          return x.id !== id && x.publico === payload.publico && x.produto === payload.produto && x.ordem >= payload.ordem;
+        }).sort(function (a, b) { return b.ordem - a.ordem; });
+        if (ocupados.length && ocupados[ocupados.length - 1].ordem === payload.ordem) {
+          for (var i = 0; i < ocupados.length; i++) {
+            await supabase.from('prioridades_comerciais').update({ ordem: ocupados[i].ordem + 1 }).eq('id', ocupados[i].id);
+          }
+        }
+      }
+      var r;
+      if (id) {
+        r = await supabase.from('prioridades_comerciais').update(payload).eq('id', id);
+      } else {
+        payload.created_by = appState.session.user.id;
+        r = await supabase.from('prioridades_comerciais').insert(payload);
+      }
+      if (r.error) { showMsgEl(msg, 'Não foi possível salvar. Verifique se você tem permissão para atualizar prioridades.', 'error'); return; }
+      f('prioModal').classList.add('hidden');
+      loadPrioridades();
+    });
+  })();
+
+  // Home: o 1º banco de cada convênio/produto
+  async function loadHomePrioridades() {
+    var widget = document.getElementById('homePrioWidget');
+    var grid = document.getElementById('homePrioGrid');
+    if (!widget || !grid || !appState.session) return;
+    var items;
+    try { items = (await fetchPrioridades()).filter(function (x) { return !prioVencida(x); }); } catch (e) { return; }
+    if (!items.length) { widget.style.display = 'none'; return; }
+    grid.innerHTML = '';
+    prioAgrupar(items).forEach(function (g) {
+      g.produtos.forEach(function (p) {
+        var top = p.itens[0];
+        var el = document.createElement('div');
+        el.className = 'prio-home-item';
+        el.innerHTML = '<small>' + prioEsc(g.publico) + ' · ' + prioEsc(p.produto) + '</small><b>' + prioEsc(top.banco) + '</b>' +
+          (p.itens[1] ? '<span>depois: ' + prioEsc(p.itens[1].banco) + '</span>' : '');
+        el.addEventListener('click', function () { prioState.filtro = g.publico; navigate('prioridades'); });
+        grid.appendChild(el);
+      });
+    });
+    widget.style.display = '';
   }
 </script>
 
