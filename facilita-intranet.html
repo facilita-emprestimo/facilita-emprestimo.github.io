@@ -1038,6 +1038,18 @@
 </svg>
 
 <!-- ============ LOGIN ============ -->
+<div class="modal-overlay hidden" id="newPassModal" style="z-index:10000;">
+  <div class="modal-card">
+    <h3>Crie sua nova senha</h3>
+    <p style="font-size:13px;color:var(--muted);margin:0 0 14px;">Você entrou pelo link de recuperação. Defina agora a senha que vai usar para acessar o portal.</p>
+    <div class="login-msg error" id="newPassMsg"></div>
+    <form id="newPassForm">
+      <div class="login-field"><label for="newPass1">Nova senha (mínimo 8 caracteres)</label><input type="password" id="newPass1" minlength="8" required autocomplete="new-password"></div>
+      <div class="login-field"><label for="newPass2">Repita a nova senha</label><input type="password" id="newPass2" minlength="8" required autocomplete="new-password"></div>
+      <button type="submit" class="login-btn" id="newPassBtn">Salvar nova senha</button>
+    </form>
+  </div>
+</div>
 <div class="login-overlay" id="loginOverlay">
   <svg class="login-deco login-deco-1" viewBox="0 0 200 200"><polygon points="10,10 190,100 10,190" fill="none" stroke="rgba(255,255,255,.12)" stroke-width="3"/></svg>
   <svg class="login-deco login-deco-2" viewBox="0 0 200 200"><polygon points="10,10 190,100 10,190" fill="none" stroke="rgba(251,133,0,.35)" stroke-width="3"/></svg>
@@ -2955,6 +2967,7 @@
   var loginForm = document.getElementById('loginForm');
   var loginBtn = document.getElementById('loginBtn');
   var loginMsg = document.getElementById('loginMsg');
+  var PORTAL_URL = 'https://facilita-emprestimo.github.io/';
   var forgotBtn = document.getElementById('forgotBtn');
   var logoutBtn = document.getElementById('logoutBtn');
 
@@ -3121,7 +3134,7 @@
         showLoginMsg('Digite seu e-mail no campo acima e clique em "Esqueci minha senha" novamente.', 'error');
         return;
       }
-      supabase.auth.resetPasswordForEmail(email)
+      supabase.auth.resetPasswordForEmail(email, { redirectTo: PORTAL_URL })
         .then(function (res) {
           if (res.error) showLoginMsg(authErrorMessage(res.error.message), 'error');
           else showLoginMsg('Enviamos um link de redefinição de senha para ' + email + '.', 'success');
@@ -3152,7 +3165,38 @@
 
   supabase.auth.onAuthStateChange(function (event, session) {
     handleSession(session);
+    if (event === 'PASSWORD_RECOVERY') openNewPassModal();
   });
+  // Link de recuperação: a URL chega com #...type=recovery (fallback caso o evento dispare antes do listener)
+  if (/type=recovery/.test(window.location.hash)) { setTimeout(openNewPassModal, 300); }
+
+  function openNewPassModal() {
+    var m = document.getElementById('newPassModal');
+    if (!m || !m.classList.contains('hidden')) return;
+    document.getElementById('newPassForm').reset();
+    hideMsgEl(document.getElementById('newPassMsg'));
+    m.classList.remove('hidden');
+  }
+  (function () {
+    var form = document.getElementById('newPassForm');
+    if (!form) return;
+    form.addEventListener('submit', async function (e) {
+      e.preventDefault();
+      var msg = document.getElementById('newPassMsg');
+      var p1 = document.getElementById('newPass1').value, p2 = document.getElementById('newPass2').value;
+      hideMsgEl(msg);
+      if (p1.length < 8) { showMsgEl(msg, 'A senha precisa ter pelo menos 8 caracteres.', 'error'); return; }
+      if (p1 !== p2) { showMsgEl(msg, 'As duas senhas não são iguais.', 'error'); return; }
+      var btn = document.getElementById('newPassBtn');
+      btn.disabled = true;
+      var res = await supabase.auth.updateUser({ password: p1 });
+      btn.disabled = false;
+      if (res.error) { showMsgEl(msg, authErrorMessage(res.error.message), 'error'); return; }
+      showMsgEl(msg, 'Senha alterada! Use a nova senha nos próximos acessos.', 'success');
+      if (window.history && history.replaceState) history.replaceState(null, '', window.location.pathname);
+      setTimeout(function () { document.getElementById('newPassModal').classList.add('hidden'); }, 1500);
+    });
+  })();
   supabase.auth.getSession().then(function (res) {
     handleSession(res.data && res.data.session);
   });
@@ -3211,7 +3255,7 @@
       var email = document.getElementById('adminResetEmail').value.trim();
       adminResetBtn.disabled = true;
       try {
-        var res = await supabase.auth.resetPasswordForEmail(email);
+        var res = await supabase.auth.resetPasswordForEmail(email, { redirectTo: PORTAL_URL });
         if (res.error) {
           showMsgEl(adminResetMsg, authErrorMessage(res.error.message), 'error');
         } else {
