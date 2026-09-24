@@ -3637,69 +3637,141 @@
     }
   }
 
+  // =====================================================================
+  // MINIATURAS — reduz o tráfego do Supabase.
+  // Cada imagem/vídeo/PDF ganha UMA miniatura JPG leve, gerada no navegador na 1ª
+  // visualização e salva em <bucket>/thumbs/<tamanho>/<caminho>.jpg. Depois disso todos
+  // veem a miniatura; o original só é baixado ao abrir/baixar o arquivo.
+  // Os links assinados ficam guardados no navegador por alguns dias, para o cache funcionar.
+  // =====================================================================
+  var THUMB_SIZES = { sm: 640, md: 1400 };
+  var THUMB_TTL = 7 * 24 * 3600;           // validade do link assinado (s)
+  var thumbMemo = {};
+  var THUMB_IMG_EXT = ['png', 'jpg', 'jpeg', 'jfif', 'pjpeg', 'pjp', 'gif', 'webp', 'avif', 'bmp'];
+  var THUMB_VID_EXT = ['mp4', 'webm', 'mov', 'avi', 'mkv', 'm4v'];
+  function extOfPath(path) { return String(path || '').split('?')[0].split('.').pop().toLowerCase(); }
+  function lsGet(k) { try { var v = localStorage.getItem(k); return v ? JSON.parse(v) : null; } catch (e) { return null; } }
+  function lsSet(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} }
+  function memoGet(k) {
+    var v = thumbMemo[k] || lsGet(k);
+    if (v && v.e > Date.now() + 3600 * 1000) { thumbMemo[k] = v; return v; }
+    return null;
+  }
+  function memoSet(k, u, ttlSec) { var v = { u: u, e: Date.now() + ttlSec * 1000 }; thumbMemo[k] = v; if (u && u.indexOf('blob:') !== 0) lsSet(k, v); }
+
+  // Link assinado do arquivo ORIGINAL, reaproveitado entre acessos (permite cache do navegador).
+  async function cachedSignedUrl(bucket, path) {
+    var k = 'su|' + bucket + '|' + path;
+    var m = memoGet(k); if (m) return m.u;
+    var r = await supabase.storage.from(bucket).createSignedUrl(path, THUMB_TTL);
+    if (r.error || !r.data) return null;
+    memoSet(k, r.data.signedUrl, THUMB_TTL);
+    return r.data.signedUrl;
+  }
+
+  function scaleCanvas(src, w, h, maxSide) {
+    var r = Math.min(1, maxSide / Math.max(w, h));
+    var c = document.createElement('canvas');
+    c.width = Math.max(1, Math.round(w * r)); c.height = Math.max(1, Math.round(h * r));
+    var ctx = c.getContext('2d');
+    ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, c.width, c.height);
+    ctx.drawImage(src, 0, 0, c.width, c.height);
+    return c;
+  }
+  function canvasFromImage(url, maxSide) {
+    return new Promise(function (resolve, reject) {
+      var img = new Image(); img.crossOrigin = 'anonymous';
+      img.onload = function () { try { resolve(scaleCanvas(img, img.naturalWidth, img.naturalHeight, maxSide)); } catch (e) { reject(e); } };
+      img.onerror = reject; img.src = url;
+    });
+  }
+  function canvasFromVideo(url, maxSide) {
+    return new Promise(function (resolve, reject) {
+      var v = document.createElement('video');
+      v.crossOrigin = 'anonymous'; v.muted = true; v.preload = 'metadata';
+      v.style.cssText = 'position:fixed;left:-9999px;width:1px;height:1px;';
+      var end = function (fn, arg) { if (v.parentNode) v.parentNode.removeChild(v); fn(arg); };
+      var t = setTimeout(function () { end(reject, new Error('timeout')); }, 20000);
+      v.addEventListener('loadedmetadata', function () { try { v.currentTime = Math.min(0.5, (v.duration || 1) / 4); } catch (e) { clearTimeout(t); end(reject, e); } });
+      v.addEventListener('seeked', function () { clearTimeout(t); try { end(resolve, scaleCanvas(v, v.videoWidth || 320, v.videoHeight || 180, maxSide)); } catch (e) { end(reject, e); } });
+      v.addEventListener('error', function () { clearTimeout(t); end(reject, new Error('video')); });
+      document.body.appendChild(v); v.src = url;
+    });
+  }
+  async function canvasFromPdf(url, maxSide) {
+    var pdfjsLib = await loadPdfJs();
+    var pdf = await pdfjsLib.getDocument({ url: url, disableAutoFetch: true }).promise;
+    try {
+      var page = await pdf.getPage(1);
+      var base = page.getViewport({ scale: 1 });
+      var vp = page.getViewport({ scale: maxSide / Math.max(base.width, base.height) });
+      var c = document.createElement('canvas'); c.width = Math.round(vp.width); c.height = Math.round(vp.height);
+      var ctx = c.getContext('2d'); ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, c.width, c.height);
+      await page.render({ canvasContext: ctx, viewport: vp }).promise;
+      return c;
+    } finally { try { pdf.destroy(); } catch (e) {} }
+  }
+
+  var thumbInflight = {};
+  // Devolve o link da miniatura (cria e salva se ainda não existir). kind: image | video | pdf
+  function getThumbUrl(bucket, path, size, kind) {
+    size = THUMB_SIZES[size] ? size : 'sm';
+    var key = 'th|' + bucket + '|' + size + '|' + path;
+    var m = memoGet(key); if (m) return Promise.resolve(m.u || null);
+    if (thumbInflight[key]) return thumbInflight[key];
+    var thumbPath = 'thumbs/' + size + '/' + path + '.jpg';
+    var p = (async function () {
+      var ex = await supabase.storage.from(bucket).createSignedUrl(thumbPath, THUMB_TTL);
+      if (!ex.error && ex.data && ex.data.signedUrl) { memoSet(key, ex.data.signedUrl, THUMB_TTL); return ex.data.signedUrl; }
+      var orig = await supabase.storage.from(bucket).createSignedUrl(path, 900);
+      if (orig.error || !orig.data) return null;
+      var maxSide = THUMB_SIZES[size];
+      var canvas;
+      try {
+        canvas = kind === 'video' ? await canvasFromVideo(orig.data.signedUrl, maxSide)
+          : kind === 'pdf' ? await canvasFromPdf(orig.data.signedUrl, maxSide)
+          : await canvasFromImage(orig.data.signedUrl, maxSide);
+      } catch (e) {
+        memoSet(key, '', 24 * 3600);   // não tenta de novo hoje
+        return null;
+      }
+      var blob = await new Promise(function (r) { canvas.toBlob(r, 'image/jpeg', 0.82); });
+      if (!blob) return null;
+      var up = await supabase.storage.from(bucket).upload(thumbPath, blob, { contentType: 'image/jpeg', cacheControl: '31536000', upsert: false });
+      if (!up.error) {
+        var s2 = await supabase.storage.from(bucket).createSignedUrl(thumbPath, THUMB_TTL);
+        if (!s2.error && s2.data) { memoSet(key, s2.data.signedUrl, THUMB_TTL); return s2.data.signedUrl; }
+      }
+      var local = URL.createObjectURL(blob);
+      memoSet(key, local, 3600);
+      return local;
+    })().finally(function () { delete thumbInflight[key]; });
+    thumbInflight[key] = p;
+    return p;
+  }
+
+  // Substituto de createSignedUrl para EXIBIR arquivos: imagem → miniatura; o resto → link original reaproveitado.
+  // Retorna no mesmo formato do Supabase: { data: { signedUrl } }.
+  async function displaySignedUrl(bucket, path, size) {
+    var ext = extOfPath(path);
+    var url = null;
+    if (THUMB_IMG_EXT.indexOf(ext) !== -1) url = await getThumbUrl(bucket, path, size || 'md', 'image');
+    if (!url) url = await cachedSignedUrl(bucket, path);
+    return url ? { data: { signedUrl: url }, error: null } : { data: null, error: new Error('sem link') };
+  }
+
   // Insere uma prévia real (imagem ou quadro de vídeo) dentro de containerEl, por cima do ícone genérico
   // que já estiver lá. Se não for imagem/vídeo, ou se falhar ao carregar, o ícone genérico permanece.
   function attachRealThumb(containerEl, doc) {
     var kind = mediaKindOf(doc);
     if (kind !== 'image' && kind !== 'video') return;
     if (!doc.storage_path) return;
-
     var cached = thumbCache[doc.id];
     if (cached) { insertThumbImg(containerEl, cached.kind, cached.src); return; }
-
     scheduleThumbWork(function (done) {
-      supabase.storage.from('documentos').createSignedUrl(doc.storage_path, 3600).then(function (res) {
-        if (!res.data || !res.data.signedUrl) { done(); return; }
-        var url = res.data.signedUrl;
-        if (kind === 'image') {
-          var img = document.createElement('img');
-          img.className = 'thumb-mini-img';
-          img.alt = '';
-          img.onload = function () {
-            thumbCache[doc.id] = { kind: 'image', src: url };
-            containerEl.insertBefore(img, containerEl.firstChild);
-            done();
-          };
-          img.onerror = function () { done(); };
-          img.src = url;
-        } else {
-          // preload:'metadata' + seek para um instante específico baixa só o essencial p/ decodificar
-          // 1 quadro (poucos KB), em vez de 'auto', que baixava boa parte do vídeo só p/ gerar a miniatura.
-          var video = document.createElement('video');
-          video.crossOrigin = 'anonymous';
-          video.muted = true;
-          video.preload = 'metadata';
-          video.style.position = 'fixed';
-          video.style.left = '-9999px';
-          video.style.width = '1px';
-          video.style.height = '1px';
-          var settled = false;
-          var cleanup = function () {
-            if (settled) return;
-            settled = true;
-            if (video.parentNode) video.parentNode.removeChild(video);
-            done();
-          };
-          video.addEventListener('loadedmetadata', function () {
-            try { video.currentTime = Math.min(0.5, (video.duration || 1) / 4); } catch (e) { cleanup(); }
-          });
-          video.addEventListener('seeked', function () {
-            try {
-              var canvas = document.createElement('canvas');
-              canvas.width = video.videoWidth || 160;
-              canvas.height = video.videoHeight || 90;
-              var ctx = canvas.getContext('2d');
-              ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-              var dataUrl = canvas.toDataURL('image/jpeg', 0.7);
-              thumbCache[doc.id] = { kind: 'video', src: dataUrl };
-              insertThumbImg(containerEl, 'video', dataUrl);
-            } catch (e) {}
-            cleanup();
-          });
-          video.addEventListener('error', cleanup);
-          document.body.appendChild(video);
-          video.src = url;
-        }
+      getThumbUrl('documentos', doc.storage_path, 'sm', kind).then(function (url) {
+        if (url) { thumbCache[doc.id] = { kind: kind, src: url }; insertThumbImg(containerEl, kind, url); }
+        done();
       }).catch(function () { done(); });
     });
   }
@@ -3744,7 +3816,7 @@
     var mediaWrap = document.createElement('div');
     mediaWrap.className = cssClass;
     wrapEl.appendChild(mediaWrap);
-    supabase.storage.from('conteudo').createSignedUrl(item.attachment_path, 3600).then(function (res) {
+    displaySignedUrl('conteudo', item.attachment_path, 'md').then(function (res) {
       if (!res.data || !res.data.signedUrl) return;
       var signedUrl = res.data.signedUrl;
       if (item.attachment_type === 'image') {
@@ -3864,48 +3936,12 @@
     if (!doc || !doc.storage_path) return;
     var cached = folderCoverCache[doc.id];
     if (cached) { cb(cached.src, cached.kind); return; }
-    var ext = docExt(doc);
-    var kind = ext === 'pdf' ? 'pdf' : mediaKindOf(doc);
+    var kind = docExt(doc) === 'pdf' ? 'pdf' : mediaKindOf(doc);
+    if (kind !== 'image' && kind !== 'video' && kind !== 'pdf') return;
     scheduleThumbWork(function (done) {
-      supabase.storage.from('documentos').createSignedUrl(doc.storage_path, 3600).then(function (res) {
-        if (!res.data || !res.data.signedUrl) { done(); return; }
-        var url = res.data.signedUrl;
-        var ok = function (src) { folderCoverCache[doc.id] = { src: src, kind: kind }; cb(src, kind); done(); };
-        if (kind === 'image') {
-          var probe = new Image();
-          probe.onload = function () { ok(url); };
-          probe.onerror = function () { done(); };
-          probe.src = url;
-        } else if (kind === 'video') {
-          var video = document.createElement('video');
-          video.crossOrigin = 'anonymous';
-          video.muted = true;
-          video.preload = 'metadata';
-          video.style.cssText = 'position:fixed;left:-9999px;width:1px;height:1px;';
-          var settled = false;
-          var cleanup = function () { if (settled) return; settled = true; if (video.parentNode) video.parentNode.removeChild(video); done(); };
-          video.addEventListener('loadedmetadata', function () {
-            try { video.currentTime = Math.min(0.5, (video.duration || 1) / 4); } catch (e) { cleanup(); }
-          });
-          video.addEventListener('seeked', function () {
-            try {
-              var c = document.createElement('canvas');
-              c.width = video.videoWidth || 320; c.height = video.videoHeight || 180;
-              c.getContext('2d').drawImage(video, 0, 0, c.width, c.height);
-              var src = c.toDataURL('image/jpeg', 0.75);
-              folderCoverCache[doc.id] = { src: src, kind: 'video' };
-              cb(src, 'video');
-            } catch (e) {}
-            cleanup();
-          });
-          video.addEventListener('error', cleanup);
-          document.body.appendChild(video);
-          video.src = url;
-        } else if (kind === 'pdf') {
-          renderPdfFirstPage(url, 520).then(function (src) { if (src) ok(src); else done(); }).catch(function () { done(); });
-        } else {
-          done();
-        }
+      getThumbUrl('documentos', doc.storage_path, 'sm', kind).then(function (url) {
+        if (url) { folderCoverCache[doc.id] = { src: url, kind: kind }; cb(url, kind); }
+        done();
       }).catch(function () { done(); });
     });
   }
@@ -4041,7 +4077,7 @@
     var applyCover = function () {
       clearCover();
       if (folder.cover_path) {
-        supabase.storage.from('conteudo').createSignedUrl(folder.cover_path, 3600).then(function (res) {
+        displaySignedUrl('conteudo', folder.cover_path, 'sm').then(function (res) {
           if (res.data && res.data.signedUrl) finishCover(res.data.signedUrl, 'image');
           else applyAutoCover();
         }).catch(applyAutoCover);
@@ -4391,11 +4427,8 @@
       if (aulaCoverCache[doc.id]) {
         showImg(aulaCoverCache[doc.id]);
       } else {
-        supabase.storage.from('documentos').createSignedUrl(doc.storage_path, 3600).then(function (res) {
-          if (!res.data) return;
-          captureVideoFrame(res.data.signedUrl, function (dataUrl) {
-            if (dataUrl) { aulaCoverCache[doc.id] = dataUrl; showImg(dataUrl); }
-          });
+        getThumbUrl('documentos', doc.storage_path, 'md', 'video').then(function (url) {
+          if (url) { aulaCoverCache[doc.id] = url; showImg(url); }
         });
       }
     } else if (youtubeId) {
@@ -4701,7 +4734,7 @@
     }
 
     try {
-      var signedRes = await supabase.storage.from(opts.bucket).createSignedUrl(opts.path, 3600);
+      var signedRes = kind === 'image' ? await displaySignedUrl(opts.bucket, opts.path, 'md') : await supabase.storage.from(opts.bucket).createSignedUrl(opts.path, 3600);
       if (signedRes.error || !signedRes.data) throw new Error('Não foi possível gerar o link de pré-visualização.');
       var url = signedRes.data.signedUrl;
       filePreviewBody.innerHTML = '';
@@ -5290,7 +5323,7 @@
 
   // Pré-visualização do anexo já salvo (ao editar um Comunicado/Informativo existente).
   function showAttachmentPreviewFromStorage(previewEl, attachmentPath, attachmentType) {
-    supabase.storage.from('conteudo').createSignedUrl(attachmentPath, 3600).then(function (res) {
+    displaySignedUrl('conteudo', attachmentPath, 'md').then(function (res) {
       if (!res.data || !res.data.signedUrl) return;
       previewEl.innerHTML = '';
       if (attachmentType === 'image') {
@@ -5886,7 +5919,7 @@
 
   function attachComunicadoCover(coverEl, coverIconEl, item) {
     if (!item.attachment_path || (item.attachment_type !== 'image' && item.attachment_type !== 'video')) return;
-    supabase.storage.from('conteudo').createSignedUrl(item.attachment_path, 3600).then(function (res) {
+    displaySignedUrl('conteudo', item.attachment_path, 'sm').then(function (res) {
       if (!res.data || !res.data.signedUrl) return;
       var signedUrl = res.data.signedUrl;
       var finishCover = function (imgSrc) {
@@ -6126,7 +6159,7 @@
       thumbWrap.className = 'noticia-side-thumb';
       if (it.attachment_path && it.attachment_type === 'image') {
         (function (thumbWrap, it) {
-          supabase.storage.from('conteudo').createSignedUrl(it.attachment_path, 3600).then(function (res) {
+          displaySignedUrl('conteudo', it.attachment_path, 'sm').then(function (res) {
             if (res.data && res.data.signedUrl) {
               var img = document.createElement('img');
               img.src = res.data.signedUrl;
@@ -6203,7 +6236,7 @@
     linkifyInto(corpoEl, item.description || '');
 
     if (item.attachment_path && (item.attachment_type === 'image' || item.attachment_type === 'video')) {
-      var signed = await supabase.storage.from('conteudo').createSignedUrl(item.attachment_path, 3600);
+      var signed = await displaySignedUrl('conteudo', item.attachment_path, 'md');
       if (signed.data && signed.data.signedUrl) {
         coverWrap.style.display = 'block';
         if (item.attachment_type === 'image') {
@@ -6628,7 +6661,7 @@
     }
     card.appendChild(body);
     if (photoImg) {
-      supabase.storage.from('conteudo').createSignedUrl(item.photo_path, 3600).then(function (res) {
+      displaySignedUrl('conteudo', item.photo_path, 'sm').then(function (res) {
         if (res.data) photoImg.src = res.data.signedUrl;
       });
     }
@@ -6776,7 +6809,7 @@
     if (item.photo_path) {
       var img = document.createElement('img');
       img.alt = '';
-      supabase.storage.from('conteudo').createSignedUrl(item.photo_path, 3600).then(function (res) {
+      displaySignedUrl('conteudo', item.photo_path, 'sm').then(function (res) {
         if (res.data) img.src = res.data.signedUrl;
       });
       return img;
@@ -7240,7 +7273,7 @@
       var img = document.createElement('img');
       img.alt = '';
       photoEl.appendChild(img);
-      supabase.storage.from('conteudo').createSignedUrl(item.photo_path, 3600).then(function (res) {
+      displaySignedUrl('conteudo', item.photo_path, 'md').then(function (res) {
         if (res.data) img.src = res.data.signedUrl;
       });
     } else {
