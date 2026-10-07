@@ -467,6 +467,8 @@
   .unit-row{display:flex;gap:9px;font-size:12.5px;color:var(--muted);margin-bottom:8px;align-items:flex-start;}
   .unit-row .ic{width:15px;height:15px;margin-top:2px;color:var(--muted);}
   .unit-row b{color:var(--text);}
+  .unit-row a{color:var(--text);text-decoration:none;word-break:break-word;}
+  .unit-row a:hover{text-decoration:underline;}
 
   /* ---------- UNIDADES: menu lateral (Unidades / Colaboradores) ---------- */
   .unidades-layout{display:flex;gap:20px;align-items:flex-start;}
@@ -6667,6 +6669,7 @@
       row2.appendChild(document.createTextNode(item.address));
       body.appendChild(row2);
     }
+    appendUnitCardPerfil(body, item);
     if (item.video_url) {
       var videoRow = document.createElement('div');
       videoRow.style.display = 'flex';
@@ -6701,10 +6704,36 @@
       });
     }
     card.addEventListener('click', function (e) {
-      if (e.target.closest('button')) return;
+      if (e.target.closest('button') || e.target.closest('a')) return;
       openUnidadeColaboradores(item);
     });
     return card;
+  }
+
+  // Dados do Perfil da Loja exibidos na capa (abaixo de supervisor/endereço)
+  function appendUnitCardPerfil(body, item) {
+    var p = lojaPerfilCache[item.id];
+    if (!p) return;
+    function row(icon, html) {
+      var r = document.createElement('div');
+      r.className = 'unit-row';
+      r.innerHTML = '<svg class="ic"><use href="#' + icon + '"/></svg><span>' + html + '</span>';
+      body.appendChild(r);
+    }
+    var esc = lojaPerfilEsc;
+    var meta = [];
+    if (p.codigo) meta.push('<b>Cód.</b> ' + esc(p.codigo));
+    if (p.data_inauguracao) meta.push('<b>Inaugurada em</b> ' + esc(lojaPerfilFormatDate(p.data_inauguracao)));
+    if (meta.length) row('i-store', meta.join(' &nbsp;·&nbsp; '));
+    if (p.endereco && !item.address) row('i-map', esc(p.endereco));
+    if (p.telefone) row('i-phone', '<a href="tel:' + lojaPerfilDigits(p.telefone) + '">' + esc(p.telefone) + '</a>');
+    if (p.whatsapp) {
+      var z = lojaPerfilDigits(p.whatsapp);
+      if (z && z.length <= 11) z = '55' + z;
+      row('i-message', '<a href="https://wa.me/' + z + '" target="_blank" rel="noopener">WhatsApp ' + esc(p.whatsapp) + '</a>');
+    }
+    if (p.email) row('i-mail', '<a href="mailto:' + esc(p.email) + '">' + esc(p.email) + '</a>');
+    if (p.observacao) row('i-info', '<i>' + esc(p.observacao) + '</i>');
   }
 
   async function loadUnidades() {
@@ -6726,6 +6755,10 @@
     if (!items.length) { emptyEl.style.display = 'block'; return; }
     emptyEl.style.display = 'none';
     await loadCurtidas('unidade', items.map(function (i) { return i.id; }));
+    try {
+      var perfRes = await supabase.from('unidade_perfil').select('*').in('unidade_id', items.map(function (i) { return i.id; }));
+      (perfRes.data || []).forEach(function (p) { lojaPerfilCache[p.unidade_id] = p; });
+    } catch (ignorePerfilErr) {}
     items.forEach(function (item) { grid.appendChild(buildUnitCard(item)); });
   }
 
@@ -7670,6 +7703,7 @@
       if (res.error) { showMsgEl(lojaPerfilModalMsg, 'Não foi possível salvar o perfil da loja.', 'error'); return; }
       lojaPerfilModal.classList.add('hidden');
       if (lojaPerfilCurrent) fillLojaPerfilCard(lojaPerfilCurrent.card, lojaPerfilCurrent.unit);
+      if (typeof loadUnidades === 'function') loadUnidades();
     });
   }
 
