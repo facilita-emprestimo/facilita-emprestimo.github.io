@@ -1181,6 +1181,9 @@
       <button class="nav-link" data-page="documentos" onclick="navigate('documentos')">
         <svg class="ic"><use href="#i-file"/></svg> Documentos
       </button>
+      <button class="nav-link" data-page="biblioteca" onclick="navigate('biblioteca')">
+        <svg class="ic"><use href="#i-clipboard-check"/></svg> Biblioteca (POPs e Regras)
+      </button>
       <div class="nav-caption">Estrutura</div>
       <button class="nav-link" data-page="unidades" onclick="navigate('unidades')">
         <svg class="ic"><use href="#i-store"/></svg> Lojas
@@ -1297,6 +1300,10 @@
             <button class="tile" data-tile-label="Documentos" onclick="navigate('documentos')">
               <div class="tile-icon" style="background:var(--orange)"><svg class="ic" style="color:#fff"><use href="#i-file"/></svg></div>
               <div class="tile-label">Documentos</div>
+            </button>
+            <button class="tile" data-tile-label="Biblioteca POPs Regras Circulares Manuais" onclick="navigate('biblioteca')">
+              <div class="tile-icon" style="background:var(--teal)"><svg class="ic" style="color:#fff"><use href="#i-clipboard-check"/></svg></div>
+              <div class="tile-label">Biblioteca</div>
             </button>
             <button class="tile tile-extra" data-tile-label="Lojas" onclick="navigate('unidades')">
               <div class="tile-icon" style="background:var(--teal)"><svg class="ic" style="color:#fff"><use href="#i-store"/></svg></div>
@@ -1924,6 +1931,10 @@
             <div class="module-search-wrap" style="max-width:420px;">
               <svg class="ic module-search-ic"><use href="#i-search"/></svg>
               <input type="text" id="docsSearchInput" placeholder="Buscar pastas e arquivos..." oninput="filterDocsView(this.value)">
+            </div>
+            <div id="bibSearchView" style="display:none;">
+              <p id="bibSearchInfo" class="bib-search-info"></p>
+              <div id="bibSearchList" class="doc-file-list"></div>
             </div>
 
             <div id="docsFolderView">
@@ -3535,10 +3546,11 @@
     'sobre-nos': { crumb: 'Sobre Nós', title: 'Sobre Nós', subtitle: 'História, missão e valores da Facilita Empréstimo — pastas com PDFs, vídeos e imagens.', emptyFolders: 'Nenhum conteúdo publicado em Sobre Nós ainda.' },
     'trilha-conhecimento': { crumb: 'Trilha do Conhecimento', title: 'Trilha do Conhecimento', subtitle: 'Treinamentos, vídeos e materiais de capacitação — pastas com PDFs, vídeos e imagens.', emptyFolders: 'Nenhum conteúdo publicado na Trilha do Conhecimento ainda.' }
   };
+  AREA_CONFIG.biblioteca = { crumb: 'Biblioteca', title: 'Biblioteca de Processos', subtitle: 'Circulares, regras, POPs, checklists, roteiros e manuais por departamento — sempre na versão vigente.', emptyFolders: 'Nenhum departamento disponível para o seu nível de acesso ainda.' };
   var docsState = { path: [], area: 'documentos' };
 
   // Áreas que ganham o menu lateral com as pastas principais (estilo Unidades/Colaboradores).
-  var DOCS_SIDEBAR_AREAS = { 'trilha-conhecimento': true };
+  var DOCS_SIDEBAR_AREAS = { 'trilha-conhecimento': true, biblioteca: true };
 
   function applyAreaHeader(area) {
     var cfg = AREA_CONFIG[area] || AREA_CONFIG.documentos;
@@ -3550,6 +3562,9 @@
     if (titleEl) titleEl.textContent = cfg.title;
     if (subtitleEl) subtitleEl.textContent = cfg.subtitle;
     if (emptyEl) emptyEl.textContent = cfg.emptyFolders;
+    var searchInputEl = document.getElementById('docsSearchInput');
+    if (searchInputEl) searchInputEl.placeholder = area === 'biblioteca' ? 'Buscar por nome, código ou palavra-chave...' : 'Buscar pastas e arquivos...';
+    if (area !== 'biblioteca' && typeof hideBibSearchView === 'function') hideBibSearchView();
     var sidebarWrap = document.getElementById('docsAreaSidebar');
     if (sidebarWrap) {
       var showSidebar = !!DOCS_SIDEBAR_AREAS[area];
@@ -4231,6 +4246,7 @@
     setDocsMsg('');
     var docsSearchEl = document.getElementById('docsSearchInput');
     if (docsSearchEl) docsSearchEl.value = '';
+    if (typeof hideBibSearchView === 'function') hideBibSearchView();
     docsState.path = [];
     var toolbar = document.getElementById('docsAdminActions');
     if (toolbar) toolbar.style.display = (appState.profile && appState.profile.is_admin) ? 'flex' : 'none';
@@ -4299,6 +4315,7 @@
     setDocsMsg('');
     var docsSearchEl2 = document.getElementById('docsSearchInput');
     if (docsSearchEl2) docsSearchEl2.value = '';
+    if (typeof hideBibSearchView === 'function') hideBibSearchView();
     document.getElementById('docsFolderView').style.display = 'none';
     document.getElementById('docsInsideView').style.display = '';
     var toolbar = document.getElementById('docsAdminActions');
@@ -4332,6 +4349,10 @@
     var listEl = document.getElementById('docsFileList');
     var emptyEl = document.getElementById('docsFileEmpty');
     listEl.innerHTML = '';
+    if (docsState.area === 'biblioteca') {
+      docs = bibliotecaPrepareDocs(docs);
+      await loadBibliotecaCiencias(docs);
+    }
     if (!docs.length) {
       emptyEl.style.display = 'block';
       return;
@@ -4709,6 +4730,7 @@
     body.appendChild(nameEl);
     body.appendChild(subEl);
     card.appendChild(body);
+    if (docsState.area === 'biblioteca') decorateBibliotecaCard(card, body, doc);
     return card;
   }
 
@@ -4936,16 +4958,32 @@
       if (!files.length) return;
       var folderId = currentFolderId();
       if (!folderId) { alert('Abra uma pasta antes de enviar arquivos.'); return; }
-      await runWithConcurrency(files, 3, function (file) { return uploadOneFile(file, folderId); });
+      var isBib = docsState.area === 'biblioteca';
+      if (isBib) {
+        // Biblioteca guarda documentos leves (POP, regra, circular). Vídeo e arquivo pesado
+        // ocupam o armazenamento do portal — o certo é link do YouTube (não listado) ou Drive.
+        var pesados = files.filter(function (f) { return f.size > BIB_MAX_BYTES; });
+        if (pesados.length) {
+          alert('Arquivo acima de ' + (BIB_MAX_BYTES / 1048576) + ' MB não entra na Biblioteca: ' + pesados.map(function (f) { return f.name; }).join(', ') + '.\n\nPara vídeos, use um link do YouTube (não listado) ou do Drive. Para PDFs escaneados, comprima antes de enviar.');
+          e.target.value = '';
+          return;
+        }
+      }
+      var criados = [];
+      await runWithConcurrency(files, 3, function (file) {
+        return uploadOneFile(file, folderId).then(function (doc) { if (doc) criados.push(doc); });
+      });
       e.target.value = '';
-      renderInsideFolder(folderId);
+      await renderInsideFolder(folderId);
+      if (isBib && criados.length === 1) openBibliotecaMetaModal(criados[0]);
+      else if (isBib && criados.length > 1) alert(criados.length + ' arquivos enviados. Clique em "Editar dados" em cada um para preencher código, versão e status.');
     });
   }
 
   async function uploadOneFile(file, folderId) {
     var path = folderId + '/' + crypto.randomUUID() + '-' + safeStorageName(file.name);
     var up = await supabase.storage.from('documentos').upload(path, file);
-    if (up.error) { alert('Falha ao enviar ' + file.name + ': ' + up.error.message); return; }
+    if (up.error) { alert('Falha ao enviar ' + file.name + ': ' + up.error.message); return null; }
     var ext = (file.name.split('.').pop() || '').toLowerCase();
     var ins = await supabase.from('documents').insert({
       folder_id: folderId,
@@ -4954,8 +4992,9 @@
       file_type: ext,
       size_bytes: file.size,
       uploaded_by: appState.session.user.id
-    });
-    if (ins.error) { alert('Falha ao registrar ' + file.name + ': ' + ins.error.message); }
+    }).select().single();
+    if (ins.error) { alert('Falha ao registrar ' + file.name + ': ' + ins.error.message); return null; }
+    return ins.data;
   }
 
   // ---- Modal: nova aula (Trilha do Conhecimento) ----
@@ -5218,6 +5257,7 @@
   }
 
   function filterDocsView(query) {
+    if (docsState.area === 'biblioteca') { bibliotecaSearchDebounced(query); return; }
     var q = normalizeSearchText(query).trim();
     var folderViewVisible = document.getElementById('docsFolderView').style.display !== 'none';
     var grids = folderViewVisible
@@ -5232,9 +5272,9 @@
       });
     });
     if (!folderViewVisible) {
-      var rows = document.querySelectorAll('#docsFileList .doc-file-row');
+      var rows = document.querySelectorAll('#docsFileList .doc-file-row, #docsFileList .doc-file-card');
       rows.forEach(function (row) {
-        var nameEl = row.querySelector('.doc-file-name');
+        var nameEl = row.querySelector('.doc-file-name, .doc-file-card-name');
         var name = normalizeSearchText(nameEl ? nameEl.textContent : '');
         row.style.display = (!q || name.indexOf(q) !== -1) ? '' : 'none';
       });
@@ -10716,6 +10756,558 @@
       });
     });
     widget.style.display = '';
+  }
+</script>
+
+<style>
+  /* ---- Biblioteca de Processos ---- */
+  .bib-meta{display:flex;flex-wrap:wrap;gap:4px;margin-top:7px;}
+  .bib-line{font-size:11.5px;color:var(--muted);margin-top:6px;line-height:1.4;}
+  .bib-actions{display:flex;flex-wrap:wrap;gap:6px;margin-top:9px;}
+  .bib-btn{display:inline-flex;align-items:center;gap:5px;font-family:inherit;font-size:11.5px;font-weight:700;padding:6px 11px;border-radius:8px;cursor:pointer;border:1px solid var(--line);background:#fff;color:var(--text);white-space:nowrap;}
+  .bib-btn:hover{background:var(--bg);}
+  .bib-btn-primary{background:var(--red);border-color:var(--red);color:#fff;}
+  .bib-btn-primary:hover{background:var(--red-dark);}
+  .bib-btn:disabled{opacity:.5;cursor:not-allowed;}
+  .bib-ok{display:inline-flex;align-items:center;gap:5px;font-size:11.5px;font-weight:700;color:#15803D;}
+  .bib-ok .ic{width:13px;height:13px;}
+  .bib-pending{font-size:11.5px;font-weight:700;color:#B91C2B;}
+  .doc-file-card.bib-revogado{opacity:.55;}
+  .doc-file-card.bib-revogado .doc-file-card-name{text-decoration:line-through;}
+  .bib-search-info{font-size:13px;color:var(--muted);margin:4px 0 12px;}
+  .bib-folder-hits{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px;}
+  .bib-folder-hit{display:inline-flex;align-items:center;gap:6px;font-family:inherit;font-size:12.5px;font-weight:600;padding:7px 12px;border-radius:9px;border:1px solid var(--line);background:#fff;cursor:pointer;color:var(--text);}
+  .bib-folder-hit .ic{width:14px;height:14px;}
+  .bib-field-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+  @media (max-width:560px){.bib-field-row{grid-template-columns:1fr;}}
+  .bib-field-row .login-field select,.bib-modal select{width:100%;box-sizing:border-box;padding:11px 13px;border:1px solid var(--line);border-radius:9px;font-family:inherit;font-size:13.5px;background:var(--bg);}
+  .bib-hint{font-size:11.5px;color:var(--muted);margin:-4px 0 10px;}
+  .bib-ciencia-list{max-height:52vh;overflow:auto;margin:8px 0 14px;}
+  .bib-ciencia-list h4{font-size:12.5px;margin:12px 0 6px;}
+  .bib-ciencia-row{display:flex;justify-content:space-between;gap:10px;font-size:13px;padding:6px 0;border-bottom:1px solid var(--line);}
+  .bib-ciencia-row span:last-child{color:var(--muted);font-size:12px;white-space:nowrap;}
+</style>
+
+<!-- ============ MODAL: DADOS DO DOCUMENTO (Biblioteca) ============ -->
+<div class="modal-overlay hidden bib-modal" id="bibMetaModal">
+  <div class="modal-card" style="max-width:600px;">
+    <h3>Dados do documento</h3>
+    <div class="login-msg error" id="bibMetaMsg"></div>
+    <form id="bibMetaForm">
+      <div class="login-field">
+        <label for="bibMetaNome">Nome exibido</label>
+        <input type="text" id="bibMetaNome" required>
+      </div>
+      <div class="bib-field-row">
+        <div class="login-field">
+          <label for="bibMetaTipo">Tipo</label>
+          <select id="bibMetaTipo"></select>
+        </div>
+        <div class="login-field">
+          <label for="bibMetaCodigo">Código</label>
+          <input type="text" id="bibMetaCodigo" placeholder="Ex.: COM-POP-001">
+        </div>
+      </div>
+      <p class="bib-hint">O código é sugerido sozinho ao escolher o tipo. Formato: DEPARTAMENTO-TIPO-NÚMERO.</p>
+      <div class="bib-field-row">
+        <div class="login-field">
+          <label for="bibMetaVersao">Versão</label>
+          <input type="text" id="bibMetaVersao" placeholder="Ex.: 1.0">
+        </div>
+        <div class="login-field">
+          <label for="bibMetaStatus">Status</label>
+          <select id="bibMetaStatus">
+            <option value="vigente">Vigente</option>
+            <option value="em_revisao">Em revisão</option>
+            <option value="revogado">Revogado</option>
+          </select>
+        </div>
+      </div>
+      <div class="bib-field-row">
+        <div class="login-field">
+          <label for="bibMetaResponsavel">Responsável (dono do documento)</label>
+          <input type="text" id="bibMetaResponsavel" placeholder="Quem mantém atualizado">
+        </div>
+        <div class="login-field">
+          <label for="bibMetaRevisar">Revisar até</label>
+          <input type="date" id="bibMetaRevisar">
+        </div>
+      </div>
+      <div class="login-field">
+        <label for="bibMetaPalavras">Palavras-chave (ajudam a busca)</label>
+        <input type="text" id="bibMetaPalavras" placeholder="Ex.: esteira, pendência, formalização">
+      </div>
+      <label class="gate-check-row" style="margin-bottom:4px;">
+        <input type="checkbox" id="bibMetaCiencia">
+        Exigir ciência ("li e entendi") de quem tem acesso
+      </label>
+      <p class="bib-hint">Ao mudar a versão de um documento com ciência obrigatória, todos precisam confirmar de novo.</p>
+      <div style="display:flex;gap:10px;margin-top:16px;">
+        <button type="submit" class="login-btn" id="bibMetaSave" style="width:auto;padding:11px 20px;">Salvar</button>
+        <button type="button" class="login-btn" id="bibMetaCancel" style="width:auto;padding:11px 20px;background:#9CA3AF;">Cancelar</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- ============ MODAL: CIÊNCIAS (Biblioteca) ============ -->
+<div class="modal-overlay hidden bib-modal" id="bibCienciaModal">
+  <div class="modal-card" style="max-width:520px;">
+    <h3 id="bibCienciaTitle">Ciências</h3>
+    <div id="bibCienciaBody" class="bib-ciencia-list"></div>
+    <div style="display:flex;gap:10px;margin-top:6px;">
+      <button type="button" class="login-btn" id="bibCienciaClose" style="width:auto;padding:11px 20px;background:#9CA3AF;">Fechar</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  // ==================================================================
+  // Biblioteca de Processos — circulares, regras, POPs, checklists,
+  // roteiros e manuais por departamento. Reaproveita o motor de pastas
+  // (área "biblioteca") e acrescenta: código, tipo, versão, status,
+  // responsável, data de revisão, busca global e registro de ciência.
+  // Se as colunas novas ainda não existirem no banco, tudo continua
+  // funcionando como pasta comum (os campos simplesmente não aparecem).
+  // ==================================================================
+  var BIB_MAX_BYTES = 15 * 1048576;
+  var BIB_TIPOS = [
+    { v: 'circular', label: 'Circular', sigla: 'CIR' },
+    { v: 'regra', label: 'Regra / Política', sigla: 'REG' },
+    { v: 'pop', label: 'POP (procedimento)', sigla: 'POP' },
+    { v: 'checklist', label: 'Checklist', sigla: 'CHK' },
+    { v: 'roteiro', label: 'Roteiro de atendimento', sigla: 'ROT' },
+    { v: 'manual', label: 'Manual de sistema', sigla: 'MAN' },
+    { v: 'pde', label: 'PDE / Desenvolvimento', sigla: 'PDE' },
+    { v: 'outro', label: 'Outro', sigla: 'DOC' }
+  ];
+  var BIB_STATUS = {
+    vigente: { label: 'Vigente', cls: 'badge-green' },
+    em_revisao: { label: 'Em revisão', cls: 'badge-orange' },
+    revogado: { label: 'Revogado', cls: 'badge-gray' }
+  };
+  var BIB_DEPTO_SIGLA = { comercial: 'COM', 'back office': 'BKO', 'administrativo e financeiro': 'ADM', administrativo: 'ADM', financeiro: 'FIN', 'rh': 'RH' };
+  var bibCiencia = { mine: {}, readers: {} };
+  var bibSearchTimer = null;
+  var bibSearchSeq = 0;
+  var bibPrevViews = null;
+  var bibEditingDoc = null;
+
+  function bibCanManage() {
+    return !!(appState.profile && appState.profile.is_admin) || hasPermission('documentos.gerenciar');
+  }
+  function bibTipoInfo(v) {
+    for (var i = 0; i < BIB_TIPOS.length; i++) if (BIB_TIPOS[i].v === v) return BIB_TIPOS[i];
+    return null;
+  }
+  function bibStatusOf(doc) { return BIB_STATUS[doc.status] ? doc.status : 'vigente'; }
+  function bibVersaoKey(doc) { return String(doc.versao || ''); }
+  function bibRevisaoVencida(doc) { return !!(doc.revisar_em && doc.revisar_em < todayDateStr()); }
+
+  function bibliotecaPrepareDocs(docs) {
+    var canManage = bibCanManage();
+    var rank = { vigente: 0, em_revisao: 1, revogado: 2 };
+    var list = docs.filter(function (d) { return canManage || bibStatusOf(d) !== 'revogado'; });
+    list.sort(function (a, b) {
+      var r = rank[bibStatusOf(a)] - rank[bibStatusOf(b)];
+      if (r) return r;
+      if (!a.codigo !== !b.codigo) return a.codigo ? -1 : 1; // sem código vai para o fim
+      var c = String(a.codigo || '').localeCompare(String(b.codigo || ''), 'pt-BR', { numeric: true });
+      if (c) return c;
+      return String(a.name || '').localeCompare(String(b.name || ''), 'pt-BR');
+    });
+    return list;
+  }
+
+  async function loadBibliotecaCiencias(docs) {
+    bibCiencia = { mine: {}, readers: {} };
+    var alvo = docs.filter(function (d) { return d.exige_ciencia; });
+    if (!alvo.length || !appState.session) return;
+    var res = await supabase.from('documento_ciencias').select('document_id,user_id,versao,created_at').in('document_id', alvo.map(function (d) { return d.id; }));
+    if (res.error) return;
+    var byId = {};
+    alvo.forEach(function (d) { byId[d.id] = d; });
+    var me = appState.session.user.id;
+    (res.data || []).forEach(function (row) {
+      var doc = byId[row.document_id];
+      if (!doc || row.versao !== bibVersaoKey(doc)) return; // ciência de versão antiga não conta
+      if (row.user_id === me) bibCiencia.mine[row.document_id] = row.created_at;
+      (bibCiencia.readers[row.document_id] = bibCiencia.readers[row.document_id] || []).push(row);
+    });
+  }
+
+  function bibBadge(text, cls) {
+    var b = document.createElement('span');
+    b.className = 'badge ' + cls;
+    b.textContent = text;
+    return b;
+  }
+
+  function decorateBibliotecaCard(card, body, doc) {
+    var canManage = bibCanManage();
+    var status = bibStatusOf(doc);
+    if (status === 'revogado') card.classList.add('bib-revogado');
+
+    var meta = document.createElement('div');
+    meta.className = 'bib-meta';
+    if (doc.codigo) meta.appendChild(bibBadge(doc.codigo, 'badge-blue'));
+    var tipo = bibTipoInfo(doc.tipo);
+    if (tipo) meta.appendChild(bibBadge(tipo.label.split(' (')[0], 'badge-purple'));
+    if (doc.versao) meta.appendChild(bibBadge('v' + doc.versao, 'badge-gray'));
+    if (doc.status) meta.appendChild(bibBadge(BIB_STATUS[status].label, BIB_STATUS[status].cls));
+    if (canManage && status !== 'revogado' && bibRevisaoVencida(doc)) meta.appendChild(bibBadge('Revisão vencida', 'badge-red'));
+    if (meta.childElementCount) body.appendChild(meta);
+
+    var linhas = [];
+    if (doc.responsavel) linhas.push('Responsável: ' + doc.responsavel);
+    if (canManage && doc.revisar_em) linhas.push('Revisar até ' + formatDateBR(doc.revisar_em));
+    if (doc._bibFolderName) linhas.push('Pasta: ' + doc._bibFolderName);
+    if (linhas.length) {
+      var line = document.createElement('div');
+      line.className = 'bib-line';
+      line.textContent = linhas.join(' · ');
+      body.appendChild(line);
+    }
+
+    var actions = document.createElement('div');
+    actions.className = 'bib-actions';
+
+    if (doc.exige_ciencia && status !== 'revogado') {
+      var minha = bibCiencia.mine[doc.id];
+      if (minha) {
+        var ok = document.createElement('span');
+        ok.className = 'bib-ok';
+        ok.innerHTML = '<svg class="ic"><use href="#i-check"/></svg>';
+        ok.appendChild(document.createTextNode('Ciência em ' + formatDateBR(minha)));
+        actions.appendChild(ok);
+      } else {
+        var lerBtn = document.createElement('button');
+        lerBtn.type = 'button';
+        lerBtn.className = 'bib-btn bib-btn-primary';
+        lerBtn.textContent = 'Li e entendi';
+        lerBtn.title = 'Confirma que você leu e entendeu esta versão do documento';
+        lerBtn.addEventListener('click', function () { registrarCiencia(doc, lerBtn); });
+        actions.appendChild(lerBtn);
+      }
+    }
+
+    if (canManage) {
+      var editBtn = document.createElement('button');
+      editBtn.type = 'button';
+      editBtn.className = 'bib-btn';
+      editBtn.innerHTML = '<svg class="ic" style="width:12px;height:12px"><use href="#i-edit"/></svg>';
+      editBtn.appendChild(document.createTextNode('Editar dados'));
+      editBtn.addEventListener('click', function () { openBibliotecaMetaModal(doc); });
+      actions.appendChild(editBtn);
+
+      if (doc.exige_ciencia) {
+        var n = (bibCiencia.readers[doc.id] || []).length;
+        var cBtn = document.createElement('button');
+        cBtn.type = 'button';
+        cBtn.className = 'bib-btn';
+        cBtn.innerHTML = '<svg class="ic" style="width:12px;height:12px"><use href="#i-users"/></svg>';
+        cBtn.appendChild(document.createTextNode('Ciências: ' + n));
+        cBtn.addEventListener('click', function () { openCienciaModal(doc); });
+        actions.appendChild(cBtn);
+      }
+    }
+    if (actions.childElementCount) body.appendChild(actions);
+  }
+
+  async function registrarCiencia(doc, btn) {
+    if (!confirm('Confirmar que você leu e entendeu "' + (doc.codigo ? doc.codigo + ' — ' : '') + doc.name + '"' + (doc.versao ? ' (versão ' + doc.versao + ')' : '') + '?')) return;
+    btn.disabled = true;
+    btn.textContent = 'Registrando...';
+    var res = await supabase.from('documento_ciencias').insert({ document_id: doc.id, versao: bibVersaoKey(doc) });
+    if (res.error && String(res.error.code) !== '23505') {
+      alert('Não foi possível registrar a ciência: ' + res.error.message);
+      btn.disabled = false;
+      btn.textContent = 'Li e entendi';
+      return;
+    }
+    bibRefresh();
+  }
+
+  // ---- Lista de quem já deu ciência e quem está pendente ----
+  async function openCienciaModal(doc) {
+    var modal = document.getElementById('bibCienciaModal');
+    var bodyEl = document.getElementById('bibCienciaBody');
+    document.getElementById('bibCienciaTitle').textContent = 'Ciências — ' + (doc.codigo ? doc.codigo + ' · ' : '') + (doc.versao ? 'v' + doc.versao : 'versão atual');
+    bodyEl.textContent = 'Carregando...';
+    modal.classList.remove('hidden');
+
+    var versao = bibVersaoKey(doc);
+    var cRes = await supabase.from('documento_ciencias').select('user_id,created_at').eq('document_id', doc.id).eq('versao', versao);
+    var fRes = await supabase.from('folders').select('allow_all,allowed_roles').eq('id', doc.folder_id).single();
+    var pRes = await supabase.from('profiles').select('id,full_name,email,role,active');
+    var lidos = cRes.data || [];
+    var profiles = (pRes.data || []).filter(function (p) { return p.active !== false; });
+    var pMap = {};
+    profiles.forEach(function (p) { pMap[p.id] = p; });
+    var folder = fRes.data || { allow_all: true, allowed_roles: [] };
+    var leram = {};
+    lidos.forEach(function (r) { leram[r.user_id] = r.created_at; });
+    var publico = profiles.filter(function (p) { return folder.allow_all || (folder.allowed_roles || []).indexOf(p.role) !== -1; });
+    var pendentes = publico.filter(function (p) { return !leram[p.id]; });
+
+    bodyEl.innerHTML = '';
+    function nomeDe(p) { return p ? (p.full_name || p.email) : 'Usuário removido'; }
+    function sec(titulo, linhas) {
+      var h = document.createElement('h4');
+      h.textContent = titulo;
+      bodyEl.appendChild(h);
+      if (!linhas.length) {
+        var vazio = document.createElement('p');
+        vazio.className = 'bib-line';
+        vazio.textContent = 'Ninguém.';
+        bodyEl.appendChild(vazio);
+      }
+      linhas.forEach(function (l) {
+        var row = document.createElement('div');
+        row.className = 'bib-ciencia-row';
+        var a = document.createElement('span'); a.textContent = l[0];
+        var b = document.createElement('span'); b.textContent = l[1];
+        row.appendChild(a); row.appendChild(b);
+        bodyEl.appendChild(row);
+      });
+    }
+    sec('Pendentes (' + pendentes.length + ')', pendentes
+      .sort(function (a, b) { return nomeDe(a).localeCompare(nomeDe(b), 'pt-BR'); })
+      .map(function (p) { return [nomeDe(p), ROLE_LABELS[p.role] || p.role || '']; }));
+    sec('Já deram ciência (' + lidos.length + ')', lidos
+      .sort(function (a, b) { return String(a.created_at).localeCompare(String(b.created_at)); })
+      .map(function (r) { return [nomeDe(pMap[r.user_id]), formatDateBR(r.created_at)]; }));
+  }
+
+  // ---- Modal de dados do documento ----
+  (function initBibModals() {
+    var tipoSel = document.getElementById('bibMetaTipo');
+    if (tipoSel && !tipoSel.childElementCount) {
+      var blank = document.createElement('option');
+      blank.value = '';
+      blank.textContent = 'Selecione...';
+      tipoSel.appendChild(blank);
+      BIB_TIPOS.forEach(function (t) {
+        var o = document.createElement('option');
+        o.value = t.v;
+        o.textContent = t.label;
+        tipoSel.appendChild(o);
+      });
+      tipoSel.addEventListener('change', function () {
+        var codEl = document.getElementById('bibMetaCodigo');
+        if (!codEl.value.trim() || codEl.dataset.auto === '1') sugerirCodigo();
+      });
+    }
+    var codigoEl = document.getElementById('bibMetaCodigo');
+    if (codigoEl) codigoEl.addEventListener('input', function () { codigoEl.dataset.auto = ''; });
+    var cancel = document.getElementById('bibMetaCancel');
+    if (cancel) cancel.addEventListener('click', function () { document.getElementById('bibMetaModal').classList.add('hidden'); });
+    var close = document.getElementById('bibCienciaClose');
+    if (close) close.addEventListener('click', function () { document.getElementById('bibCienciaModal').classList.add('hidden'); });
+    var form = document.getElementById('bibMetaForm');
+    if (form) form.addEventListener('submit', salvarBibliotecaMeta);
+  })();
+
+  function bibDeptoSigla() {
+    var raiz = docsState.path.length ? docsState.path[0].name : '';
+    var key = normalizeSearchText(raiz).trim();
+    for (var k in BIB_DEPTO_SIGLA) if (normalizeSearchText(k) === key) return BIB_DEPTO_SIGLA[k];
+    return (key.replace(/[^a-z]/g, '').slice(0, 3) || 'DOC').toUpperCase();
+  }
+
+  async function sugerirCodigo() {
+    var codEl = document.getElementById('bibMetaCodigo');
+    var tipo = bibTipoInfo(document.getElementById('bibMetaTipo').value);
+    if (!tipo) return;
+    var prefixo = bibDeptoSigla() + '-' + tipo.sigla + '-' + (tipo.v === 'circular' ? new Date().getFullYear() + '-' : '');
+    var res = await supabase.from('documents').select('codigo').ilike('codigo', prefixo + '%');
+    var max = 0;
+    (res.data || []).forEach(function (r) {
+      var m = String(r.codigo || '').slice(prefixo.length).match(/^(\d+)/);
+      if (m) max = Math.max(max, parseInt(m[1], 10));
+    });
+    codEl.value = prefixo + String(max + 1).padStart(3, '0');
+    codEl.dataset.auto = '1';
+  }
+
+  function openBibliotecaMetaModal(doc) {
+    bibEditingDoc = doc;
+    hideMsgEl(document.getElementById('bibMetaMsg'));
+    document.getElementById('bibMetaNome').value = doc.name || '';
+    document.getElementById('bibMetaTipo').value = doc.tipo || '';
+    var codEl = document.getElementById('bibMetaCodigo');
+    codEl.value = doc.codigo || '';
+    codEl.dataset.auto = '';
+    document.getElementById('bibMetaVersao').value = doc.versao || (doc.codigo ? '' : '1.0');
+    document.getElementById('bibMetaStatus').value = bibStatusOf(doc);
+    document.getElementById('bibMetaResponsavel').value = doc.responsavel || '';
+    document.getElementById('bibMetaRevisar').value = doc.revisar_em || bibSugestaoRevisao();
+    document.getElementById('bibMetaPalavras').value = doc.palavras_chave || '';
+    document.getElementById('bibMetaCiencia').checked = !!doc.exige_ciencia;
+    document.getElementById('bibMetaModal').classList.remove('hidden');
+  }
+
+  function bibSugestaoRevisao() {
+    var d = new Date();
+    d.setMonth(d.getMonth() + 6);
+    return d.getFullYear() + '-' + pad2(d.getMonth() + 1) + '-' + pad2(d.getDate());
+  }
+
+  async function salvarBibliotecaMeta(e) {
+    e.preventDefault();
+    var msgEl = document.getElementById('bibMetaMsg');
+    hideMsgEl(msgEl);
+    if (!bibEditingDoc) return;
+    var codigo = document.getElementById('bibMetaCodigo').value.trim().toUpperCase();
+    var payload = {
+      name: document.getElementById('bibMetaNome').value.trim() || bibEditingDoc.name,
+      tipo: document.getElementById('bibMetaTipo').value || null,
+      codigo: codigo || null,
+      versao: document.getElementById('bibMetaVersao').value.trim() || null,
+      status: document.getElementById('bibMetaStatus').value,
+      responsavel: document.getElementById('bibMetaResponsavel').value.trim() || null,
+      revisar_em: document.getElementById('bibMetaRevisar').value || null,
+      palavras_chave: document.getElementById('bibMetaPalavras').value.trim() || null,
+      exige_ciencia: document.getElementById('bibMetaCiencia').checked
+    };
+    if (codigo) {
+      var dup = await supabase.from('documents').select('id,name,status').eq('codigo', codigo).neq('id', bibEditingDoc.id);
+      var ativos = (dup.data || []).filter(function (d) { return d.status !== 'revogado'; });
+      if (ativos.length && payload.status !== 'revogado') {
+        showMsgEl(msgEl, 'O código ' + codigo + ' já está em uso por "' + ativos[0].name + '". Revogue o anterior ou use outro código.', 'error');
+        return;
+      }
+    }
+    var btn = document.getElementById('bibMetaSave');
+    btn.disabled = true;
+    btn.textContent = 'Salvando...';
+    var res = await supabase.from('documents').update(payload).eq('id', bibEditingDoc.id);
+    btn.disabled = false;
+    btn.textContent = 'Salvar';
+    if (res.error) {
+      var semColuna = /column|coluna|schema cache/i.test(res.error.message || '');
+      showMsgEl(msgEl, semColuna
+        ? 'O banco ainda não tem os campos da Biblioteca. Rode o script sql/biblioteca_01_metadados_e_ciencia.sql no Supabase e tente de novo.'
+        : 'Não foi possível salvar: ' + res.error.message, 'error');
+      return;
+    }
+    document.getElementById('bibMetaModal').classList.add('hidden');
+    bibRefresh();
+  }
+
+  // ---- Busca em toda a Biblioteca (todas as pastas que a pessoa pode ver) ----
+  function bibliotecaSearchDebounced(query) {
+    clearTimeout(bibSearchTimer);
+    bibSearchTimer = setTimeout(function () { bibliotecaSearch(query); }, 300);
+  }
+
+  function showBibSearchView() {
+    var folderView = document.getElementById('docsFolderView');
+    var insideView = document.getElementById('docsInsideView');
+    if (!bibPrevViews) bibPrevViews = { folder: folderView.style.display, inside: insideView.style.display };
+    folderView.style.display = 'none';
+    insideView.style.display = 'none';
+    document.getElementById('bibSearchView').style.display = '';
+  }
+
+  function hideBibSearchView() {
+    var view = document.getElementById('bibSearchView');
+    if (!view) return;
+    view.style.display = 'none';
+    if (bibPrevViews) {
+      document.getElementById('docsFolderView').style.display = bibPrevViews.folder;
+      document.getElementById('docsInsideView').style.display = bibPrevViews.inside;
+      bibPrevViews = null;
+    }
+  }
+
+  async function bibliotecaSearch(query) {
+    var termo = String(query || '').replace(/[,()%*\\]/g, ' ').trim();
+    var seq = ++bibSearchSeq;
+    if (termo.length < 2) { hideBibSearchView(); return; }
+    showBibSearchView();
+    var info = document.getElementById('bibSearchInfo');
+    var list = document.getElementById('bibSearchList');
+    info.textContent = 'Buscando...';
+    list.innerHTML = '';
+
+    var like = '%' + termo + '%';
+    var filtro = ['name', 'codigo', 'palavras_chave', 'tipo', 'responsavel'].map(function (c) { return c + '.ilike.' + like; }).join(',');
+    var dRes = await supabase.from('documents').select('*, folders!inner(id,name,area,parent_id)').eq('folders.area', 'biblioteca').or(filtro).limit(60);
+    if (dRes.error) {
+      // Banco ainda sem as colunas novas: busca só pelo nome.
+      dRes = await supabase.from('documents').select('*, folders!inner(id,name,area,parent_id)').eq('folders.area', 'biblioteca').ilike('name', like).limit(60);
+    }
+    var fRes = await supabase.from('folders').select('*').eq('area', 'biblioteca').ilike('name', like).limit(12);
+    if (seq !== bibSearchSeq) return; // chegou uma busca mais nova
+
+    var docs = (dRes.data || []).map(function (d) { d._bibFolderName = d.folders ? d.folders.name : ''; return d; });
+    docs = bibliotecaPrepareDocs(docs);
+    await loadBibliotecaCiencias(docs);
+    if (seq !== bibSearchSeq) return;
+    var pastas = fRes.data || [];
+
+    info.textContent = (docs.length || pastas.length)
+      ? docs.length + ' documento(s)' + (pastas.length ? ' e ' + pastas.length + ' pasta(s)' : '') + ' para "' + termo + '"'
+      : 'Nada encontrado para "' + termo + '". Tente outra palavra, o código (ex.: COM-POP) ou o nome do sistema.';
+
+    if (pastas.length) {
+      var hits = document.createElement('div');
+      hits.className = 'bib-folder-hits';
+      pastas.forEach(function (f) {
+        var b = document.createElement('button');
+        b.type = 'button';
+        b.className = 'bib-folder-hit';
+        b.innerHTML = '<svg class="ic"><use href="#i-folder"/></svg>';
+        b.appendChild(document.createTextNode(f.name));
+        b.addEventListener('click', function () { bibOpenFolderById(f); });
+        hits.appendChild(b);
+      });
+      list.appendChild(hits);
+    }
+    if (docs.length) {
+      var ids = [];
+      docs.forEach(function (d) { if (d.uploaded_by && ids.indexOf(d.uploaded_by) === -1) ids.push(d.uploaded_by); });
+      var profilesMap = {};
+      if (ids.length) {
+        var pr = await supabase.from('profiles').select('id,full_name,email').in('id', ids);
+        (pr.data || []).forEach(function (p) { profilesMap[p.id] = p; });
+      }
+      if (seq !== bibSearchSeq) return;
+      var grid = document.createElement('div');
+      grid.className = 'doc-file-grid';
+      docs.forEach(function (d) { grid.appendChild(buildFileCard(d, profilesMap[d.uploaded_by])); });
+      list.appendChild(grid);
+    }
+  }
+
+  async function bibOpenFolderById(folder) {
+    var path = [folder];
+    var atual = folder;
+    while (atual && atual.parent_id) {
+      var r = await supabase.from('folders').select('*').eq('id', atual.parent_id).single();
+      if (r.error || !r.data) break;
+      path.unshift(r.data);
+      atual = r.data;
+    }
+    var input = document.getElementById('docsSearchInput');
+    if (input) input.value = '';
+    bibPrevViews = null;
+    document.getElementById('bibSearchView').style.display = 'none';
+    docsState.path = path;
+    renderInsideFolder(folder.id);
+  }
+
+  function bibRefresh() {
+    var input = document.getElementById('docsSearchInput');
+    var q = input ? input.value : '';
+    if (q && q.trim().length >= 2 && document.getElementById('bibSearchView').style.display !== 'none') {
+      bibliotecaSearch(q);
+    } else if (currentFolderId()) {
+      renderInsideFolder(currentFolderId());
+    } else {
+      loadRootFolders();
+    }
   }
 </script>
 
