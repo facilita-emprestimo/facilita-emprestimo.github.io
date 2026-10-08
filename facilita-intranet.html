@@ -577,6 +577,8 @@
   .ai-panel-close .ic{width:16px;height:16px;}
   .ai-panel-messages{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:10px;}
   .ai-msg{max-width:85%;padding:9px 13px;border-radius:13px;font-size:13px;line-height:1.5;white-space:pre-wrap;}
+  .ai-link-interno{display:inline-block;margin-top:4px;padding:3px 10px;border-radius:8px;background:var(--teal);color:#fff !important;font-weight:700;text-decoration:none;}
+  .ai-msg-bot a{color:var(--teal);font-weight:600;}
   .ai-msg-bot{background:var(--bg);color:var(--text);align-self:flex-start;border-bottom-left-radius:4px;}
   .ai-msg-user{background:var(--red);color:#fff;align-self:flex-end;border-bottom-right-radius:4px;}
   .ai-msg-error{background:#FEE2E2;color:#B91C2B;align-self:flex-start;border-bottom-left-radius:4px;}
@@ -3249,6 +3251,46 @@
     handleSession(res.data && res.data.session);
   });
 
+  // ---- Links diretos: #pasta=<id>, #doc=<id>, #pagina=<nome> (usados pela assistente e para compartilhar) ----
+  var DEEP_RE = /^#(pasta|doc|pagina)=([A-Za-z0-9_-]+)/;
+  async function portalAbrirLink(hash) {
+    var m = DEEP_RE.exec(hash || '');
+    if (!m) return false;
+    if (!appState.session || !appState.profile) return false;
+    var tipo = m[1], id = m[2];
+    try {
+      if (tipo === 'pagina') { navigate(id); return true; }
+      var doc = null, folderId = id;
+      if (tipo === 'doc') {
+        var dr = await supabase.from('documents').select('*').eq('id', id).single();
+        if (dr.error || !dr.data) { alert('Documento não encontrado ou sem permissão de acesso.'); return true; }
+        doc = dr.data; folderId = doc.folder_id;
+      }
+      var chain = [], atual = null, guard = 0, fid = folderId;
+      while (fid && guard++ < 12) {
+        var fr = await supabase.from('folders').select('*').eq('id', fid).single();
+        if (fr.error || !fr.data) break;
+        chain.unshift(fr.data); atual = fr.data; fid = fr.data.parent_id;
+      }
+      if (!chain.length) { alert('Pasta não encontrada ou sem permissão de acesso.'); return true; }
+      var area = chain[0].area || 'documentos';
+      navigate(area);
+      docsState.path = chain;
+      await renderInsideFolder(folderId);
+      if (doc && doc.storage_path && isPreviewable(doc.name, doc.file_type)) {
+        openFilePreview({ bucket: 'documentos', path: doc.storage_path, name: doc.name, fileType: doc.file_type, onDownload: function () { downloadDocument(doc); } });
+      }
+    } catch (e) { console.warn('link direto', e); }
+    return true;
+  }
+  window.portalAbrirLink = portalAbrirLink;
+  window.addEventListener('hashchange', function () { if (DEEP_RE.test(window.location.hash)) portalAbrirLink(window.location.hash); });
+  (function esperarLogin(tentativas) {
+    if (!DEEP_RE.test(window.location.hash)) return;
+    if (appState.session && appState.profile) { setTimeout(function () { portalAbrirLink(window.location.hash); }, 400); return; }
+    if (tentativas > 0) setTimeout(function () { esperarLogin(tentativas - 1); }, 500);
+  })(120);
+
   // ---- Administração: criar usuário (via Edge Function) e redefinir senha ----
   var adminCreateForm = document.getElementById('adminCreateForm');
   var adminCreateMsg = document.getElementById('adminCreateMsg');
@@ -4255,7 +4297,9 @@
     document.getElementById('docsBreadcrumb').style.display = 'none';
     refreshDocsSidebar();
 
+    var navSeq = docsState.seq = (docsState.seq || 0) + 1;
     var res = await supabase.from('folders').select('*').is('parent_id', null).eq('area', docsState.area).order('name');
+    if (navSeq !== docsState.seq) return; // outra navegação (ex.: link direto) assumiu a tela
     if (res.error) { setDocsMsg('Não foi possível carregar as pastas.'); return; }
     var folders = res.data || [];
     var grid = document.getElementById('docsFolderGrid');
@@ -4312,6 +4356,7 @@
   }
 
   async function renderInsideFolder(folderId) {
+    docsState.seq = (docsState.seq || 0) + 1;
     setDocsMsg('');
     var docsSearchEl2 = document.getElementById('docsSearchInput');
     if (docsSearchEl2) docsSearchEl2.value = '';
@@ -9983,10 +10028,39 @@
   var aiHistory = [];
   var aiBusy = false;
 
+  // Converte [texto](url), URLs soltas e **negrito** em elementos. Links internos do portal (#pasta=, #doc=, #pagina=)
+  // abrem na mesma aba, direto no lugar certo.
+  function aiRenderRich(el, text) {
+    el.innerHTML = '';
+    var re = /\[([^\]]+)\]\((https?:\/\/[^\s)]+|#[^\s)]+)\)|(https?:\/\/[^\s)]+)|\*\*([^*]+)\*\*/g;
+    var last = 0, m;
+    while ((m = re.exec(text))) {
+      if (m.index > last) el.appendChild(document.createTextNode(text.slice(last, m.index)));
+      if (m[4]) {
+        var b = document.createElement('b'); b.textContent = m[4]; el.appendChild(b);
+      } else {
+        var url = m[2] || m[3];
+        var a = document.createElement('a');
+        a.textContent = m[1] || url;
+        a.href = url;
+        var hashIdx = url.indexOf('#');
+        var interno = hashIdx !== -1 && /^#(pasta|doc|pagina)=/.test(url.slice(hashIdx)) &&
+          (url.charAt(0) === '#' || url.indexOf(window.location.host) !== -1);
+        if (interno) {
+          a.className = 'ai-link-interno';
+          a.addEventListener('click', (function (h) { return function (ev) { ev.preventDefault(); portalAbrirLink(h); }; })(url.slice(hashIdx)));
+        } else { a.target = '_blank'; a.rel = 'noopener'; }
+        el.appendChild(a);
+      }
+      last = m.index + m[0].length;
+    }
+    if (last < text.length) el.appendChild(document.createTextNode(text.slice(last)));
+  }
+
   function aiAppendMessage(role, text) {
     var el = document.createElement('div');
     el.className = 'ai-msg ' + (role === 'user' ? 'ai-msg-user' : role === 'error' ? 'ai-msg-error' : 'ai-msg-bot');
-    el.textContent = text;
+    if (role === 'bot') aiRenderRich(el, text); else el.textContent = text;
     aiMessagesEl.appendChild(el);
     aiMessagesEl.scrollTop = aiMessagesEl.scrollHeight;
     return el;
