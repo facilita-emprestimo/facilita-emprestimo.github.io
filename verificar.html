@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Verificar certificado — Facilita</title>
+<!--
+  Página PÚBLICA (sem login) para conferir se um certificado da Universidade Facilita é autêntico.
+  Chama a função verificar_certificado do Supabase, que devolve só nome, curso e datas.
+  Link usado no certificado: verificar.html?c=FAC-XXXX-XXXX
+-->
+<style>
+  :root{--red:#219EBC;--ink:#023047;--bg:#F3F4F7;--line:#EAECF0;--text:#1F2430;--muted:#6B7280;--green:#16A34A;}
+  *{box-sizing:border-box;}
+  body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;background:var(--bg);color:var(--text);}
+  .wrap{max-width:560px;margin:0 auto;padding:40px 16px;}
+  .brand{font-weight:800;letter-spacing:3px;color:var(--ink);font-size:15px;margin-bottom:6px;}
+  .brand span{font-weight:500;color:var(--muted);letter-spacing:1px;}
+  h1{font-size:22px;margin:0 0 6px;color:var(--ink);}
+  p.sub{color:var(--muted);font-size:14px;margin:0 0 22px;}
+  form{display:flex;gap:8px;}
+  input{flex:1;min-width:0;font-size:16px;padding:12px 14px;border:1px solid var(--line);border-radius:10px;text-transform:uppercase;font-family:inherit;}
+  button{background:var(--red);color:#fff;border:none;border-radius:10px;padding:0 18px;font-weight:700;font-size:14px;cursor:pointer;font-family:inherit;}
+  .card{background:#fff;border:1px solid var(--line);border-radius:14px;padding:20px;margin-top:20px;}
+  .ok{border-left:5px solid var(--green);}
+  .bad{border-left:5px solid #DC2626;}
+  .status{font-weight:800;font-size:15px;margin-bottom:12px;}
+  .ok .status{color:var(--green);} .bad .status{color:#DC2626;}
+  dl{margin:0;display:grid;grid-template-columns:130px 1fr;gap:8px 12px;font-size:14px;}
+  dt{color:var(--muted);} dd{margin:0;font-weight:600;}
+  .foot{margin-top:26px;font-size:12px;color:var(--muted);text-align:center;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="brand">FACILITA <span>Empréstimo</span></div>
+  <h1>Verificar certificado</h1>
+  <p class="sub">Digite o código impresso no certificado da Universidade Facilita.</p>
+  <form id="f">
+    <input id="codigo" placeholder="FAC-XXXX-XXXX" autocomplete="off" required>
+    <button type="submit">Verificar</button>
+  </form>
+  <div id="resultado"></div>
+  <div class="foot">Universidade Facilita · Portal Interno</div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script>
+  // Mesmo projeto e chave PÚBLICA (anon) do portal. Esta chave só acessa o que as regras do banco permitem.
+  var SUPABASE_URL = 'https://zlztcabjiwyssafwkphy.supabase.co';
+  var SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpsenRjYWJqaXd5c3NhZndrcGh5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODcwMDY5MDUsImV4cCI6MjEwMjU4MjkwNX0.MIjVd6SlXQpny3J7Pgg1fgNq39zAciDOEuiXyCd_noU';
+  var sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, { auth: { persistSession: false } });
+
+  function dataBR(iso) {
+    return iso ? new Date(iso).toLocaleDateString('pt-BR', { timeZone: 'America/Fortaleza' }) : '—';
+  }
+  function horas(min) {
+    if (!min) return '—';
+    var h = Math.floor(min / 60), m = min % 60;
+    return h ? (h + 'h' + (m ? (m < 10 ? '0' : '') + m + 'min' : '')) : (m + 'min');
+  }
+  function linha(dl, rotulo, valor) {
+    var dt = document.createElement('dt'); dt.textContent = rotulo;
+    var dd = document.createElement('dd'); dd.textContent = valor;
+    dl.appendChild(dt); dl.appendChild(dd);
+  }
+
+  async function verificar(codigo) {
+    var out = document.getElementById('resultado');
+    out.innerHTML = '<div class="card">Verificando…</div>';
+    var res = await sb.rpc('verificar_certificado', { p_codigo: codigo });
+    var c = res.data && res.data[0];
+    var card = document.createElement('div');
+    var st = document.createElement('div');
+    st.className = 'status';
+    card.appendChild(st);
+    if (res.error || !c) {
+      card.className = 'card bad';
+      st.textContent = res.error ? 'Não foi possível verificar agora. Tente novamente.' : 'Certificado não encontrado. Confira o código.';
+    } else {
+      card.className = 'card ' + (c.valido ? 'ok' : 'bad');
+      st.textContent = c.valido ? '✓ Certificado autêntico' : 'Certificado revogado pela empresa';
+      var dl = document.createElement('dl');
+      linha(dl, 'Código', c.codigo);
+      linha(dl, 'Colaborador(a)', c.aluno_nome);
+      linha(dl, 'Curso', c.curso_nome);
+      linha(dl, 'Carga horária', horas(c.carga_horaria_min));
+      linha(dl, 'Aulas', String(c.total_aulas));
+      linha(dl, 'Concluído em', dataBR(c.concluido_em));
+      linha(dl, 'Emitido em', dataBR(c.emitido_em));
+      card.appendChild(dl);
+    }
+    out.innerHTML = '';
+    out.appendChild(card);
+  }
+
+  document.getElementById('f').addEventListener('submit', function (e) {
+    e.preventDefault();
+    var c = document.getElementById('codigo').value.trim().toUpperCase();
+    if (!c) return;
+    history.replaceState(null, '', '?c=' + encodeURIComponent(c));
+    verificar(c);
+  });
+
+  var inicial = new URLSearchParams(location.search).get('c');
+  if (inicial) {
+    document.getElementById('codigo').value = inicial.toUpperCase();
+    verificar(inicial.trim().toUpperCase());
+  }
+</script>
+</body>
+</html>
