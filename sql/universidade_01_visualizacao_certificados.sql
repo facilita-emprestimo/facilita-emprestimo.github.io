@@ -8,6 +8,7 @@
 -- Só ADICIONA tabelas, colunas e funções. Não apaga dados existentes.
 -- Pode rodar mais de uma vez sem problema.
 -- Rodar no Supabase: projeto facilita-portal-interno > SQL Editor > New query > colar > Run.
+-- JÁ APLICADO em produção em 21/10/2026.
 -- =====================================================================
 
 -- ---------------------------------------------------------------------
@@ -135,14 +136,15 @@ returns boolean language sql stable security definer set search_path = public as
 $$;
 grant execute on function public.univ_pode_concluir(uuid) to authenticated;
 
--- Troca a regra de "marcar como concluído": antes bastava clicar.
-drop policy if exists aula_progresso_insert_propria on public.aula_progresso;
-create policy aula_progresso_insert_propria on public.aula_progresso for insert to authenticated
-  with check (user_id = auth.uid() and public.univ_pode_concluir(documento_id));
+-- Regra nova de "marcar como concluído" (antes bastava clicar).
+-- Políticas RESTRITIVAS: somam-se às que já existem sem precisar apagá-las.
+drop policy if exists univ_concluir_exige_video on public.aula_progresso;
+create policy univ_concluir_exige_video on public.aula_progresso as restrictive for insert to authenticated
+  with check (public.univ_pode_concluir(documento_id));
 
 -- Antes qualquer pessoa logada via o progresso de todo mundo. Agora: o próprio ou quem tem relatório.
-drop policy if exists aula_progresso_select_logado on public.aula_progresso;
-create policy aula_progresso_select_logado on public.aula_progresso for select to authenticated
+drop policy if exists univ_progresso_privado on public.aula_progresso;
+create policy univ_progresso_privado on public.aula_progresso as restrictive for select to authenticated
   using (user_id = auth.uid() or public.has_permission('universidade.relatorios'));
 
 -- ---------------------------------------------------------------------

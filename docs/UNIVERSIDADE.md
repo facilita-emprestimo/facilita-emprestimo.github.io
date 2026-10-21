@@ -33,7 +33,7 @@ Isso impede o "clicar em concluído sem abrir o vídeo" e o "pular até o fim". 
 
 ## Como colocar no ar
 
-1. **Banco (uma vez):** Supabase → projeto `facilita-portal-interno` → SQL Editor → New query → colar `sql/universidade_01_visualizacao_certificados.sql` → Run. Só adiciona coisas; pode rodar de novo sem problema.
+1. **Banco (uma vez, já feito em 21/10/2026):** Supabase → projeto `facilita-portal-interno` → SQL Editor → New query → colar `sql/universidade_01_visualizacao_certificados.sql` → Run. Só adiciona coisas; pode rodar de novo sem problema.
 2. **Site:** aprovar o pull request. O GitHub Pages publica sozinho em 1 a 2 minutos.
 3. **Permissão do relatório:** Administração → Permissões → "Ver relatório da Universidade". Já vem liberado para diretor e coordenador.
 4. **Teste:** abra um curso na Trilha, dê play num vídeo do YouTube, confira o botão "Assista ao vídeo para concluir · X%" subindo. Depois emita o certificado e abra o link de verificação impresso nele.
