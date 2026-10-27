@@ -3,7 +3,7 @@ import { createClient } from "jsr:@supabase/supabase-js@2";
 
 const PORTAL_URL = "https://facilita-emprestimo.github.io/";
 
-const SYSTEM_PROMPT_BASE = `Você é a assistente do Portal Interno da Facilita Empréstimo (correspondente bancário de crédito consignado em São Luís/MA). Ajuda colaboradores a (1) achar coisas no Portal, (2) tirar dúvidas sobre processos e produtos da Facilita e (3) responder sobre os convênios/bancos que estão na Base de Conhecimento (mais abaixo).
+const SYSTEM_PROMPT_BASE = `Você é a Lia, assistente virtual da Facilita, que atende no Portal Interno da Facilita Empréstimo (correspondente bancário de crédito consignado em São Luís/MA). Se perguntarem seu nome ou quem você é, responda que é a Lia, assistente virtual da Facilita. Tom simpático e profissional, sempre objetiva. Ajuda colaboradores a (1) achar coisas no Portal, (2) tirar dúvidas sobre processos e produtos da Facilita e (3) responder sobre os convênios/bancos que estão na Base de Conhecimento (mais abaixo).
 
 FORMA DE RESPONDER (obrigatório):
 - Seja objetiva. Vá direto ao ponto: sem saudação, sem introdução, sem repetir a pergunta.
@@ -204,7 +204,7 @@ Deno.serve(async (req: Request) => {
       return new Response(
         JSON.stringify({
           error:
-            "A assistente ainda não foi configurada. Peça ao administrador para adicionar a chave da OpenAI (OPENAI_API_KEY) nos secrets do Supabase.",
+            "A Lia ainda não foi configurada. Peça ao administrador para adicionar a chave da OpenAI (OPENAI_API_KEY) nos secrets do Supabase.",
         }),
         { status: 200, headers: { ...cors, "Content-Type": "application/json" } },
       );
@@ -245,7 +245,7 @@ Deno.serve(async (req: Request) => {
     const data = await openaiResp.json();
 
     if (!openaiResp.ok) {
-      const msg = (data && data.error && data.error.message) || "Erro ao consultar a assistente.";
+      const msg = (data && data.error && data.error.message) || "Erro ao consultar a Lia.";
       return new Response(JSON.stringify({ error: msg }), {
         status: 200,
         headers: { ...cors, "Content-Type": "application/json" },
@@ -259,7 +259,7 @@ Deno.serve(async (req: Request) => {
       headers: { ...cors, "Content-Type": "application/json" },
     });
   } catch (_err) {
-    return new Response(JSON.stringify({ error: "Erro inesperado ao consultar a assistente." }), {
+    return new Response(JSON.stringify({ error: "Erro inesperado ao consultar a Lia." }), {
       status: 200,
       headers: { ...cors, "Content-Type": "application/json" },
     });
