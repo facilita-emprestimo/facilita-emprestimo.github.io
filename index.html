@@ -3039,6 +3039,14 @@
           </div>
           <div id="permissoesMsg" style="font-size:12px;color:var(--muted);margin-top:10px;min-height:16px;"></div>
         </div>
+
+        <div class="card" id="liaLeituraCard" style="margin-top:18px;">
+          <div class="panel-title"><h3><img src="img/lia.jpg" alt="" style="width:26px;height:26px;border-radius:50%;vertical-align:-7px;margin-right:6px;">Leitura de documentos da Lia</h3></div>
+          <p style="font-size:13px;color:var(--muted);margin:0 0 12px;line-height:1.5;">A Lia lê o conteúdo dos arquivos do portal (PDF, Word, PowerPoint, Excel e imagens) para responder dúvidas e indicar o documento certo. Arquivos novos são lidos sozinhos logo após o envio. Ela só usa o conteúdo de documentos que a pessoa que pergunta pode ver.</p>
+          <div id="liaLeituraStatus" style="font-size:13.5px;margin-bottom:12px;">Carregando...</div>
+          <button type="button" class="btn-primary-sm" id="liaLeituraBtn">Ler documentos pendentes</button>
+          <div id="liaLeituraMsg" style="font-size:12.5px;color:var(--muted);margin-top:10px;min-height:16px;white-space:pre-wrap;"></div>
+        </div>
       </section>
 
     </div>
@@ -5376,6 +5384,7 @@ Posso te ajudar a encontrar algo no portal ou tirar dúvidas sobre processos, pr
       uploaded_by: appState.session.user.id
     }).select().single();
     if (ins.error) { alert('Falha ao registrar ' + file.name + ': ' + ins.error.message); return null; }
+    if (ins.data && typeof liaLerDocumento === 'function') liaLerDocumento(ins.data.id);
     return ins.data;
   }
 
@@ -5708,6 +5717,7 @@ Posso te ajudar a encontrar algo no portal ou tirar dúvidas sobre processos, pr
     }
     if (page === 'universidade' && typeof univAbrirPagina === 'function') { univAbrirPagina(); }
     if (page === 'prioridades' && typeof loadPrioridades === 'function') { loadPrioridades(); }
+    if (page === 'admin' && typeof liaCarregarStatusLeitura === 'function') { liaCarregarStatusLeitura(); }
     if (page === 'home' && typeof loadHomePrioridades === 'function') { loadHomePrioridades(); }
     if (page === 'comunicados' && typeof loadComunicados === 'function') { loadComunicados(); }
     if (page === 'enquetes' && typeof loadEnquetes === 'function') { loadEnquetes(); }
@@ -10372,6 +10382,60 @@ Posso te ajudar a encontrar algo no portal ou tirar dúvidas sobre processos, pr
       listEl.appendChild(row);
     });
   }
+
+  // ---------------- Lia: leitura do conteúdo dos documentos ----------------
+  // Chama a função que lê o arquivo e guarda o texto para a Lia. Roda em segundo plano, sem travar o envio.
+  function liaChamarLeitura(body) {
+    if (!appState.session) return Promise.reject(new Error('Sessão expirada.'));
+    return fetch(SUPABASE_URL + '/functions/v1/lia-ler-documentos', {
+      method: 'POST',
+      headers: { 'Authorization': 'Bearer ' + appState.session.access_token, 'Content-Type': 'application/json' },
+      body: JSON.stringify(body)
+    }).then(function (r) { return r.json(); });
+  }
+  function liaLerDocumento(documentId) {
+    liaChamarLeitura({ document_id: documentId }).catch(function (e) { console.warn('Lia não conseguiu ler o documento agora:', e); });
+  }
+
+  async function liaCarregarStatusLeitura() {
+    var statusEl = document.getElementById('liaLeituraStatus');
+    if (!statusEl) return;
+    try {
+      var tot = await supabase.from('documents').select('id', { count: 'exact', head: true });
+      var lidos = await supabase.from('ai_documentos_texto').select('status');
+      if (lidos.error) throw lidos.error;
+      var c = { ok: 0, ignorado: 0, erro: 0 };
+      (lidos.data || []).forEach(function (r) { c[r.status] = (c[r.status] || 0) + 1; });
+      var total = tot.count || 0;
+      var feitos = c.ok + c.ignorado + c.erro;
+      statusEl.innerHTML = '<b>' + c.ok + '</b> lidos · <b>' + Math.max(total - feitos, 0) + '</b> pendentes · ' +
+        c.ignorado + ' sem leitura (vídeo ou formato não suportado) · ' + c.erro + ' com erro — de ' + total + ' arquivos';
+    } catch (e) {
+      statusEl.textContent = 'Não foi possível carregar o status da leitura.';
+    }
+  }
+
+  var liaLeituraBtnEl = document.getElementById('liaLeituraBtn');
+  if (liaLeituraBtnEl) liaLeituraBtnEl.addEventListener('click', async function () {
+    var msgEl = document.getElementById('liaLeituraMsg');
+    liaLeituraBtnEl.disabled = true;
+    var feitos = 0, erros = 0;
+    try {
+      for (var rodada = 0; rodada < 200; rodada++) {
+        msgEl.textContent = 'Lendo documentos... ' + feitos + ' lidos até agora. Pode continuar usando o portal, mas não feche esta página.';
+        var res = await liaChamarLeitura({ limite: 3 });
+        if (res && res.error) throw new Error(res.error);
+        var proc = (res && res.processados) || [];
+        proc.forEach(function (p) { feitos++; if (p.status === 'erro') erros++; });
+        await liaCarregarStatusLeitura();
+        if (!proc.length || !res.restantes) break;
+      }
+      msgEl.textContent = 'Pronto! ' + feitos + ' documento(s) processado(s)' + (erros ? ', ' + erros + ' com erro.' : '.');
+    } catch (e) {
+      msgEl.textContent = 'Parou com erro: ' + ((e && e.message) || e) + '\nClique de novo para continuar de onde parou.';
+    }
+    liaLeituraBtnEl.disabled = false;
+  });
 
   // ---------------- Assistente virtual (IA) ----------------
   var aiFabBtn = document.getElementById('aiFab');

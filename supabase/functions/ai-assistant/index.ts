@@ -11,7 +11,7 @@ FORMA DE RESPONDER (obrigatório):
 - Português do Brasil, linguagem simples.
 
 QUANDO PERGUNTAREM "ONDE ESTÁ / ONDE ACHO / COMO ACESSO" ALGO:
-- Procure SOMENTE no "MAPA DO PORTAL" abaixo (pastas e documentos reais, já filtrados pelo que esta pessoa pode ver). Compare por palavras parecidas, sem acento e sem diferenciar maiúsculas (ex.: "script de vídeo" = "Video Chamada" = "roteiro de videochamada").
+- Procure SOMENTE no "MAPA DO PORTAL" abaixo (pastas e documentos reais, já filtrados pelo que esta pessoa pode ver), usando o nome, as palavras-chave e o "assunto" de cada arquivo. Compare por palavras parecidas, sem acento e sem diferenciar maiúsculas (ex.: "script de vídeo" = "Video Chamada" = "roteiro de videochamada").
 - Responda exatamente neste formato, copiando o caminho e o link do mapa sem alterar nada:
   Caminho: <caminho do mapa>
   [Abrir agora](<link do mapa>)
@@ -39,6 +39,7 @@ PÁGINAS DO PORTAL (menu lateral) e links diretos:
 
 OUTRAS REGRAS:
 - Qual banco oferecer / prioridade / tabela / prazo: use "PRIORIDADES COMERCIAIS VIGENTES". Diga o 1º banco, a tabela/prazo e as exceções. Se o 1º não liberou, indique o próximo. Se não houver prioridade para o convênio/produto, diga isso e oriente o Back Office.
+- Dúvida sobre processo, regra, FAQ ou qualquer conteúdo de documento: use os "TRECHOS DO CONTEÚDO DOS DOCUMENTOS" e o "assunto" de cada arquivo no mapa. Responda com o que está escrito e termine com [Abrir documento](<link do documento>). Se o trecho não responder, diga que não encontrou e indique o documento mais próximo.
 - Dúvida sobre convênio/banco: use a "BASE DE CONHECIMENTO POR CONVÊNIO/BANCO" e informe o link quando existir. Se o convênio não estiver lá, diga que o roteiro ainda não foi cadastrado e oriente o Back Office.
 - Se não tiver certeza (comissão, política interna, dados de pessoas), diga que não sabe e indique supervisor, RH, Back Office ou administrador. Não invente.
 - Você não vê dados em tempo real (tarefas de alguém, propostas, margem de cliente).
@@ -76,15 +77,49 @@ function userClient(authHeader: string | null) {
   return createClient(supabaseUrl, anonKey, { global: { headers: { Authorization: authHeader } } });
 }
 
-async function buildMapaPortal(authHeader: string | null): Promise<string> {
+// Palavras da pergunta usadas para achar trechos nos documentos (sem acento, sem palavras comuns).
+const STOP = new Set("para como onde qual quais quando sobre esta este essa esse isso pode posso preciso tenho fazer favor obrigado obrigada voce voces mesmo ainda sobre entre depois antes porque pelo pela pelos pelas numa num uma umas uns".split(" "));
+function normalizar(t: string): string {
+  return (t || "").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+}
+function palavrasDaPergunta(t: string): string[] {
+  return Array.from(new Set(normalizar(t).split(/[^a-z0-9]+/).filter((w) => w.length >= 4 && !STOP.has(w))));
+}
+
+// Trechos do conteúdo dos documentos que esta pessoa pode ver, mais parecidos com a pergunta.
+function escolherTrechos(pergunta: string, docs: any[], textos: Record<string, any>, caminhoDoc: (d: any) => string): string {
+  const palavras = palavrasDaPergunta(pergunta);
+  if (!palavras.length) return "";
+  const candidatos: { score: number; doc: any; trecho: string }[] = [];
+  for (const d of docs) {
+    const t = textos[d.id];
+    if (!t || !t.texto) continue;
+    const nomeNorm = normalizar((d.codigo || "") + " " + d.name + " " + (t.resumo || ""));
+    const bonusNome = palavras.filter((w) => nomeNorm.includes(w)).length;
+    const blocos = String(t.texto).match(/[\s\S]{1,1600}(?=\n|$)|[\s\S]{1,1600}/g) || [];
+    for (const b of blocos) {
+      const bn = normalizar(b);
+      let score = 0;
+      for (const w of palavras) if (bn.includes(w)) score += 1;
+      if (score > 0) candidatos.push({ score: score + bonusNome * 0.5, doc: d, trecho: b.trim() });
+    }
+  }
+  candidatos.sort((a, b) => b.score - a.score);
+  const escolhidos = candidatos.slice(0, 5);
+  if (!escolhidos.length) return "";
+  return "TRECHOS DO CONTEÚDO DOS DOCUMENTOS (texto lido de dentro dos arquivos que esta pessoa pode acessar; use para responder dúvidas e cite o documento com o link):\n\n" +
+    escolhidos.map((c) => `### ${(c.doc.codigo ? c.doc.codigo + " — " : "") + c.doc.name}\nCaminho: ${caminhoDoc(c.doc)} | link: ${PORTAL_URL}#doc=${c.doc.id}\n${c.trecho}`).join("\n\n---\n\n");
+}
+
+async function buildMapaPortal(authHeader: string | null, pergunta = ""): Promise<{ mapa: string; trechos: string }> {
   const supabase = userClient(authHeader);
-  if (!supabase) return "MAPA DO PORTAL: (indisponível no momento)";
+  if (!supabase) return { mapa: "MAPA DO PORTAL: (indisponível no momento)", trechos: "" };
   try {
     const [fRes, dRes] = await Promise.all([
       supabase.from("folders").select("id, name, area, parent_id").limit(2000),
       supabase.from("documents").select("*").limit(3000),
     ]);
-    if (fRes.error || !fRes.data) return "MAPA DO PORTAL: (indisponível no momento — erro ao consultar pastas)";
+    if (fRes.error || !fRes.data) return { mapa: "MAPA DO PORTAL: (indisponível no momento — erro ao consultar pastas)", trechos: "" };
     const folders = fRes.data as any[];
     const byId: Record<string, any> = {};
     for (const f of folders) byId[f.id] = f;
@@ -101,6 +136,18 @@ async function buildMapaPortal(authHeader: string | null): Promise<string> {
       return ["Menu", area, ...nomes].join(" › ");
     };
 
+    // Conteúdo lido pela Lia: só dos documentos que esta pessoa pode ver (lista já filtrada pelo login dela).
+    const visiveis = ((dRes.data || []) as any[]).filter((d) => d.status !== "revogado");
+    const textos: Record<string, any> = {};
+    const admin = adminClient();
+    if (admin && visiveis.length) {
+      const ids = visiveis.map((d) => d.id);
+      for (let i = 0; i < ids.length; i += 300) {
+        const { data } = await admin.from("ai_documentos_texto").select("document_id, resumo, texto").in("document_id", ids.slice(i, i + 300));
+        for (const r of (data || []) as any[]) textos[r.document_id] = r;
+      }
+    }
+
     const docsPorPasta: Record<string, any[]> = {};
     for (const d of (dRes.data || []) as any[]) {
       if (d.status === "revogado") continue;
@@ -116,15 +163,23 @@ async function buildMapaPortal(authHeader: string | null): Promise<string> {
       linhas.push(`- PASTA: ${c} (${docs.length} arquivo(s)) | link: ${PORTAL_URL}#pasta=${f.id}`);
       for (const d of docs.slice(0, 40)) {
         const nome = (d.codigo ? d.codigo + " — " : "") + (d.name || "arquivo");
-        const extra = d.palavras_chave ? ` | palavras-chave: ${d.palavras_chave}` : "";
+        let extra = d.palavras_chave ? ` | palavras-chave: ${d.palavras_chave}` : "";
+        const lido = textos[d.id];
+        if (lido && lido.resumo) extra += ` | assunto: ${String(lido.resumo).replace(/\s+/g, " ").slice(0, 300)}`;
         linhas.push(`    - ARQUIVO: ${nome}${extra} | caminho: ${c} | link: ${PORTAL_URL}#doc=${d.id}`);
       }
     }
     let texto = linhas.join("\n");
     if (texto.length > 60000) texto = texto.slice(0, 60000) + "\n(... mapa truncado)";
-    return "MAPA DO PORTAL (pastas e arquivos reais que esta pessoa pode acessar; use estes caminhos e links exatamente como estão):\n" + texto;
+    const pastaPorId: Record<string, string> = {};
+    for (const { f, c } of ordenadas) pastaPorId[f.id] = c;
+    const trechos = escolherTrechos(pergunta, visiveis, textos, (d) => pastaPorId[d.folder_id] || "Documentos");
+    return {
+      mapa: "MAPA DO PORTAL (pastas e arquivos reais que esta pessoa pode acessar; use estes caminhos e links exatamente como estão):\n" + texto,
+      trechos,
+    };
   } catch (_e) {
-    return "MAPA DO PORTAL: (indisponível no momento — erro ao consultar)";
+    return { mapa: "MAPA DO PORTAL: (indisponível no momento — erro ao consultar)", trechos: "" };
   }
 }
 
@@ -221,12 +276,13 @@ Deno.serve(async (req: Request) => {
 
     const model = Deno.env.get("OPENAI_MODEL") || "gpt-4o-mini";
     const authHeader = req.headers.get("Authorization");
-    const [knowledge, prioridades, mapa] = await Promise.all([
+    const ultimas = messages.filter((m: any) => m && m.role === "user").slice(-2).map((m: any) => String(m.content || "")).join(" ");
+    const [knowledge, prioridades, mapaInfo] = await Promise.all([
       buildKnowledgeSection(),
       buildPrioridadesSection(),
-      buildMapaPortal(authHeader),
+      buildMapaPortal(authHeader, ultimas),
     ]);
-    const systemPrompt = SYSTEM_PROMPT_BASE + "\n\n" + mapa + "\n\n" + prioridades + "\n\n" + knowledge;
+    const systemPrompt = SYSTEM_PROMPT_BASE + "\n\n" + mapaInfo.mapa + "\n\n" + (mapaInfo.trechos ? mapaInfo.trechos + "\n\n" : "") + prioridades + "\n\n" + knowledge;
 
     const openaiResp = await fetch("https://api.openai.com/v1/chat/completions", {
       method: "POST",
