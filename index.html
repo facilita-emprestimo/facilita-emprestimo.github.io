@@ -248,6 +248,47 @@
   .univ-filtros select,.univ-filtros input{font-family:inherit;font-size:13px;padding:8px 10px;border:1px solid var(--line);border-radius:9px;background:#fff;color:var(--text);}
   .univ-mini-bar{display:inline-block;width:70px;height:6px;border-radius:4px;background:var(--bg);overflow:hidden;vertical-align:middle;margin-right:6px;}
   .univ-mini-bar i{display:block;height:100%;background:linear-gradient(90deg,var(--teal),var(--green));}
+
+  /* ===== Departamento Pessoal — eventos mensais ===== */
+  .dp-topo{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-bottom:14px;}
+  .dp-comp{display:flex;align-items:center;gap:6px;background:#fff;border:1px solid var(--line);border-radius:11px;padding:5px 6px;}
+  .dp-comp input{font-family:inherit;font-size:14px;font-weight:700;color:var(--ink);border:none;background:transparent;padding:4px 6px;}
+  .dp-comp button{border:none;background:var(--bg);border-radius:8px;width:30px;height:30px;cursor:pointer;color:var(--ink);font-size:16px;}
+  .dp-status{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted);flex:1;min-width:220px;}
+  .dp-kpi-alerta b{color:#C2410C;}
+  table.dp-tabela td,table.dp-tabela th{white-space:nowrap;padding:9px 8px;}
+  table.dp-tabela td:first-child{white-space:normal;min-width:170px;}
+  table.dp-tabela td small{display:block;font-size:11px;color:var(--muted);font-weight:500;}
+  table.dp-tabela .dp-num{text-align:right;}
+  table.dp-tabela tr.dp-linha{cursor:pointer;}
+  table.dp-tabela tr.dp-linha:hover td{background:#F8FAFC;}
+  .dp-eventos-cel{white-space:normal !important;max-width:240px;}
+  .dp-eventos-cel .badge{display:inline-block;margin:1px 2px 1px 0;}
+  .dp-vazio{text-align:center;color:var(--muted);padding:26px !important;white-space:normal !important;}
+  .dp-muted{color:var(--muted);font-size:12px;}
+  .dp-alerta{color:#B91C2B;font-weight:800;}
+  .dp-ok{color:#15803D;font-weight:700;}
+  .dp-medio{color:#C2410C;font-weight:700;}
+  .dp-baixo{color:#B91C2B;font-weight:700;}
+  .dp-btn-mini{border:1px solid var(--line);background:#fff;color:var(--ink);font-weight:700;font-size:12px;border-radius:8px;padding:5px 10px;cursor:pointer;font-family:inherit;}
+  .dp-btn-mini:hover{background:var(--ink);color:#fff;}
+  #dpColabModal .modal-card{max-width:680px;}
+  .dp-modal-sub{font-size:12.5px;color:var(--muted);margin:-6px 0 12px;}
+  .dp-bloco{border:1px solid var(--line);border-radius:12px;padding:14px 16px;margin-bottom:14px;}
+  .dp-bloco h4{margin:0 0 10px;font-size:13.5px;color:var(--ink);}
+  .dp-grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+  .dp-grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;}
+  @media (max-width:600px){.dp-grid2,.dp-grid3{grid-template-columns:1fr;}}
+  .dp-bloco .login-field{margin-bottom:8px;}
+  .dp-bloco textarea{width:100%;padding:9px 11px;border:1px solid var(--line);border-radius:9px;font-family:inherit;font-size:13px;background:var(--bg);resize:vertical;box-sizing:border-box;}
+  .dp-pct{font-size:12.5px;font-weight:700;color:var(--ink);}
+  .dp-ev-item{display:flex;align-items:flex-start;gap:10px;padding:8px 0;border-bottom:1px dashed var(--line);}
+  .dp-ev-item:last-child{border-bottom:none;}
+  .dp-ev-txt{flex:1;font-size:12.5px;}
+  .dp-ev-txt small{display:block;color:var(--muted);font-size:11.5px;}
+  .dp-btn-x{border:none;background:#FEE2E2;color:#B91C2B;border-radius:7px;width:26px;height:26px;cursor:pointer;font-size:16px;line-height:1;}
+  .dp-acoes-modal{display:flex;gap:10px;align-items:center;flex-wrap:wrap;}
+  .dp-relatorio-wrap{background:#fff;border:1px solid var(--line);border-radius:14px;padding:22px 24px;overflow-x:auto;}
   .univ-aviso{background:#FFF7E6;border:1px solid #F5D98B;color:#7A5B00;border-radius:12px;padding:12px 14px;font-size:12.5px;line-height:1.5;margin-bottom:16px;}
   .univ-yt{position:relative;width:100%;aspect-ratio:16/9;max-height:360px;background:#000;}
   .univ-yt iframe{position:absolute;inset:0;width:100%;height:100%;border:0;display:block;}
@@ -1293,6 +1334,10 @@
       <button class="nav-link" data-page="planos-acao" onclick="navigate('planos-acao')">
         <svg class="ic"><use href="#i-target"/></svg> Planos de Ação
         <span class="nav-badge" id="navPlanosBadge" style="display:none;"></span>
+      </button>
+      <div class="nav-caption" data-dp-acesso style="display:none;">Departamento Pessoal</div>
+      <button class="nav-link" data-page="dp" data-dp-acesso style="display:none;" onclick="navigate('dp')">
+        <svg class="ic"><use href="#i-calendar"/></svg> Eventos do mês (DP)
       </button>
       <div class="nav-caption">Acesso</div>
       <button class="nav-link" id="navAdminBtn" data-page="admin" onclick="navigate('admin')">
@@ -2861,6 +2906,128 @@
         </div>
       </div>
 
+      <!-- ================= DEPARTAMENTO PESSOAL — EVENTOS MENSAIS (dp.js) ================= -->
+      <section class="page" id="page-dp">
+        <div class="breadcrumb">Portal Interno / Departamento Pessoal / <b>Eventos do mês</b></div>
+        <div class="page-header">
+          <div><h1>Eventos do mês — DP</h1><p>Faltas, atrasos, atestados, férias e demais ocorrências + meta, realizado e prêmio. No fim do mês, gere o relatório de fechamento para a contabilidade.</p></div>
+        </div>
+        <div class="univ-aviso" id="dpSemAcesso" style="display:none;">Esta área é restrita ao Departamento Pessoal e à Administração (permissão "Departamento Pessoal" em Administração &gt; Permissões).</div>
+        <div id="dpConteudo">
+          <div class="dp-topo">
+            <div class="dp-comp" title="Competência (mês de referência)">
+              <button type="button" onclick="dpNavegarMes(-1)" aria-label="Mês anterior">&lsaquo;</button>
+              <input type="month" id="dpCompetencia" onchange="dpTrocarCompetencia(this.value)">
+              <button type="button" onclick="dpNavegarMes(1)" aria-label="Próximo mês">&rsaquo;</button>
+            </div>
+            <div class="dp-status"><span class="badge badge-green" id="dpStatusBadge">Aberta</span><span id="dpStatusInfo"></span></div>
+            <button type="button" class="doc-action-btn" id="dpBtnCopiarMetas" style="background:var(--ink-2);" onclick="dpCopiarMetas()">
+              <svg class="ic" style="width:14px;height:14px"><use href="#i-swap"/></svg> Copiar metas do mês anterior
+            </button>
+            <button type="button" class="doc-action-btn" id="dpBtnFechar" onclick="dpFecharCompetencia()">
+              <svg class="ic" style="width:14px;height:14px"><use href="#i-lock"/></svg> Fechar competência
+            </button>
+            <button type="button" class="doc-action-btn" id="dpBtnReabrir" style="display:none;background:#9CA3AF;" onclick="dpReabrirCompetencia()">
+              <svg class="ic" style="width:14px;height:14px"><use href="#i-key"/></svg> Reabrir
+            </button>
+          </div>
+          <div class="login-msg error" id="dpMsg" style="margin-bottom:12px;"></div>
+          <div class="univ-kpis" id="dpKpis" style="grid-template-columns:repeat(auto-fit,minmax(150px,1fr));"></div>
+          <div class="tabs" id="dpTabs">
+            <button class="tab active" data-dp-tab="lancamentos" onclick="dpTrocarAba('lancamentos')">Lançamentos</button>
+            <button class="tab" data-dp-tab="relatorio" onclick="dpTrocarAba('relatorio')">Relatório de fechamento</button>
+          </div>
+          <div class="univ-filtros">
+            <select id="dpFiltroLoja" onchange="DP.filtroLoja=this.value;dpRenderTabela();if(DP.aba==='relatorio')dpRenderRelatorio();"><option value="">Todas as lojas</option></select>
+            <input type="search" id="dpBusca" placeholder="Buscar colaborador…" oninput="DP.busca=this.value;dpRenderTabela();if(DP.aba==='relatorio')dpRenderRelatorio();">
+          </div>
+          <div id="dpAbaLancamentos">
+            <div class="card" style="padding:6px 6px;">
+              <div class="admin-users-table-wrap">
+                <table class="admin-users-table dp-tabela">
+                  <thead><tr><th>Colaborador</th><th class="dp-num">Faltas inj.</th><th class="dp-num">Faltas just.</th><th class="dp-num">Atrasos</th><th class="dp-num">Férias</th><th>Outros eventos</th><th class="dp-num">Meta</th><th class="dp-num">Realizado</th><th class="dp-num">% Ating.</th><th class="dp-num">Prêmio</th></tr></thead>
+                  <tbody id="dpTabelaBody"></tbody>
+                </table>
+              </div>
+            </div>
+            <p class="dp-muted" style="margin-top:10px;">Clique no colaborador para lançar ocorrências e o resultado do mês. Colaborador faltando ou desatualizado? Ajuste o cadastro em <a href="#" onclick="navigate('unidades');return false;">Lojas</a>.</p>
+          </div>
+          <div id="dpAbaRelatorio" style="display:none;">
+            <div class="univ-filtros">
+              <button type="button" class="doc-action-btn" onclick="dpImprimirRelatorio()">
+                <svg class="ic" style="width:14px;height:14px"><use href="#i-printer"/></svg> Imprimir / salvar PDF
+              </button>
+              <button type="button" class="doc-action-btn" style="background:var(--ink-2);" onclick="dpExportarCsv()">
+                <svg class="ic" style="width:14px;height:14px"><use href="#i-download"/></svg> Exportar CSV (Excel)
+              </button>
+            </div>
+            <div class="dp-relatorio-wrap" id="dpRelatorioPreview"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ MODAL: LANÇAMENTOS DO COLABORADOR (DP) ============ -->
+      <div class="modal-overlay hidden" id="dpColabModal">
+        <div class="modal-card">
+          <h3 id="dpColabTitulo">Colaborador</h3>
+          <div class="dp-modal-sub" id="dpColabSub"></div>
+          <div class="login-msg error" id="dpColabMsg"></div>
+
+          <div class="dp-bloco">
+            <h4>Ocorrências do mês</h4>
+            <div id="dpEvLista"></div>
+            <div data-dp-edicao style="margin-top:12px;border-top:1px solid var(--line);padding-top:12px;">
+              <div class="login-field">
+                <label for="dpEvTipo">Tipo de ocorrência</label>
+                <select id="dpEvTipo" onchange="dpAjustarCamposEvento()">
+                  <option value="falta_injustificada">Falta injustificada</option>
+                  <option value="falta_justificada">Falta justificada / abonada</option>
+                  <option value="atraso">Atraso / saída antecipada</option>
+                  <option value="atestado">Atestado médico</option>
+                  <option value="ferias">Férias</option>
+                  <option value="licenca">Licença (maternidade, paternidade, gala, nojo…)</option>
+                  <option value="afastamento">Afastamento (INSS / acidente)</option>
+                  <option value="folga">Folga / compensação de banco de horas</option>
+                  <option value="advertencia">Advertência</option>
+                  <option value="suspensao">Suspensão</option>
+                  <option value="admissao">Admissão</option>
+                  <option value="desligamento">Desligamento</option>
+                  <option value="outro">Outro evento</option>
+                </select>
+              </div>
+              <div class="dp-grid3">
+                <div class="login-field"><label for="dpEvInicio">Data (início)</label><input type="date" id="dpEvInicio" onchange="dpRecalcularDias()"></div>
+                <div class="login-field" id="dpEvCampoFim"><label for="dpEvFim">Até (opcional)</label><input type="date" id="dpEvFim" onchange="dpRecalcularDias()"></div>
+                <div class="login-field" id="dpEvCampoDias"><label for="dpEvDias">Dias</label><input type="text" inputmode="decimal" id="dpEvDias" placeholder="1 ou 0,5"></div>
+                <div class="login-field" id="dpEvCampoMinutos" style="display:none;"><label for="dpEvMinutos">Minutos</label><input type="number" min="1" id="dpEvMinutos" placeholder="Ex.: 25"></div>
+              </div>
+              <div class="login-field"><label for="dpEvObs">Observação / motivo</label><input type="text" id="dpEvObs" maxlength="300" placeholder="Ex.: atestado entregue; férias 2º período (15 dias)"></div>
+              <button type="button" class="login-btn" id="dpBtnAddEv" style="width:auto;padding:9px 16px;" onclick="dpAdicionarEvento()">+ Registrar ocorrência</button>
+            </div>
+          </div>
+
+          <div class="dp-bloco">
+            <h4>Resultado do mês</h4>
+            <div class="dp-grid2">
+              <div class="login-field"><label for="dpResMeta">Meta (R$)</label><input type="text" inputmode="decimal" id="dpResMeta" placeholder="0,00" oninput="dpAtualizarPctModal()"></div>
+              <div class="login-field"><label for="dpResRealizado">Realizado (R$)</label><input type="text" inputmode="decimal" id="dpResRealizado" placeholder="0,00" oninput="dpAtualizarPctModal()"></div>
+            </div>
+            <div class="dp-pct" id="dpResPct" style="margin:-2px 0 10px;">Atingimento: —</div>
+            <div class="dp-grid2">
+              <div class="login-field"><label for="dpResPremio">Valor do prêmio (R$)</label><input type="text" inputmode="decimal" id="dpResPremio" placeholder="0,00"></div>
+              <div class="login-field"><label for="dpResOutros">Outros valores (R$, opcional)</label><input type="text" inputmode="decimal" id="dpResOutros" placeholder="Use – para desconto"></div>
+            </div>
+            <div class="login-field"><label for="dpResOutrosDesc">Descrição dos outros valores</label><input type="text" id="dpResOutrosDesc" maxlength="200" placeholder="Ex.: desconto acordado do pagamento em duplicidade (parcela 1/3)"></div>
+            <div class="login-field"><label for="dpResObs">Observação para a contabilidade</label><textarea id="dpResObs" rows="2" maxlength="600"></textarea></div>
+            <button type="button" class="login-btn" id="dpBtnSalvarRes" data-dp-edicao style="width:auto;padding:9px 16px;" onclick="dpSalvarResultado()">Salvar resultado</button>
+          </div>
+
+          <div class="dp-acoes-modal">
+            <button type="button" class="login-btn" style="width:auto;padding:10px 20px;background:#9CA3AF;" onclick="dpFecharColab()">Fechar</button>
+          </div>
+        </div>
+      </div>
+
       <!-- ================= UNIVERSIDADE FACILITA (painel do aluno + relatório do gestor) ================= -->
       <section class="page" id="page-universidade">
         <div class="breadcrumb">Portal Interno / <b>Universidade</b></div>
@@ -3155,7 +3322,8 @@ Posso te ajudar a encontrar algo no portal ou tirar dúvidas sobre processos, pr
     { key: 'colaboradores.gerenciar', label: 'Editar colaboradores' },
     { key: 'unidades.gerenciar', label: 'Editar lojas' },
     { key: 'enquetes.gerenciar', label: 'Criar enquetes/pesquisas' },
-    { key: 'sugestoes.gerenciar', label: 'Ver e responder sugestões (Fala aí!)' }
+    { key: 'sugestoes.gerenciar', label: 'Ver e responder sugestões (Fala aí!)' },
+    { key: 'dp.gerenciar', label: 'Departamento Pessoal: eventos do mês e relatório de fechamento (vê prêmios)' }
   ];
   // { 'comunicados.gerenciar': { rh_dp: true, financeiro: false, ... }, ... }
   var rolePermissions = {};
@@ -3260,6 +3428,7 @@ Posso te ajudar a encontrar algo no portal ou tirar dúvidas sobre processos, pr
   function applyAdminVisibility(isAdmin) {
     var navAdminBtn = document.getElementById('navAdminBtn');
     if (navAdminBtn) navAdminBtn.style.display = isAdmin ? '' : 'none';
+    if (typeof dpAtualizarAcesso === 'function') dpAtualizarAcesso();
   }
 
   async function loadProfile(userId) {
@@ -3287,7 +3456,7 @@ Posso te ajudar a encontrar algo no portal ou tirar dúvidas sobre processos, pr
       appState.profile = profile;
       updateUserChip(profile, session.user.email);
       applyAdminVisibility(!!(profile && profile.is_admin));
-      if (typeof loadRolePermissions === 'function') { loadRolePermissions(); }
+      if (typeof loadRolePermissions === 'function') { loadRolePermissions().then(function () { if (typeof dpAtualizarAcesso === 'function') dpAtualizarAcesso(); }); }
       loginOverlay.classList.add('hidden');
       if (typeof loadGateComunicados === 'function') { loadGateComunicados(); } else { gateOverlay2.classList.remove('hidden'); }
       if (typeof loadRootFolders === 'function') loadRootFolders();
@@ -5716,6 +5885,7 @@ Posso te ajudar a encontrar algo no portal ou tirar dúvidas sobre processos, pr
     if (page === 'tarefas' && typeof loadTarefas === 'function') { loadTarefas(); }
     if (page === 'chamados' && typeof loadChamados === 'function') { loadChamados(); }
     if (page === 'planos-acao' && typeof loadPlanos === 'function') { loadPlanos(); }
+    if (page === 'dp' && typeof dpAbrirPagina === 'function') { dpAbrirPagina(); }
     if (page === 'sugestoes' && typeof loadSugestoes === 'function') { loadSugestoes(); }
     if (page === 'home' && typeof loadHomeComunicados === 'function') { loadHomeComunicados(); }
     if (page === 'home' && typeof loadHomeNoticias === 'function') { loadHomeNoticias(); }
@@ -11771,6 +11941,7 @@ Posso te ajudar a encontrar algo no portal ou tirar dúvidas sobre processos, pr
   }
 </script>
 <script src="universidade.js"></script>
+<script src="dp.js"></script>
 
 </body>
 </html>
