@@ -216,7 +216,8 @@ async function dpCarregar() {
       supabase.from('dp_lancamentos').select('*').eq('competencia', comp),
       supabase.from('dp_eventos').select('*').eq('competencia', comp).order('data_inicio', { ascending: true }),
       supabase.from('colaboradores').select('id, nome, cargo, status, unidade_id, desligado_em, created_at').order('nome'),
-      supabase.from('unidades').select('id, name').order('name')
+      supabase.from('unidades').select('id, name').order('name'),
+      supabase.from('profiles').select('full_name, email, active')
     ]);
     for (var i = 0; i < r.length; i++) if (r[i].error) throw r[i].error;
 
@@ -232,15 +233,28 @@ async function dpCarregar() {
     Object.keys(DP.lancamentos).forEach(function (id) { comRegistro[id] = true; });
     DP.eventos.forEach(function (e) { comRegistro[e.colaborador_id] = true; });
 
-    // Quem aparece no mês: ativos (exceto caixas compartilhadas), desligados
-    // dentro do mês e qualquer um que já tenha registro na competência.
+    // Acesso ao portal desativado em Administração = saiu da empresa:
+    // não entra na lista do DP (casamento por e-mail ou nome completo).
+    var inativos = {};
+    (r[5].data || []).forEach(function (p) {
+      if (p.active !== false) return;
+      if (p.email) inativos['e:' + p.email.trim().toLowerCase()] = true;
+      if (p.full_name) inativos['n:' + p.full_name.trim().toLowerCase()] = true;
+    });
+    DP.desativadosOcultos = 0;
+
+    // Quem aparece no mês: colaboradores ativos no cadastro E com acesso ativo
+    // no portal (exceto caixas compartilhadas). Desligados e desativados só
+    // aparecem se já tiverem algum registro nesta competência.
     DP.colaboradores = (r[3].data || []).filter(function (c) {
       if (comRegistro[c.id]) return true;
       if (dpEhCaixaCompartilhada(c)) return false;
       if (c.created_at && c.created_at.slice(0, 10) > fim) return false;
-      if (c.status === 'ativo' || !c.status) return true;
-      var desl = c.desligado_em ? c.desligado_em.slice(0, 10) : null;
-      return !!(desl && desl >= comp);
+      if ((c.email && inativos['e:' + c.email.trim().toLowerCase()]) || inativos['n:' + (c.nome || '').trim().toLowerCase()]) {
+        DP.desativadosOcultos++;
+        return false;
+      }
+      return c.status === 'ativo' || !c.status;
     });
 
     dpPreencherFiltroLoja();
@@ -346,6 +360,10 @@ function dpKpi(valor, rotulo, cls) {
 function dpRenderTabela() {
   var body = document.getElementById('dpTabelaBody');
   var lista = dpColabsFiltrados();
+  var nota = document.getElementById('dpNotaOcultos');
+  if (nota) nota.textContent = DP.desativadosOcultos
+    ? DP.desativadosOcultos + ' colaborador(es) com acesso desativado no portal não aparece(m) nesta lista.'
+    : '';
   if (!lista.length) {
     body.innerHTML = '<tr><td colspan="10" class="dp-vazio">Nenhum colaborador para os filtros escolhidos. Confira o cadastro em Lojas.</td></tr>';
     return;
