@@ -205,8 +205,10 @@ function dpTrocarAba(aba) {
 // 2. Carga de dados
 // ---------------------------------------------------------------------
 async function dpCarregar() {
-  if (DP.carregando) return;
+  // Trocou de mês no meio de uma carga: recarrega assim que a atual terminar.
+  if (DP.carregando) { DP.recarregar = true; return; }
   DP.carregando = true;
+  DP.recarregar = false;
   dpMsg('');
   var comp = DP.competencia, fim = dpFimDoMes(comp);
   document.getElementById('dpTabelaBody').innerHTML = '<tr><td colspan="10" class="dp-vazio">Carregando…</td></tr>';
@@ -217,7 +219,7 @@ async function dpCarregar() {
       supabase.from('dp_eventos').select('*').eq('competencia', comp).order('data_inicio', { ascending: true }),
       supabase.from('colaboradores').select('id, nome, cargo, status, unidade_id, desligado_em, created_at').order('nome'),
       supabase.from('unidades').select('id, name').order('name'),
-      supabase.from('profiles').select('full_name, email, active')
+      supabase.from('profiles').select('full_name, email, active, desativado_em')
     ]);
     for (var i = 0; i < r.length; i++) if (r[i].error) throw r[i].error;
 
@@ -233,28 +235,32 @@ async function dpCarregar() {
     Object.keys(DP.lancamentos).forEach(function (id) { comRegistro[id] = true; });
     DP.eventos.forEach(function (e) { comRegistro[e.colaborador_id] = true; });
 
-    // Acesso ao portal desativado em Administração = saiu da empresa:
-    // não entra na lista do DP (casamento por e-mail ou nome completo).
+    // Acesso ao portal desativado em Administração = saiu da empresa
+    // (casamento por e-mail ou nome completo). Guarda a data da desativação.
     var inativos = {};
     (r[5].data || []).forEach(function (p) {
       if (p.active !== false) return;
-      if (p.email) inativos['e:' + p.email.trim().toLowerCase()] = true;
-      if (p.full_name) inativos['n:' + p.full_name.trim().toLowerCase()] = true;
+      var info = { data: p.desativado_em ? p.desativado_em.slice(0, 10) : null };
+      if (p.email) inativos['e:' + p.email.trim().toLowerCase()] = info;
+      if (p.full_name) inativos['n:' + p.full_name.trim().toLowerCase()] = info;
     });
-    DP.desativadosOcultos = 0;
+    DP.semDataSaida = [];
 
-    // Quem aparece no mês: colaboradores ativos no cadastro E com acesso ativo
-    // no portal (exceto caixas compartilhadas). Desligados e desativados só
-    // aparecem se já tiverem algum registro nesta competência.
+    // Regra: ativo aparece sempre; quem saiu (Lojas > Encerrar vínculo ou
+    // acesso desativado) aparece ATÉ O FIM DO MÊS DA SAÍDA e depois some.
+    // Saída sem data conhecida: some (e é avisado abaixo da tabela).
+    // Quem já tem registro na competência aparece sempre.
     DP.colaboradores = (r[3].data || []).filter(function (c) {
+      c._saida = null;
+      var inat = (c.email && inativos['e:' + c.email.trim().toLowerCase()]) || inativos['n:' + (c.nome || '').trim().toLowerCase()];
+      var saiu = c.status === 'desligado' || !!inat;
+      if (saiu) c._saida = (c.desligado_em ? c.desligado_em.slice(0, 10) : null) || (inat && inat.data) || null;
       if (comRegistro[c.id]) return true;
       if (dpEhCaixaCompartilhada(c)) return false;
       if (c.created_at && c.created_at.slice(0, 10) > fim) return false;
-      if ((c.email && inativos['e:' + c.email.trim().toLowerCase()]) || inativos['n:' + (c.nome || '').trim().toLowerCase()]) {
-        DP.desativadosOcultos++;
-        return false;
-      }
-      return c.status === 'ativo' || !c.status;
+      if (!saiu) return true;
+      if (!c._saida) { DP.semDataSaida.push(c.nome); return false; }
+      return c._saida >= comp;
     });
 
     dpPreencherFiltroLoja();
@@ -265,6 +271,7 @@ async function dpCarregar() {
     document.getElementById('dpTabelaBody').innerHTML = '<tr><td colspan="10" class="dp-vazio">' + dpEsc(dpErro(e)) + '</td></tr>';
   } finally {
     DP.carregando = false;
+    if (DP.recarregar) dpCarregar();
   }
 }
 
@@ -361,8 +368,8 @@ function dpRenderTabela() {
   var body = document.getElementById('dpTabelaBody');
   var lista = dpColabsFiltrados();
   var nota = document.getElementById('dpNotaOcultos');
-  if (nota) nota.textContent = DP.desativadosOcultos
-    ? DP.desativadosOcultos + ' colaborador(es) com acesso desativado no portal não aparece(m) nesta lista.'
+  if (nota) nota.textContent = DP.semDataSaida.length
+    ? 'Fora da lista por estarem desligados sem data de saída registrada: ' + DP.semDataSaida.join(', ') + '. Para aparecerem no mês da saída, registre a data em Lojas.'
     : '';
   if (!lista.length) {
     body.innerHTML = '<tr><td colspan="10" class="dp-vazio">Nenhum colaborador para os filtros escolhidos. Confira o cadastro em Lojas.</td></tr>';
@@ -378,7 +385,7 @@ function dpRenderTabela() {
     var pct = s.pct === null ? '—' : dpNumBR(s.pct, 0) + '%';
     var pctCls = s.pct === null ? '' : (s.pct >= 100 ? 'dp-ok' : (s.pct >= 80 ? 'dp-medio' : 'dp-baixo'));
     return '<tr class="dp-linha" title="' + (dpPodeEditar() ? 'Clique para lançar' : 'Clique para ver') + '" onclick="dpAbrirColab(\'' + c.id + '\')">' +
-      '<td><b>' + dpEsc(c.nome) + '</b><small>' + dpEsc(DP.unidades[c.unidade_id] || 'Sem loja') + (c.status && c.status !== 'ativo' ? ' · desligado' : '') + '</small></td>' +
+      '<td><b>' + dpEsc(c.nome) + '</b><small>' + dpEsc(DP.unidades[c.unidade_id] || 'Sem loja') + (c._saida ? ' · <span class="dp-alerta">desligado em ' + formatDateBR(c._saida) + '</span>' : (c.status && c.status !== 'ativo' ? ' · desligado' : '')) + '</small></td>' +
       '<td class="dp-num">' + (s.faltasInj ? '<span class="dp-alerta">' + dpQtd(s.faltasInj) + '</span>' : '—') + '</td>' +
       '<td class="dp-num">' + (s.faltasJust ? dpQtd(s.faltasJust) : '—') + '</td>' +
       '<td class="dp-num">' + (s.atrasoMin ? s.atrasoMin + ' min' : '—') + '</td>' +
@@ -713,7 +720,7 @@ function dpHtmlRelatorio(d, paraImpressao) {
   h += '<table class="dpr-tab"><thead><tr><th>Colaborador</th><th>Loja</th><th>Faltas inj.</th><th>Faltas just.</th><th>Atrasos</th><th>Atest./Lic.</th><th>Férias</th><th>Meta</th><th>Realizado</th><th>%</th><th>Prêmio</th><th>Outros</th></tr></thead><tbody>';
   d.linhas.forEach(function (x) {
     var s = x.s;
-    h += '<tr><td>' + dpEsc(x.c.nome) + '</td><td>' + dpEsc(DP.unidades[x.c.unidade_id] || '—') + '</td>' +
+    h += '<tr><td>' + dpEsc(x.c.nome) + (x.c._saida ? '<br><i>desligado em ' + formatDateBR(x.c._saida) + '</i>' : '') + '</td><td>' + dpEsc(DP.unidades[x.c.unidade_id] || '—') + '</td>' +
          '<td class="n">' + (s.faltasInj ? dpQtd(s.faltasInj) : '—') + '</td><td class="n">' + (s.faltasJust ? dpQtd(s.faltasJust) : '—') + '</td>' +
          '<td class="n">' + (s.atrasoMin ? s.atrasoMin + ' min' : '—') + '</td><td class="n">' + (s.ausencias ? dpQtd(s.ausencias) : '—') + '</td>' +
          '<td class="n">' + (s.ferias ? dpQtd(s.ferias) : '—') + '</td><td class="n">' + dpMoeda(s.meta) + '</td><td class="n">' + dpMoeda(s.realizado) + '</td>' +
