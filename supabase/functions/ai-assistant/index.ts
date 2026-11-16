@@ -62,6 +62,34 @@ function formatDateBR(iso: string): string {
   }
 }
 
+// Data de hoje no fuso de São Luís/Brasília, no formato AAAA-MM-DD (para comparar validade das prioridades).
+function hojeISO_SP(): string {
+  return new Date().toLocaleDateString("en-CA", { timeZone: "America/Sao_Paulo" });
+}
+
+// Texto com data e hora atuais para a Lia saber "que dia é hoje".
+function dataHoraAtualSP(): string {
+  const agora = new Date();
+  const data = agora.toLocaleDateString("pt-BR", {
+    timeZone: "America/Sao_Paulo",
+    weekday: "long",
+    day: "2-digit",
+    month: "long",
+    year: "numeric",
+  });
+  const curta = agora.toLocaleDateString("pt-BR", { timeZone: "America/Sao_Paulo" });
+  const hora = agora.toLocaleTimeString("pt-BR", { timeZone: "America/Sao_Paulo", hour: "2-digit", minute: "2-digit" });
+  return `DATA E HORA ATUAIS (horário de Brasília): hoje é ${data} (${curta}), ${hora}. Use sempre esta data quando perguntarem que dia é hoje, para calcular prazos ("faltam X dias") e para saber se algo está vigente. Nunca use outra data.`;
+}
+
+// Registra falhas da Lia na tabela de saúde do portal (lida pela checagem diária). Nunca derruba a resposta.
+async function registrarFalha(detalhe: string) {
+  try {
+    const admin = adminClient();
+    if (admin) await admin.from("saude_eventos").insert({ componente: "lia", ok: false, detalhe: detalhe.slice(0, 500) });
+  } catch (_e) { /* ignora */ }
+}
+
 function adminClient() {
   const supabaseUrl = Deno.env.get("SUPABASE_URL");
   const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
@@ -214,7 +242,7 @@ async function buildPrioridadesSection(): Promise<string> {
   const supabase = adminClient();
   if (!supabase) return "PRIORIDADES COMERCIAIS VIGENTES: (indisponível no momento)";
   try {
-    const hoje = new Date().toISOString().slice(0, 10);
+    const hoje = hojeISO_SP();
     const { data, error } = await supabase
       .from("prioridades_comerciais")
       .select("publico, produto, ordem, banco, tabela, prazo, regras, valido_ate, updated_at")
@@ -256,12 +284,13 @@ Deno.serve(async (req: Request) => {
   try {
     const apiKey = Deno.env.get("OPENAI_API_KEY");
     if (!apiKey) {
+      await registrarFalha("OPENAI_API_KEY ausente");
       return new Response(
         JSON.stringify({
           error:
             "A Lia ainda não foi configurada. Peça ao administrador para adicionar a chave da OpenAI (OPENAI_API_KEY) nos secrets do Supabase.",
         }),
-        { status: 200, headers: { ...cors, "Content-Type": "application/json" } },
+        { status: 500, headers: { ...cors, "Content-Type": "application/json" } },
       );
     }
 
@@ -282,7 +311,7 @@ Deno.serve(async (req: Request) => {
       buildPrioridadesSection(),
       buildMapaPortal(authHeader, ultimas),
     ]);
-    const systemPrompt = SYSTEM_PROMPT_BASE + "\n\n" + mapaInfo.mapa + "\n\n" + (mapaInfo.trechos ? mapaInfo.trechos + "\n\n" : "") + prioridades + "\n\n" + knowledge;
+    const systemPrompt = dataHoraAtualSP() + "\n\n" + SYSTEM_PROMPT_BASE + "\n\n" + mapaInfo.mapa + "\n\n" + (mapaInfo.trechos ? mapaInfo.trechos + "\n\n" : "") + prioridades + "\n\n" + knowledge;
 
     const openaiResp = await fetch("https://api.openai.com/v1/chat/completions", {
       method: "POST",
@@ -302,8 +331,9 @@ Deno.serve(async (req: Request) => {
 
     if (!openaiResp.ok) {
       const msg = (data && data.error && data.error.message) || "Erro ao consultar a Lia.";
+      await registrarFalha("OpenAI " + openaiResp.status + ": " + msg);
       return new Response(JSON.stringify({ error: msg }), {
-        status: 200,
+        status: 502,
         headers: { ...cors, "Content-Type": "application/json" },
       });
     }
@@ -314,9 +344,10 @@ Deno.serve(async (req: Request) => {
     return new Response(JSON.stringify({ reply: text.trim() || "Não consegui gerar uma resposta agora." }), {
       headers: { ...cors, "Content-Type": "application/json" },
     });
-  } catch (_err) {
+  } catch (err) {
+    await registrarFalha("Erro inesperado: " + String((err as Error)?.message || err));
     return new Response(JSON.stringify({ error: "Erro inesperado ao consultar a Lia." }), {
-      status: 200,
+      status: 500,
       headers: { ...cors, "Content-Type": "application/json" },
     });
   }

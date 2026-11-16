@@ -2,13 +2,14 @@ import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import { createClient } from "jsr:@supabase/supabase-js@2";
 import { encodeBase64 } from "jsr:@std/encoding@1/base64";
 import JSZip from "npm:jszip@3.10.1";
+import { extractText, getDocumentProxy } from "npm:unpdf@0.12.1";
 
 // Lia: lê o conteúdo dos documentos do portal e guarda em ai_documentos_texto.
 // Quem pode chamar: administrador (qualquer documento, ou os pendentes em lote)
 // ou quem acabou de enviar o arquivo (só o próprio documento).
 
 const BUCKET = "documentos";
-const MAX_TEXTO = 40000;
+const MAX_TEXTO = 150000; // ~60 páginas de texto corrido
 const IMAGENS = ["png", "jpg", "jpeg", "jfif", "webp", "gif"];
 const OFFICE = ["docx", "pptx", "xlsx"];
 const LIDOS = ["pdf", ...IMAGENS, ...OFFICE];
@@ -74,8 +75,58 @@ async function textoOffice(bytes: Uint8Array, ext: string): Promise<string> {
     }
     return partes.join("\n\n");
   }
-  const xml = await zip.file("xl/sharedStrings.xml")?.async("string") || "";
-  return pegar(xml, "t").map(decode).join(" | ");
+  // Excel: planilha por planilha, linha por linha ("A | B | C"), para a Lia entender tabelas (ex.: regras de idade).
+  const ssXml = await zip.file("xl/sharedStrings.xml")?.async("string") || "";
+  const compartilhados = (ssXml.match(/<si>[\s\S]*?<\/si>/g) || []).map((si) => decode(pegar(si, "t").join("")));
+  const wb = await zip.file("xl/workbook.xml")?.async("string") || "";
+  const nomesAbas = Array.from(wb.matchAll(/<sheet [^>]*name="([^"]*)"/g)).map((m) => decode(m[1]));
+  const abas = Object.keys(zip.files).filter((n) => /^xl\/worksheets\/sheet\d+\.xml$/.test(n))
+    .sort((a, b) => parseInt(a.replace(/\D/g, "")) - parseInt(b.replace(/\D/g, "")));
+  const partes: string[] = [];
+  for (const [i, n] of abas.entries()) {
+    const xml = await zip.file(n)!.async("string");
+    const linhas: string[] = [];
+    for (const row of xml.match(/<row[\s\S]*?<\/row>/g) || []) {
+      const celulas: string[] = [];
+      for (const c of row.match(/<c [^>]*?(?:\/>|>[\s\S]*?<\/c>)/g) || []) {
+        const tipo = (c.match(/ t="([^"]+)"/) || [])[1];
+        const v = (c.match(/<v>([\s\S]*?)<\/v>/) || [])[1];
+        let val = "";
+        if (tipo === "s" && v != null) val = compartilhados[parseInt(v)] || "";
+        else if (tipo === "inlineStr") val = decode(pegar(c, "t").join(""));
+        else if (v != null) val = decode(v);
+        celulas.push(val.trim());
+      }
+      while (celulas.length && !celulas[celulas.length - 1]) celulas.pop();
+      if (celulas.some(Boolean)) linhas.push(celulas.join(" | "));
+    }
+    if (linhas.length) partes.push(`[Planilha: ${nomesAbas[i] || "Planilha " + (i + 1)}]\n` + linhas.join("\n"));
+  }
+  if (partes.length) return partes.join("\n\n");
+  return compartilhados.join(" | ");
+}
+
+// PDF com texto: extrai direto (rápido, completo, sem custo). Devolve "" se o PDF for escaneado (só imagem).
+async function textoPdf(bytes: Uint8Array): Promise<{ texto: string; paginas: number }> {
+  try {
+    const pdf = await getDocumentProxy(new Uint8Array(bytes));
+    const { totalPages, text } = await extractText(pdf, { mergePages: false });
+    const paginas = (text as string[]).map((t, i) => `[Página ${i + 1}]\n` + String(t || "").replace(/[ \t]+/g, " ").trim());
+    const letras = (text as string[]).join("").replace(/\s/g, "").length;
+    // Menos de ~80 letras por página = escaneado: deixa para a leitura por imagem (OCR).
+    if (letras < 80 * Math.max(totalPages, 1)) return { texto: "", paginas: totalPages };
+    return { texto: paginas.join("\n\n"), paginas: totalPages };
+  } catch (_e) {
+    return { texto: "", paginas: 0 };
+  }
+}
+
+async function resumir(nome: string, texto: string): Promise<string> {
+  const r = await openai({
+    model: "gpt-4o-mini", temperature: 0, max_tokens: 200,
+    messages: [{ role: "user", content: "Em 1 a 3 frases, diga do que trata este documento interno da Facilita e para que serve (cite convênios, bancos e produtos que ele cobre). Nome: " + nome + "\n\n" + texto.slice(0, 12000) }],
+  });
+  return r.slice(0, 600);
 }
 
 async function lerDocumento(admin: any, doc: any) {
@@ -86,14 +137,20 @@ async function lerDocumento(admin: any, doc: any) {
   if (IMAGENS.includes(ext)) {
     const signed = await admin.storage.from(BUCKET).createSignedUrl(doc.storage_path, 600);
     if (signed.error) throw new Error(signed.error.message);
-    const raw = await openai({
-      model: "gpt-4o-mini", temperature: 0, max_tokens: 3000, response_format: { type: "json_object" },
-      messages: [{ role: "user", content: [
-        { type: "text", text: PEDIDO_LEITURA + "\nNome do arquivo: " + nome },
-        { type: "image_url", image_url: { url: signed.data.signedUrl, detail: "high" } },
-      ] }],
-    });
-    return { status: "ok", ...parseLeitura(raw) };
+    try {
+      const raw = await openai({
+        model: "gpt-4o-mini", temperature: 0, max_tokens: 3000, response_format: { type: "json_object" },
+        messages: [{ role: "user", content: [
+          { type: "text", text: PEDIDO_LEITURA + "\nNome do arquivo: " + nome },
+          { type: "image_url", image_url: { url: signed.data.signedUrl, detail: "high" } },
+        ] }],
+      });
+      return { status: "ok", ...parseLeitura(raw) };
+    } catch (e) {
+      // Imagem acima de 20 MB: a OpenAI não aceita. Não é falha do portal, só fica sem leitura.
+      if (/20 ?MB/i.test(String((e as Error).message))) return { status: "ignorado", erro: "Imagem grande demais (acima de 20 MB)" };
+      throw e;
+    }
   }
 
   const dl = await admin.storage.from(BUCKET).download(doc.storage_path);
@@ -101,7 +158,13 @@ async function lerDocumento(admin: any, doc: any) {
   const bytes = new Uint8Array(await dl.data.arrayBuffer());
 
   if (ext === "pdf") {
-    if (bytes.length > MAX_PDF_BYTES) return { status: "ignorado", erro: "PDF grande demais para leitura automática" };
+    const extraido = await textoPdf(bytes);
+    if (extraido.texto) {
+      const texto = extraido.texto.slice(0, MAX_TEXTO);
+      return { status: "ok", resumo: await resumir(nome, texto), texto };
+    }
+    // Escaneado: a OpenAI lê as páginas como imagem (OCR).
+    if (bytes.length > MAX_PDF_BYTES) return { status: "ignorado", erro: "PDF escaneado grande demais para leitura automática" };
     const raw = await openai({
       model: "gpt-4o-mini", temperature: 0, max_tokens: 16000, response_format: { type: "json_object" },
       messages: [{ role: "user", content: [
@@ -115,31 +178,39 @@ async function lerDocumento(admin: any, doc: any) {
   if (bytes.length > MAX_OFFICE_BYTES) return { status: "ignorado", erro: "Arquivo grande demais para leitura automática" };
   const texto = (await textoOffice(bytes, ext)).slice(0, MAX_TEXTO);
   if (!texto.trim()) return { status: "ok", resumo: "", texto: "" };
-  const resumo = await openai({
-    model: "gpt-4o-mini", temperature: 0, max_tokens: 200,
-    messages: [{ role: "user", content: "Em 1 a 3 frases, diga do que trata este documento interno da Facilita e para que serve. Nome: " + nome + "\n\n" + texto.slice(0, 12000) }],
-  });
-  return { status: "ok", resumo: resumo.slice(0, 600), texto };
+  return { status: "ok", resumo: await resumir(nome, texto), texto };
 }
 
 Deno.serve(async (req: Request) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: cors });
   try {
     const url = Deno.env.get("SUPABASE_URL")!;
-    const authHeader = req.headers.get("Authorization") || "";
-    const userClient = createClient(url, Deno.env.get("SUPABASE_ANON_KEY")!, { global: { headers: { Authorization: authHeader } } });
-    const { data: u } = await userClient.auth.getUser();
-    if (!u || !u.user) return json({ error: "Login necessário." }, 401);
     const admin = createClient(url, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!);
-    const { data: perfil } = await admin.from("profiles").select("is_admin").eq("id", u.user.id).maybeSingle();
-    const isAdmin = !!(perfil && perfil.is_admin);
+    // Rotina automática do banco (a cada 2 min): lê os pendentes em lote, com uma senha guardada no Vault.
+    const cronHeader = req.headers.get("x-lia-cron") || "";
+    let viaRotina = false;
+    if (cronHeader) {
+      const { data: ok } = await admin.rpc("lia_cron_ok", { p_secret: cronHeader });
+      viaRotina = ok === true;
+    }
+    let isAdmin = viaRotina;
+    let userId = "";
+    if (!viaRotina) {
+      const authHeader = req.headers.get("Authorization") || "";
+      const userClient = createClient(url, Deno.env.get("SUPABASE_ANON_KEY")!, { global: { headers: { Authorization: authHeader } } });
+      const { data: u } = await userClient.auth.getUser();
+      if (!u || !u.user) return json({ error: "Login necessário." }, 401);
+      userId = u.user.id;
+      const { data: perfil } = await admin.from("profiles").select("is_admin").eq("id", userId).maybeSingle();
+      isAdmin = !!(perfil && perfil.is_admin);
+    }
 
     const body = await req.json().catch(() => ({}));
     let docs: any[] = [];
     if (body.document_id) {
       const { data } = await admin.from("documents").select("id, name, codigo, file_type, storage_path, uploaded_by").eq("id", body.document_id).maybeSingle();
       if (!data) return json({ error: "Documento não encontrado." }, 404);
-      if (!isAdmin && data.uploaded_by !== u.user.id) return json({ error: "Sem permissão." }, 403);
+      if (!isAdmin && data.uploaded_by !== userId) return json({ error: "Sem permissão." }, 403);
       docs = [data];
     } else {
       // Lote de pendentes: só administrador.
@@ -165,6 +236,9 @@ Deno.serve(async (req: Request) => {
         erro: r.erro || null, atualizado_em: new Date().toISOString(),
       });
       resultados.push({ id: doc.id, nome: doc.name, status: r.status, erro: r.erro || null });
+      if (r.status === "erro") {
+        await admin.from("saude_eventos").insert({ componente: "lia-leitura", ok: false, detalhe: (doc.name + ": " + (r.erro || "")).slice(0, 500) });
+      }
     }
     return json({ processados: resultados, restantes: body._restantes ?? 0 });
   } catch (e) {
